@@ -1,3 +1,27 @@
+# Virtual Environments:
+venv/
+.venv/
+backend_venv/
+interface_venv
+
+# Python
+__pycache__/
+*.py[cod]
+
+# Environmental Variables
+.env
+
+# IDE
+.vscode/
+.idea/
+
+# System Files
+.DS_Store
+Thumbs.db
+
+----------------------------------------------------------------------------------------------
+Old Version
+
 # Ignore Python caches.
 **/__pycache__
 **/*cache

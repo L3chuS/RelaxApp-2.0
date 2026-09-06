@@ -1,4 +1,4 @@
-import Interface.relaxapp as app
+import relaxapp as app
 
 if __name__ == "__main__":
     root = app.ctk.CTk()
