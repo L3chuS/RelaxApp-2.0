@@ -1,4 +1,4 @@
-#import tkinter as tk
+import tkinter as tk
 import customtkinter as ctk
 # import Database.database as db
 # from Database.presets_values import user, databases, tables
@@ -12,9 +12,12 @@ import datetime
 import os
 # from utils import get_resource_path
 import webbrowser
+import requests
 
 # # Connect to the database.
 # database = db.Database(**db.root_access)
+
+API_URL = "http://127.0.0.1:8000/relaxapp/login/"
 
 # Get the windows resolution regardless of rescaling
 user32 = ctypes.windll.user32
@@ -422,46 +425,59 @@ class RelaxApp_Initial_Frame():
                                           hover_color=colors["dark_green"])
         self.button_start.place(rely=0.72, relx=0.5, anchor="center")
 
-        # "Register User" button.
-        self.button_new_user = ctk.CTkButton(self.frame, width=10, height=10, text="Registrar Usuario", font=(font,12), 
-                                             command=self.sign_up, corner_radius=10, hover=True, fg_color=colors["soft_grey"], 
-                                             hover_color=colors["dark_green"])
-        self.button_new_user.place(rely=0.9, relx=0.04)
+        # # "Register User" button.
+        # self.button_new_user = ctk.CTkButton(self.frame, width=10, height=10, text="Registrar Usuario", font=(font,12), 
+        #                                      command=self.sign_up, corner_radius=10, hover=True, fg_color=colors["soft_grey"], 
+        #                                      hover_color=colors["dark_green"])
+        # self.button_new_user.place(rely=0.9, relx=0.04)
 
-        # "Forget password" button.
-        self.button_forget_pw = ctk.CTkButton(self.frame, width=10, height=10, text="Olvidé contraseña", font=(font,12), 
-                                              command=self.change_password, corner_radius=10, hover=True, fg_color=colors["soft_grey"], 
-                                              hover_color=colors["dark_green"])
-        self.button_forget_pw.place(rely=0.9, relx=0.6)
+        # # "Forget password" button.
+        # self.button_forget_pw = ctk.CTkButton(self.frame, width=10, height=10, text="Olvidé contraseña", font=(font,12), 
+        #                                       command=self.change_password, corner_radius=10, hover=True, fg_color=colors["soft_grey"], 
+        #                                       hover_color=colors["dark_green"])
+        # self.button_forget_pw.place(rely=0.9, relx=0.6)
 
     # Method to log in.
     def sign_in(self):
         get_login = self.entry_user.get()
         get_password = self.entry_password.get()
-        user["login"] = get_login
-        user["password"] = get_password
-        database.verify_login(databases["database1"], tables["users_table"], user)
         
-        if database.valid_login:
-            waiting_logging = ctk.CTkLabel(self.frame, text="Iniciando Sesión...", font=(font,12))
-            waiting_logging.place(rely=0.81, relx=0.5, anchor="center")
-            self.frame.update_idletasks()
-            database.user_configuration(databases["database1"], tables["settings_table"], user["login"], 
-                                        "Restore")
-            RelaxApp_Structure.close_create(self, RelaxApp_User_Main_Menu, self.root, self.frame)
+        data = {
+            "username" : get_login,
+            "password" : get_password
+        }
+        
+        response = requests.post(
+            API_URL,
+           json=data
+        )
+        
+        print(response.json())
+        # user["login"] = get_login
+        # user["password"] = get_password
+        # database.verify_login(databases["database1"], tables["users_table"], user)
+        
+        # if database.valid_login:
+        #     waiting_logging = ctk.CTkLabel(self.frame, text="Iniciando Sesión...", font=(font,12))
+        #     waiting_logging.place(rely=0.81, relx=0.5, anchor="center")
+        #     self.frame.update_idletasks()
+        #     database.user_configuration(databases["database1"], tables["settings_table"], user["login"], 
+        #                                 "Restore")
+            
+        #     RelaxApp_Structure.close_create(self, RelaxApp_User_Main_Menu, self.root, self.frame)
 
-        else:
-            self.error_login = ctk.CTkLabel(self.frame, text="Usuario o contraseña incorrecta. Vuelva a intentarlo.", 
-                                            font=(font,11))
-            self.error_login.place(rely=0.81, relx=0.5, anchor="center")
+        # else:
+        #     self.error_login = ctk.CTkLabel(self.frame, text="Usuario o contraseña incorrecta. Vuelva a intentarlo.", 
+        #                                     font=(font,11))
+        #     self.error_login.place(rely=0.81, relx=0.5, anchor="center")
    
-    # Method that register users.
-    def sign_up(self):
-        RelaxApp_Structure.close_create(self, RelaxApp_User_Registration, self.root, self.frame)
+    # # Method that register users.
+    # def sign_up(self):
+    #     RelaxApp_Structure.close_create(self, RelaxApp_User_Registration, self.root, self.frame)
 
-    # Method to change password.
-    def change_password(self):
-        RelaxApp_Structure.close_create(self, RelaxApp_User_Change_Password, self.root, self.frame)
+    # # Method to change password.
+    # def change_password(self):
+    #     RelaxApp_Structure.close_create(self, RelaxApp_User_Change_Password, self.root, self.frame)
    
 
 ###############################################################
