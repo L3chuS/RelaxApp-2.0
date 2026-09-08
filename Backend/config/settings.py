@@ -29,10 +29,10 @@ SECRET_KEY = 'django-insecure-$k&lo^6=hbqm8rot56t1z@p6bul68=j##yshvql++qnn*s9p&l
 DEBUG = True
 
 ALLOWED_HOSTS = [
-     'localhost',
-     '127.0.0.1',
-     #'django-backend-production-7428.up.railway.app',
-     ]
+    'localhost',
+    '127.0.0.1',
+    'relaxapp-20-production.up.railway.app',
+    ]
 
 
 # Application definition

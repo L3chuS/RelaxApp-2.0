@@ -1,7 +1,5 @@
 import tkinter as tk
 import customtkinter as ctk
-# import Database.database as db
-# from Database.presets_values import user, databases, tables
 import ctypes
 import time
 import threading
@@ -12,12 +10,8 @@ import datetime
 import os
 # from utils import get_resource_path
 import webbrowser
-import requests
+import comms
 
-# # Connect to the database.
-# database = db.Database(**db.root_access)
-
-API_URL = "http://127.0.0.1:8000/relaxapp/login/"
 
 # Get the windows resolution regardless of rescaling
 user32 = ctypes.windll.user32
@@ -447,12 +441,19 @@ class RelaxApp_Initial_Frame():
             "password" : get_password
         }
         
-        response = requests.post(
-            API_URL,
-           json=data
-        )
+        response_dict = comms.login(data)
+ 
+        if response_dict["connection_status"]:
+            response = response_dict["response"]
+            values = response.json()
+            if response.status_code == 200:
+                print(values["message"])
+            else:
+                print(values["error"])
         
-        print(response.json())
+        else:
+            print(response_dict["message"])
+        
         # user["login"] = get_login
         # user["password"] = get_password
         # database.verify_login(databases["database1"], tables["users_table"], user)
