@@ -444,6 +444,7 @@ class RelaxApp_Initial_Frame():
         response_dict = comms.login(data)
  
         if response_dict["connection_status"]:
+            
             response = response_dict["response"]
             values = response.json()
             if response.status_code == 200:
