@@ -256,6 +256,8 @@ class RelaxApp_Structure:
 class Set_Messages():
     
     def server_messages(type):
+        
+        # Messages related to the server connection.
         if type == "ERROR_SERVER_CONNECTION":
             return messages.ERROR_SERVER_CONNECTION
         elif type == "ERROR_SERVER_TIMEOUT":
@@ -495,11 +497,17 @@ class RelaxApp_Initial_Frame():
                 print(values["message"])
                 print(message)
             else:
-                message = Set_Messages.response_messages(values["error_type"])
-                print(values["error"])
-                print(message)
+                if values["error_type"] == "VIEWS":
+                    message = Set_Messages.response_messages(values["error_link"])
+                    print(values["error"])
+                    print(message)
+                elif values["error_type"] == "SERIALIZER":
+                    message = Set_Messages.serializer_messages(values["error_link"])
+                    print(values["error"])
+                    print(message)
+
         else:
-            message = Set_Messages.server_messages(response_dict["error_type"])
+            message = Set_Messages.server_messages(response_dict["error_link"])
             print(response_dict["error"])
             print(message)
 
@@ -639,17 +647,18 @@ class RelaxApp_User_Registration():
                 print(values["message"])
                 print(message)
             else:
-                if values["error_type"] == "ERROR_SERIALIZER_GENERAL":
+                if values["error_type"] == "VIEWS":
+                    message = Set_Messages.response_messages(values["error_link"])
                     print(values["error"])
+                    print(message)
+    
+                elif values["error_type"] == "SERIALIZER":
                     keys = next(iter(values["error"]))
-                    message = Set_Messages.serializer_messages(keys)                   
-                    print(message)                                              
-                else:
-                    message = Set_Messages.response_messages(values["error_type"])
+                    message = Set_Messages.serializer_messages(keys)
                     print(values["error"])
                     print(message)
         else:
-            message = Set_Messages.server_messages(response_dict["error_type"])
+            message = Set_Messages.server_messages(response_dict["error_link"])
             print(response_dict["error"])
             print(message)
                  

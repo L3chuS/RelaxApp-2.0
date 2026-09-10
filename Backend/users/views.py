@@ -19,14 +19,16 @@ def user_login(request):
         if user is None:
             return Response(
                 {"error" : "User does not exists.",
-                 "error_type" : "ERROR_LOGIN_USERNAME_NOT_EXISTS"},
+                 "error_type" : "VIEWS",
+                 "error_link" : "ERROR_LOGIN_USERNAME_NOT_EXISTS"},
                 status=401
             )
             
         if not user.check_password(password):
             return Response(
                 {"error" : "Invalid Password.",
-                 "error_type" : "ERROR_LOGIN_INVALID_PASSWORD"},
+                 "error_type" : "VIEWS",
+                 "error_link" : "ERROR_LOGIN_INVALID_PASSWORD"},
                 status=401
             )
         
@@ -42,7 +44,8 @@ def user_login(request):
         #serializer_error_message = next(iter(login_serializer.errors.values()))[0]
         return Response(
             {"error" : login_serializer.errors,
-             "error_type" : "ERROR_SERIALIZER_GENERAL"}, 
+             "error_type" : "SERIALIZER",
+             "error_link" : "ERROR_SERIALIZER_GENERAL"}, 
             status=400
             )
 
@@ -64,14 +67,16 @@ def user_registration(request):
         if username_exist:
             return Response(
                 {"error" : "Username already exists.",
-                 "error_type" : "ERROR_REGISTER_USERNAME_EXISTS"},
+                 "error_type" : "VIEWS",
+                 "error_link" : "ERROR_REGISTER_USERNAME_EXISTS"},
                 status=400
             )
             
         elif email_exist:
             return Response(
                 {"error" : "Email already exists.",
-                 "error_type" : "ERROR_REGISTER_EMAIL_EXISTS"},
+                 "error_type" : "VIEWS",
+                 "error_link" : "ERROR_REGISTER_EMAIL_EXISTS"},
                 status=400
             )
         
@@ -98,6 +103,7 @@ def user_registration(request):
         #serializer_error_message = next(iter(register_serializer.errors.values()))[0]
         return Response({
             "error" : register_serializer.errors,
-            "error_type" : "ERROR_SERIALIZER_GENERAL"}, 
+            "error_type" : "SERIALIZER",
+            "error_link" : "ERROR_SERIALIZER_GENERAL"}, 
             status=400
         )
