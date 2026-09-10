@@ -11,6 +11,7 @@ import os
 # from utils import get_resource_path
 import webbrowser
 import comms
+import messages
 
 
 # Get the windows resolution regardless of rescaling
@@ -248,6 +249,48 @@ class RelaxApp_Structure:
 #         self.title = self.window_PFS.title("RelaxApp")
 #         self.window_PFS.after(200, lambda: self.window_PFS.iconbitmap(os.path.join(image_path, "logo.ico")))
 
+#############################################################
+### Class that contains general functions to set messages ###
+#############################################################
+
+class Set_Messages():
+    
+    def server_messages(type):
+        if type == "ERROR_SERVER_CONNECTION":
+            return messages.ERROR_SERVER_CONNECTION
+        elif type == "ERROR_SERVER_TIMEOUT":
+            return messages.ERROR_SERVER_TIMEOUT
+        else:
+            return messages.ERROR_SERVER_GENERAL
+        
+    def serializer_messages(key):
+        if key == "first_name":
+            return messages.ERROR_SERIALIZER_INVALID_FIRST_NAME
+        elif key == "last_name":
+            return messages.ERROR_SERIALIZER_INVALID_LAST_NAME
+        elif key == "username":
+            return messages.ERROR_SERIALIZER_INVALID_USERNAME
+        elif key == "email":
+            return messages.ERROR_SERIALIZER_INVALID_EMAIL
+        elif key == "password":
+            return messages.ERROR_SERIALIZER_INVALID_PASSWORD  
+        else:
+            return messages.ERROR_SERIALIZER_GENERAL
+    
+    def response_messages(type):
+        if type == "MESSAGE_LOGIN_CORRECT":
+            return messages.MESSAGE_LOGIN_CORRECT
+        elif type == "ERROR_LOGIN_USERNAME_NOT_EXISTS":
+            return messages.ERROR_LOGIN_USERNAME_NOT_EXISTS
+        elif type == "ERROR_LOGIN_INVALID_PASSWORD":
+            return messages.ERROR_LOGIN_INVALID_PASSWORD
+        elif type == "MESSAGE_REGISTER_USER_CREATED":
+            return messages.MESSAGE_REGISTER_USER_CREATED
+        elif type == "ERROR_REGISTER_USERNAME_EXISTS":
+            return messages.ERROR_REGISTER_USERNAME_EXISTS
+        elif type == "ERROR_REGISTER_EMAIL_EXISTS":
+            return messages.ERROR_REGISTER_EMAIL_EXISTS
+        
 
 #############################################################
 ### Class that contains general functions to set RelaxApp ###
@@ -448,12 +491,17 @@ class RelaxApp_Initial_Frame():
             response = response_dict["response"]
             values = response.json()
             if response.status_code == 200:
+                message = Set_Messages.response_messages(values["message_type"])
                 print(values["message"])
+                print(message)
             else:
+                message = Set_Messages.response_messages(values["error_type"])
                 print(values["error"])
-
+                print(message)
         else:
-            print(response_dict["message"])
+            message = Set_Messages.server_messages(response_dict["error_type"])
+            print(response_dict["error"])
+            print(message)
 
         # user["login"] = get_login
         # user["password"] = get_password
@@ -567,13 +615,44 @@ class RelaxApp_User_Registration():
 
     # This method gets the values registered and call the class to check them
     def accept_sign_up(self):
-        get_name = self.name_entry.get()
+        get_first_name = self.name_entry.get()
         get_last_name = self.last_name_entry.get()
         get_username = self.username_entry.get()
         get_email = self.email_entry.get()
         get_password = self.password_entry.get()
 
-        print("usuario a registrar: ", get_name, get_last_name, get_username, get_email, get_password)
+        data = {
+            "first_name" : get_first_name,
+            "last_name" : get_last_name,
+            "username" : get_username,
+            "email" : get_email,
+            "password" : get_password,
+        }
+               
+        response_dict = comms.register(data)
+        
+        if response_dict["connection_status"]:
+            response = response_dict["response"]
+            values = response.json()
+            if response.status_code == 201:
+                message = Set_Messages.response_messages(values["message_type"])
+                print(values["message"])
+                print(message)
+            else:
+                if values["error_type"] == "ERROR_SERIALIZER_GENERAL":
+                    print(values["error"])
+                    keys = next(iter(values["error"]))
+                    message = Set_Messages.serializer_messages(keys)                   
+                    print(message)                                              
+                else:
+                    message = Set_Messages.response_messages(values["error_type"])
+                    print(values["error"])
+                    print(message)
+        else:
+            message = Set_Messages.server_messages(response_dict["error_type"])
+            print(response_dict["error"])
+            print(message)
+                 
         # user["action"] = "sign_up"
         # user["name"] = get_name
         # user["lastname"] = get_last_name

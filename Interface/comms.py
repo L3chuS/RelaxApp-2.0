@@ -4,7 +4,6 @@ from settings import API_URL
 def make_request(method, url, **kwargs):
     
     try:
-    
         response =  requests.request(
             method,
             url,
@@ -22,22 +21,25 @@ def make_request(method, url, **kwargs):
         return {
             "connection_status" : False,
             "response" : None,
-            "message" : "No se pudo conectar con el servidor"
+            "error" : "The connection to the server has failed.",
+            "error_type" : "ERROR_SERVER_CONNECTION"
         }
         
     except requests.exceptions.Timeout:
         return {
             "connection_status" : False,
             "response" : None,
-            "message" : "El servidor tardó demasiado en responder"
+            "error" : "The request timed out.",
+            "error_type" : "ERROR_SERVER_TIMEOUT"
         }
     except requests.exceptions.RequestException as error:
         return {
             "connection_status" : False,
             "response" : None,
-            "message" : str(error)
+            "error" : str(error),
+            "error_type" : "ERROR_SERVER_GENERAL"
         }
- 
+
 def login(data):
     
     response = make_request(
@@ -49,3 +51,13 @@ def login(data):
     
     return response
 
+def register(data):
+    
+    response = make_request(
+        "POST",
+        f"{API_URL}register/",
+        json=data
+    )
+    print(response)
+    
+    return response
