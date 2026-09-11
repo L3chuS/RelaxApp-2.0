@@ -64,3 +64,24 @@ def register(data):
     print(response)
     
     return response
+
+def reset_password(data):
+    
+    response = make_request(
+        "POST",
+        f"{API_URL}reset/",
+        json=data
+    )
+    print(response)
+        
+    return response
+
+def reset_password_confirmation(data):
+    response = make_request(
+            "POST",
+            f"{API_URL}reset/confirm/",
+            json=data
+        )
+    print(response)
+        
+    return response

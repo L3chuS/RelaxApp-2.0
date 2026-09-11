@@ -470,11 +470,11 @@ class RelaxApp_Initial_Frame():
                                              hover_color=colors["dark_green"])
         self.button_new_user.place(rely=0.9, relx=0.04)
 
-        # # "Forget password" button.
-        # self.button_forget_pw = ctk.CTkButton(self.frame, width=10, height=10, text="Olvidé contraseña", font=(font,12),
-        #                                       command=self.change_password, corner_radius=10, hover=True, fg_color=colors["soft_grey"],
-        #                                       hover_color=colors["dark_green"])
-        # self.button_forget_pw.place(rely=0.9, relx=0.6)
+        # "Forget password" button.
+        self.button_forget_pw = ctk.CTkButton(self.frame, width=10, height=10, text="Olvidé contraseña", font=(font,12),
+                                              command=self.change_password, corner_radius=10, hover=True, fg_color=colors["soft_grey"],
+                                              hover_color=colors["dark_green"])
+        self.button_forget_pw.place(rely=0.9, relx=0.6)
 
     # Method to log in.
     def sign_in(self):
@@ -533,9 +533,9 @@ class RelaxApp_Initial_Frame():
     def sign_up(self):
         RelaxApp_Structure.close_create(self, RelaxApp_User_Registration, self.root, self.frame)
 
-    # # Method to change password.
-    # def change_password(self):
-    #     RelaxApp_Structure.close_create(self, RelaxApp_User_Change_Password, self.root, self.frame)
+    # Method to change password.
+    def change_password(self):
+        RelaxApp_Structure.close_create(self, RelaxApp_User_Change_Password, self.root, self.frame)
 
 
 ###############################################################
@@ -680,92 +680,187 @@ class RelaxApp_User_Registration():
 ###  Class that contains the window to change the password ###
 ##############################################################
 
-# class RelaxApp_User_Change_Password():
-#     """This class opens a new window to change the pasword."""
+class RelaxApp_User_Change_Password():
+    """This class opens a new window to change the password."""
 
-#     def __init__(self, root, frame):
-#         self.root = root
-#         self.frame = frame
+    def __init__(self, root, frame):
+        self.root = root
+        self.frame = frame
 
-#         # Top bar of the change password menu.
-#         self.top_bar = ctk.CTkLabel(self.frame, text=None, fg_color=colors["dark_green"], width=310, height=0,
-#                                     corner_radius=10)
-#         self.top_bar.place(rely=0.02, relx=0.03)
+        # Top bar of the change password menu.
+        self.top_bar = ctk.CTkLabel(self.frame, text=None, fg_color=colors["dark_green"], width=310, height=0,
+                                    corner_radius=10)
+        self.top_bar.place(rely=0.02, relx=0.03)
 
-#         # Bottom bar of the change password menu.
-#         self.bottom_bar = ctk.CTkLabel(self.frame, text=None, fg_color=colors["dark_green"], width=310, height=0,
-#                                        corner_radius=10)
-#         self.bottom_bar.place(rely=0.95, relx=0.03)
+        # Bottom bar of the change password menu.
+        self.bottom_bar = ctk.CTkLabel(self.frame, text=None, fg_color=colors["dark_green"], width=310, height=0,
+                                       corner_radius=10)
+        self.bottom_bar.place(rely=0.95, relx=0.03)
 
-#         # Label of the change password menu.
-#         self.top_text = ctk.CTkLabel(self.frame, text="Complete todos los campos indicados:", font=(font,14))
-#         self.top_text.place(rely=0.08, relx=0.03)
+        # Label of the change password menu.
+        self.top_text = ctk.CTkLabel(self.frame, text="Introduzca el correo vinculado a la cuenta:", font=(font,14))
+        self.top_text.place(rely=0.1, relx=0.03)
+        
+        # Label to set the email.
+        self.email = ctk.CTkLabel(self.frame, text="Email:", font=(font,14))
+        self.email.place(rely=0.25, relx=0.03, anchor="w")
+               
+        # Username entry.
+        self.email_entry = ctk.CTkEntry(self.frame, font=(font,14), width=230, height=10, corner_radius=10)
+        self.email_entry.place(rely=0.25, relx=0.95, anchor="e")
+        # self.email_entry.place(rely=0.2, relx=0.25, anchor="e")
+        self.email_entry.bind("<Button-1>", lambda remove: self.email_entry.delete(0, tk.END))
+        
+        # Label of the change password menu.
+        self.middle_text = ctk.CTkLabel(self.frame, text="Se le enviará un código de recuperación al correo indicado.", font=(font,14), 
+                                        wraplength=335, justify="left")
+        self.middle_text.place(rely=0.35, relx=0.03)
 
-#         # Label to set the username.
-#         self.name = ctk.CTkLabel(self.frame, text="Nombre Usuario:", font=(font,14))
-#         self.name.place(rely=0.2, relx=0.03)
+        # Button to send the code to change the password.
+        self.change_pw_button = ctk.CTkButton(self.frame, text="Enviar código", font=(font,14), command= self.send_code,
+                                              corner_radius=90, width=100, height=20, hover=True, fg_color=colors["soft_green"],
+                                              hover_color=colors["dark_green"])
+        self.change_pw_button.place(rely=0.65, relx=0.5, anchor="center")
 
-#         # Username entry.
-#         self.name_entry = ctk.CTkEntry(self.frame, font=(font,14), width=165, height=10, corner_radius=10)
-#         self.name_entry.place(rely=0.2, relx=0.47)
-#         self.name_entry.bind("<Button-1>", lambda remove: self.name_entry.delete(0, tk.END))
+        # Button to cancel to change the password.
+        self.cancel_change_pw_button = ctk.CTkButton(self.frame, text="Cancelar", font=(font,14), command= self.cancel_change_pw,
+                                                     corner_radius=90, width=100, height=20, hover=True, fg_color=colors["soft_green"],
+                                                     hover_color=colors["dark_green"])
+        self.cancel_change_pw_button.place(rely=0.75, relx=0.5, anchor="center")
 
-#         # Label to set the new password.
-#         self.pw1 = ctk.CTkLabel(self.frame, text="Nueva Contraseña:", font=(font,14))
-#         self.pw1.place(rely=0.3, relx=0.03)
+    # This method gets the values registered and call the class to check them.
+    def send_code(self):
 
-#         # Password entry 1.
-#         self.pw1_entry = ctk.CTkEntry(self.frame, font=(font,14), width=165, height=10, corner_radius=10,
-#                                       show="*")
-#         self.pw1_entry.place(rely=0.3, relx=0.47)
-#         self.pw1_entry.bind("<Button-1>", lambda remove: self.pw1_entry.delete(0, tk.END))
+        # Variable to compare password 1 with password 2.
+        self.confirm_pw = False
 
-#         # Label to confirm the new password.
-#         self.pw2 = ctk.CTkLabel(self.frame, text="Repetir Contraseña:", font=(font,14))
-#         self.pw2.place(rely=0.4, relx=0.03)
+        get_email_pw_menu = self.email_entry.get()
+        
+        data = {"email" : get_email_pw_menu}
+        
+        response_dict = comms.reset_password(data)
 
-#         # Password entry 2.
-#         self.pw2_entry = ctk.CTkEntry(self.frame, font=(font,14), width=165, height=10, corner_radius=10,
-#                                       show="*")
-#         self.pw2_entry.place(rely=0.4, relx=0.47)
-#         self.pw2_entry.bind("<Button-1>", lambda remove: self.pw2_entry.delete(0, tk.END))
+        if response_dict["connection_status"]:
+            response = response_dict["response"]
+            values = response.json()
+            if response.status_code == 200:
+                
+                print(values["message"])
+                RelaxApp_Structure.close_create(self, RelaxApp_User_Confirm_Change_Password, self.root, self.frame)
+            else:
+                keys = next(iter(values["error"]))
+                message = Set_Messages.serializer_messages(keys)
+                print(values["error"])
+                print(message)
+        else:
+            message = Set_Messages.server_messages(response_dict["error_link"])
+            print(response_dict["error"])
+            print(message)
+            
+        
+        # user["action"] = "modify"
+        # user["login"] = get_username_pw_menu
+        # user["password"] = get_password1_pw_menu
 
-#         # Button to confirm to change the password.
-#         self.change_pw_button = ctk.CTkButton(self.frame, text="Cambiar Contraseña", font=(font,14), command= self.accept_change_pw,
-#                                               corner_radius=90, width=100, height=20, hover=True, fg_color=colors["soft_green"],
-#                                               hover_color=colors["dark_green"])
-#         self.change_pw_button.place(rely=0.55, relx=0.5, anchor="center")
+        # if user["password"] == get_password2_pw_menu:
+        #     self.confirm_pw = True
+        #     RelaxApp_MessageBox_Options(self.root, self.frame, "Password Correct", user)
+        # else:
+        #     RelaxApp_MessageBox_Options(self.root, self.frame, "Password Incorrect", user)
 
-#         # Button to cancel to change the password.
-#         self.cancel_change_pw_button = ctk.CTkButton(self.frame, text="Cancelar", font=(font,14), command= self.cancel_change_pw,
-#                                                      corner_radius=90, width=100, height=20, hover=True, fg_color=colors["soft_green"],
-#                                                      hover_color=colors["dark_green"])
-#         self.cancel_change_pw_button.place(rely=0.65, relx=0.5, anchor="center")
+    # This method cancel the user registration and turns back to the main menu.
+    def cancel_change_pw (self):
+        print("Se cancela el cambio")
+        #RelaxApp_MessageBox_Options(self.root, self.frame, "Cancel Change PW", user)
 
-#     # This method gets the values registered and call the class to check them.
-#     def accept_change_pw(self):
 
-#         # Variable to compare password 1 with password 2.
-#         self.confirm_pw = False
+class RelaxApp_User_Confirm_Change_Password():
+    """This class opens a new window to confirm the change of the password."""
 
-#         get_username_pw_menu = self.name_entry.get()
-#         get_password1_pw_menu = self.pw1_entry.get()
-#         get_password2_pw_menu = self.pw2_entry.get()
+    def __init__(self, root, frame):
+        self.root = root
+        self.frame = frame
 
-#         user["action"] = "modify"
-#         user["login"] = get_username_pw_menu
-#         user["password"] = get_password1_pw_menu
+        # Top bar of the change password menu.
+        self.top_bar = ctk.CTkLabel(self.frame, text=None, fg_color=colors["dark_green"], width=310, height=0,
+                                    corner_radius=10)
+        self.top_bar.place(rely=0.02, relx=0.03)
 
-#         if user["password"] == get_password2_pw_menu:
-#             self.confirm_pw = True
-#             RelaxApp_MessageBox_Options(self.root, self.frame, "Password Correct", user)
-#         else:
-#             RelaxApp_MessageBox_Options(self.root, self.frame, "Password Incorrect", user)
+        # Bottom bar of the change password menu.
+        self.bottom_bar = ctk.CTkLabel(self.frame, text=None, fg_color=colors["dark_green"], width=310, height=0,
+                                       corner_radius=10)
+        self.bottom_bar.place(rely=0.95, relx=0.03)
 
-#     # This method cancel the user registration and turns back to the main menu.
-#     def cancel_change_pw (self):
-#         RelaxApp_MessageBox_Options(self.root, self.frame, "Cancel Change PW", user)
+        # Label of the change password menu.
+        self.top_text = ctk.CTkLabel(self.frame, text="Introduzca el código que se ha enviado y cree la nueva contraseña:", 
+                                     font=(font,14), wraplength=315, justify="left")
+        self.top_text.place(rely=0.08, relx=0.03)
 
+        # Label to set the code.
+        self.code = ctk.CTkLabel(self.frame, text="Código Enviado:", font=(font,14))
+        self.code.place(rely=0.25, relx=0.03)
+        
+        # Code entry.
+        self.code_entry = ctk.CTkEntry(self.frame, font=(font,14), width=165, height=10, corner_radius=10)
+        self.code_entry.place(rely=0.25, relx=0.47)
+        self.code_entry.bind("<Button-1>", lambda remove: self.code_entry.delete(0, tk.END))
+
+        # Label to set the new password.
+        self.pw1 = ctk.CTkLabel(self.frame, text="Nueva Contraseña:", font=(font,14))
+        self.pw1.place(rely=0.35, relx=0.03)
+
+        # Password entry 1.
+        self.pw1_entry = ctk.CTkEntry(self.frame, font=(font,14), width=165, height=10, corner_radius=10,
+                                      show="*")
+        self.pw1_entry.place(rely=0.35, relx=0.47)
+        self.pw1_entry.bind("<Button-1>", lambda remove: self.pw1_entry.delete(0, tk.END))
+
+        # Label to confirm the new password.
+        self.pw2 = ctk.CTkLabel(self.frame, text="Repetir Contraseña:", font=(font,14))
+        self.pw2.place(rely=0.45, relx=0.03)
+
+        # Password entry 2.
+        self.pw2_entry = ctk.CTkEntry(self.frame, font=(font,14), width=165, height=10, corner_radius=10,
+                                      show="*")
+        self.pw2_entry.place(rely=0.45, relx=0.47)
+        self.pw2_entry.bind("<Button-1>", lambda remove: self.pw2_entry.delete(0, tk.END))
+
+        # Button to confirm to change the password.
+        self.change_pw_button = ctk.CTkButton(self.frame, text="Cambiar Contraseña", font=(font,14), command= self.accept_change_pw,
+                                              corner_radius=90, width=100, height=20, hover=True, fg_color=colors["soft_green"],
+                                              hover_color=colors["dark_green"])
+        self.change_pw_button.place(rely=0.65, relx=0.5, anchor="center")
+
+        # Button to cancel to change the password.
+        self.cancel_change_pw_button = ctk.CTkButton(self.frame, text="Cancelar", font=(font,14), command= self.cancel_change_pw,
+                                                     corner_radius=90, width=100, height=20, hover=True, fg_color=colors["soft_green"],
+                                                     hover_color=colors["dark_green"])
+        self.cancel_change_pw_button.place(rely=0.75, relx=0.5, anchor="center")
+
+    # This method gets the values registered and call the class to check them.
+    def accept_change_pw(self):
+
+        # Variable to compare password 1 with password 2.
+        self.confirm_pw = False
+
+        get_code_pw_menu = self.code_entry.get()
+        get_password1_pw_menu = self.pw1_entry.get()
+        get_password2_pw_menu = self.pw2_entry.get()
+        print("cambio pw: ", get_code_pw_menu, get_password1_pw_menu, get_password2_pw_menu)
+        # user["action"] = "modify"
+        # user["login"] = get_username_pw_menu
+        # user["password"] = get_password1_pw_menu
+
+        # if user["password"] == get_password2_pw_menu:
+        #     self.confirm_pw = True
+        #     RelaxApp_MessageBox_Options(self.root, self.frame, "Password Correct", user)
+        # else:
+        #     RelaxApp_MessageBox_Options(self.root, self.frame, "Password Incorrect", user)
+
+    # This method cancel the user registration and turns back to the main menu.
+    def cancel_change_pw (self):
+        print("Se cancela el cambio")
+        #RelaxApp_MessageBox_Options(self.root, self.frame, "Cancel Change PW", user)
 
 #########################################################
 ###  Class that contains the user's main menu window  ###

@@ -14,3 +14,11 @@ class UserRegistrationSerializer(serializers.Serializer):
     username = serializers.CharField()
     email = serializers.EmailField()
     password = serializers.CharField()
+
+class UserChangePasswordSerializer(serializers.Serializer):
+    email = serializers.EmailField()
+    
+class UserChangePasswordConfirmationSerializer(serializers.Serializer):
+    code = serializers.CharField()
+    password1 = serializers.CharField()
+    password2 = serializers.CharField()
