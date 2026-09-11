@@ -135,18 +135,8 @@ STATIC_URL = 'static/'
 # Email
 # https://docs.djangoproject.com/en/6.1/topics/email/#topic-email-configuration
 
-EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
-EMAIL_HOST = "smtp.gmail.com"
-EMAIL_PORT = 587
-EMAIL_USE_TLS = True
-EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER")
-EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD")
-
-# MAILERS = {
-#     'default': {
-#         'BACKEND': 'django.core.mail.backends.console.EmailBackend',
-#     },
-# }
+RESEND_FROM_EMAIL = os.getenv("RESEND_FROM_EMAIL")
+RESEND_API_KEY = os.getenv("RESEND_API_KEY")
 
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": [

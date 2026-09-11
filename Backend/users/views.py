@@ -3,11 +3,11 @@ from rest_framework.response import Response
 from rest_framework.authtoken.models import Token
 from datetime import timedelta
 from django.utils import timezone
-from django.core.mail import EmailMultiAlternatives
 from django.template.loader import render_to_string
-from email.mime.image import MIMEImage
 from django.contrib.auth.models import User
 import secrets
+import resend
+import base64
 from django.conf import settings
 from .models import *
 from .serializers import *
@@ -159,31 +159,28 @@ def user_pw_reset(request):
         }
     )
     
-    email_message = EmailMultiAlternatives(
-        subject="RelaxApp - Código de recuperación",
-        body=f"El código de recuperación es: {code}",
-        from_email=None,
-        to=[email],
-    )
-    
-    email_message.attach_alternative(
-        html_content,
-        "text/html"
-    )
-    
     logo_path = settings.BASE_DIR / "images" / "Logo.png"
-
+    
     with open(logo_path, "rb") as image_file:
-        logo = MIMEImage(image_file.read())
+        logo = base64.b64encode(image_file.read()).decode("utf-8")
     
-    logo.add_header(
-        "Content-ID",
-        "<relaxapp_logo>"
-    )
-    
-    email_message.attach(logo)        
-    email_message.send()
-    
+    resend.api_key = settings.RESEND_API_KEY
+
+    resend.Emails.send({
+        "from": settings.RESEND_FROM_EMAIL,
+        "to": email,
+        "subject": "RelaxApp - Código de recuperación",
+        "text": f"El código de recuperación es: {code}",
+        "html": html_content,
+        "attachments": [
+            {
+                "filename": "Logo.png",
+                "content": logo,
+                "content_id": "relaxapp_logo",
+            }
+        ]
+    })
+       
     return Response({
         "message": "If the email is registered, a recovery code has been sent."
     }, status=200)
