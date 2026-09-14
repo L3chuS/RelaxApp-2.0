@@ -84,7 +84,7 @@ class RelaxApp_Structure:
         for wid in clean_frame.winfo_children():
             wid.destroy()
         # New class is run.
-        app = new_window(self.root, clean_frame)
+        app = new_window(self.root, clean_frame, *args)
 
     # Method that, besides to create a new root everytime the main root is destroyed, creates the main frame again.
     def close_create2(self, new_window, root, clean_frame, *args):
@@ -265,19 +265,27 @@ class Set_Messages():
         else:
             return messages.ERROR_SERVER_GENERAL
         
-    def serializer_messages(key):
+    def serializers_messages(key):
         if key == "first_name":
-            return messages.ERROR_SERIALIZER_INVALID_FIRST_NAME
+            return messages.ERROR_SERIALIZERS_INVALID_FIRST_NAME
         elif key == "last_name":
-            return messages.ERROR_SERIALIZER_INVALID_LAST_NAME
+            return messages.ERROR_SERIALIZERS_INVALID_LAST_NAME
         elif key == "username":
-            return messages.ERROR_SERIALIZER_INVALID_USERNAME
+            return messages.ERROR_SERIALIZERS_INVALID_USERNAME
         elif key == "email":
-            return messages.ERROR_SERIALIZER_INVALID_EMAIL
+            return messages.ERROR_SERIALIZERS_INVALID_EMAIL
         elif key == "password":
-            return messages.ERROR_SERIALIZER_INVALID_PASSWORD  
+            return messages.ERROR_SERIALIZERS_INVALID_PASSWORD
+        elif key == "code":
+            return messages.ERROR_SERIALIZERS_TOKEN_MISSING
+        elif key == "password1":
+            return messages.ERROR_SERIALIZERS_PASSWORD1_MISSING
+        elif key == "password2":
+            return messages.ERROR_SERIALIZERS_PASSWORD2_MISSING
+        elif key == "password_no_match":
+            return messages.ERROR_PW_RESET_CONF_PW_NOT_MATCH
         else:
-            return messages.ERROR_SERIALIZER_GENERAL
+            return messages.ERROR_SERIALIZERS_GENERAL
     
     def response_messages(type):
         if type == "MESSAGE_LOGIN_CORRECT":
@@ -286,12 +294,22 @@ class Set_Messages():
             return messages.ERROR_LOGIN_USERNAME_NOT_EXISTS
         elif type == "ERROR_LOGIN_INVALID_PASSWORD":
             return messages.ERROR_LOGIN_INVALID_PASSWORD
+        
         elif type == "MESSAGE_REGISTER_USER_CREATED":
             return messages.MESSAGE_REGISTER_USER_CREATED
         elif type == "ERROR_REGISTER_USERNAME_EXISTS":
             return messages.ERROR_REGISTER_USERNAME_EXISTS
         elif type == "ERROR_REGISTER_EMAIL_EXISTS":
             return messages.ERROR_REGISTER_EMAIL_EXISTS
+        
+        elif type == "MESSAGE_PW_RESET_CONF_SUCCESS":
+            return messages.MESSAGE_PW_RESET_CONF_SUCCESS
+        elif type == "ERROR_PW_RESET_CONF_INVALID_TOKEN":
+            return messages.ERROR_PW_RESET_CONF_INVALID_TOKEN
+        elif type == "ERROR_PW_RESET_CONF_TOKEN_USED":
+            return messages.ERROR_PW_RESET_CONF_TOKEN_USED
+        elif type == "ERROR_PW_RESET_CONF_TOKEN_EXPIRED":
+            return messages.ERROR_PW_RESET_CONF_TOKEN_EXPIRED
         
 
 #############################################################
@@ -493,7 +511,7 @@ class RelaxApp_Initial_Frame():
             response = response_dict["response"]
             values = response.json()
             if response.status_code == 200:
-                message = Set_Messages.response_messages(values["message_type"])
+                message = Set_Messages.response_messages(values["message_link"])
                 print(values["message"])
                 print(message)
             else:
@@ -501,9 +519,9 @@ class RelaxApp_Initial_Frame():
                     message = Set_Messages.response_messages(values["error_link"])
                     print(values["error"])
                     print(message)
-                elif values["error_type"] == "SERIALIZER":
-                    message = Set_Messages.serializer_messages(values["error_link"])
-                    print(values["error"])
+                elif values["error_type"] == "SERIALIZERS":
+                    message = Set_Messages.serializers_messages(values["error_link"])
+                    print("* ERROR: ", values["error"])
                     print(message)
 
         else:
@@ -643,7 +661,7 @@ class RelaxApp_User_Registration():
             response = response_dict["response"]
             values = response.json()
             if response.status_code == 201:
-                message = Set_Messages.response_messages(values["message_type"])
+                message = Set_Messages.response_messages(values["message_link"])
                 print(values["message"])
                 print(message)
             else:
@@ -652,9 +670,9 @@ class RelaxApp_User_Registration():
                     print(values["error"])
                     print(message)
     
-                elif values["error_type"] == "SERIALIZER":
+                elif values["error_type"] == "SERIALIZERS":
                     keys = next(iter(values["error"]))
-                    message = Set_Messages.serializer_messages(keys)
+                    message = Set_Messages.serializers_messages(keys)
                     print(values["error"])
                     print(message)
         else:
@@ -744,12 +762,11 @@ class RelaxApp_User_Change_Password():
             response = response_dict["response"]
             values = response.json()
             if response.status_code == 200:
-                
                 print(values["message"])
-                RelaxApp_Structure.close_create(self, RelaxApp_User_Confirm_Change_Password, self.root, self.frame)
+                RelaxApp_Structure.close_create(self, RelaxApp_User_Confirm_Change_Password, self.root, self.frame, get_email_pw_menu)
             else:
                 keys = next(iter(values["error"]))
-                message = Set_Messages.serializer_messages(keys)
+                message = Set_Messages.serializers_messages(keys)
                 print(values["error"])
                 print(message)
         else:
@@ -777,9 +794,10 @@ class RelaxApp_User_Change_Password():
 class RelaxApp_User_Confirm_Change_Password():
     """This class opens a new window to confirm the change of the password."""
 
-    def __init__(self, root, frame):
+    def __init__(self, root, frame, email):
         self.root = root
         self.frame = frame
+        self.email = email
 
         # Top bar of the change password menu.
         self.top_bar = ctk.CTkLabel(self.frame, text=None, fg_color=colors["dark_green"], width=310, height=0,
@@ -846,7 +864,38 @@ class RelaxApp_User_Confirm_Change_Password():
         get_code_pw_menu = self.code_entry.get()
         get_password1_pw_menu = self.pw1_entry.get()
         get_password2_pw_menu = self.pw2_entry.get()
-        print("cambio pw: ", get_code_pw_menu, get_password1_pw_menu, get_password2_pw_menu)
+        
+        data = {
+            "email" : self.email,
+            "code" : get_code_pw_menu,
+            "password1" : get_password1_pw_menu,
+            "password2" : get_password2_pw_menu
+        }
+        
+        response_dict = comms.reset_password_confirmation(data)
+        
+        if response_dict["connection_status"]:
+            response = response_dict["response"]
+            values = response.json()
+            if response.status_code == 200:
+                message = Set_Messages.response_messages(values["message_link"])
+                print(values["message"])
+                print(message)
+            else:
+                if values["error_type"] == "VIEWS":
+                    message = Set_Messages.response_messages(values["error_link"])
+                    print(values["error"])
+                    print(message)
+                    
+                elif values["error_type"] == "SERIALIZERS":
+                    keys = next(iter(values["error"]))
+                    message = Set_Messages.serializers_messages(keys)
+                    print(values["error"])
+                    print(message)
+        else:
+            message = Set_Messages.server_messages(response_dict["error_link"])
+            print(response_dict["error"])
+            print(message)
         # user["action"] = "modify"
         # user["login"] = get_username_pw_menu
         # user["password"] = get_password1_pw_menu

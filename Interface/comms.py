@@ -10,18 +10,19 @@ def make_request(method, url, **kwargs):
             timeout=10,
             **kwargs
         )
-        
+        perro = 123
         return {
             "connection_status" : True,
             "response" : response,
-            "message" : None
+            "message" : "* MESSAGE: The connection with the server has been established.",
+            "message_link" : None
         }
     
     except requests.exceptions.ConnectionError:
         return {
             "connection_status" : False,
             "response" : None,
-            "error" : "The connection to the server has failed.",
+            "error" : "* ERROR: The connection to the server has failed.",
             "error_type" : "SERVER",
             "error_link" : "ERROR_SERVER_CONNECTION"
         }
@@ -30,7 +31,7 @@ def make_request(method, url, **kwargs):
         return {
             "connection_status" : False,
             "response" : None,
-            "error" : "The request timed out.",
+            "error" : "* ERROR: The request timed out.",
             "error_type" : "SERVER",
             "error_link" : "ERROR_SERVER_TIMEOUT"
         }
@@ -38,7 +39,7 @@ def make_request(method, url, **kwargs):
         return {
             "connection_status" : False,
             "response" : None,
-            "error" : str(error),
+            "error" : "* ERROR: " + str(error),
             "error_type" : "SERVER",
             "error_link" : "ERROR_SERVER_GENERAL"
         }
@@ -49,9 +50,7 @@ def login(data):
         "POST",
         f"{API_URL}login/",
         json=data
-    )
-    print(response)
-    
+    )    
     return response
 
 def register(data):
@@ -60,9 +59,7 @@ def register(data):
         "POST",
         f"{API_URL}register/",
         json=data
-    )
-    print(response)
-    
+    )    
     return response
 
 def reset_password(data):
@@ -71,17 +68,13 @@ def reset_password(data):
         "POST",
         f"{API_URL}reset/",
         json=data
-    )
-    print(response)
-        
+    )        
     return response
 
 def reset_password_confirmation(data):
     response = make_request(
-            "POST",
+            "PUT",
             f"{API_URL}reset/confirm/",
             json=data
-        )
-    print(response)
-        
+        )        
     return response

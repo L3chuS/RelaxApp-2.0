@@ -16,9 +16,19 @@ class UserRegistrationSerializer(serializers.Serializer):
     password = serializers.CharField()
 
 class UserChangePasswordSerializer(serializers.Serializer):
+    
     email = serializers.EmailField()
     
 class UserChangePasswordConfirmationSerializer(serializers.Serializer):
+    
+    email = serializers.EmailField()
     code = serializers.CharField()
     password1 = serializers.CharField()
     password2 = serializers.CharField()
+    
+    def validate(self, data):
+        if data["password1"] != data["password2"]:
+            raise serializers.ValidationError({
+                "password_no_match": "Passwords do not match."
+            })
+        return data

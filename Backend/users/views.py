@@ -27,14 +27,14 @@ def user_login(request):
     else:
         return Response(
             {"error" : login_serializer.errors,
-            "error_type" : "SERIALIZER",
-            "error_link" : "ERROR_SERIALIZER_GENERAL"}, 
+            "error_type" : "SERIALIZERS",
+            "error_link" : "ERROR_SERIALIZERS_GENERAL"}, 
             status=400
             )
              
     if user is None:
         return Response(
-            {"error" : "User does not exists.",
+            {"error" : "* ERROR: User does not exists.",
             "error_type" : "VIEWS",
             "error_link" : "ERROR_LOGIN_USERNAME_NOT_EXISTS"},
             status=401
@@ -42,7 +42,7 @@ def user_login(request):
 
     if not user.check_password(password):
         return Response(
-            {"error" : "Invalid Password.",
+            {"error" : "* ERROR: Invalid Password.",
             "error_type" : "VIEWS",
             "error_link" : "ERROR_LOGIN_INVALID_PASSWORD"},
             status=401
@@ -51,10 +51,10 @@ def user_login(request):
     Token.objects.filter(user=user).delete()
     token = Token.objects.create(user=user)
     return Response(
-        {"message" : "Logging in.",
+        {"message" : "* MESSAGE: Logging in.",
         "username" : user.username,
         "token" : token.key,
-        "message_type" : "MESSAGE_LOGIN_CORRECT"}
+        "message_link" : "MESSAGE_LOGIN_CORRECT"}
     )
     
 
@@ -76,14 +76,14 @@ def user_registration(request):
     else:
         return Response({
             "error" : register_serializer.errors,
-            "error_type" : "SERIALIZER",
-            "error_link" : "ERROR_SERIALIZER_GENERAL"}, 
+            "error_type" : "SERIALIZERS",
+            "error_link" : "ERROR_SERIALIZERS_GENERAL"}, 
             status=400
         )
     
     if username_exist:
         return Response(
-            {"error" : "Username already exists.",
+            {"error" : "* ERROR: Username already exists.",
             "error_type" : "VIEWS",
             "error_link" : "ERROR_REGISTER_USERNAME_EXISTS"},
             status=400
@@ -91,7 +91,7 @@ def user_registration(request):
         
     elif email_exist:
         return Response(
-            {"error" : "Email already exists.",
+            {"error" : "* ERROR: Email already exists.",
             "error_type" : "VIEWS",
             "error_link" : "ERROR_REGISTER_EMAIL_EXISTS"},
             status=400
@@ -106,15 +106,16 @@ def user_registration(request):
     )
 
     return Response(
-        {"message" : "Registration user.",
+        {"message" : "* MESSAGE: User has been registered.",
         "first_name" : first_name,
         "last_name" : last_name,
         "username" : username,
         "email" : email,
-        "message_type" : "MESSAGE_REGISTER_USER_CREATED"
+        "message_link" : "MESSAGE_REGISTER_USER_CREATED"
         },
         status=201
     )
+
 
 @api_view(["POST"])     
 def user_pw_reset(request):
@@ -128,14 +129,15 @@ def user_pw_reset(request):
     else:
         return Response({
             "error" : change_pw_serializer.errors,
-            "error_type" : "SERIALIZER",
-            "error_link" : "ERROR_SERIALIZER_GENERAL"}, 
+            "error_type" : "SERIALIZERS",
+            "error_link" : "ERROR_SERIALIZERS_GENERAL"}, 
             status=400
         )    
         
     if user is None:
         return Response({
-            "message": "If the email is registered, a recovery code has been sent."}, 
+            "message" : "* MESSAGE: If the email is registered, a recovery code has been sent.",
+            "message_link" : None}, 
             status=200
         )
 
@@ -145,7 +147,7 @@ def user_pw_reset(request):
     PasswordReset.objects.create(
         user = user,
         code = code,
-        expires_at=timezone.now() + timedelta(minutes=10)
+        expires_at=timezone.now() + timedelta(minutes=2)
     )
     
     # It converts the variables at the html.    
@@ -182,10 +184,63 @@ def user_pw_reset(request):
     })
        
     return Response({
-        "message": "If the email is registered, a recovery code has been sent."
-    }, status=200)
+        "message": "* MESSAGE: If the email is registered, a recovery code has been sent.",
+        "message_link" : None},
+        status=200)
     
-    
-@api_view(["POST"])     
+   
+@api_view(["PUT"])     
 def user_pw_reset_confirmation(request):
-    pass
+    
+    change_pw_confirm_serializer =  UserChangePasswordConfirmationSerializer(data=request.data)
+    
+    if change_pw_confirm_serializer.is_valid():
+        email = change_pw_confirm_serializer.validated_data["email"]
+        code = change_pw_confirm_serializer.validated_data["code"]
+        password1 = change_pw_confirm_serializer.validated_data["password1"]
+        
+        user = User.objects.filter(email=email).first()
+        user_token = PasswordReset.objects.filter(user=user, code=code).first()
+    else:
+        return Response({
+            "error" : change_pw_confirm_serializer.errors,
+            "error_type" : "SERIALIZERS",
+            "error_link" : "ERROR_SERIALIZERS_GENERAL"}, 
+            status=400
+        )
+
+    if user_token == None:
+        return Response({
+            "error" : "* ERROR: Token is incorrect.",
+            "error_type" : "VIEWS",
+            "error_link" : "ERROR_PW_RESET_CONF_INVALID_TOKEN"}, 
+            status=400
+        )
+        
+    if user_token.used:
+        return Response({
+            "error" : "* ERROR: Token has been used.",
+            "error_type" : "VIEWS",
+            "error_link" : "ERROR_PW_RESET_CONF_TOKEN_USED"}, 
+            status=400
+        )
+        
+    if timezone.now() > user_token.expires_at:
+        return Response({
+            "error" : "* ERROR: Token has expired.",
+            "error_type" : "VIEWS",
+            "error_link" : "ERROR_PW_RESET_CONF_TOKEN_EXPIRED"}, 
+            status=400
+        )
+    
+    user.set_password(password1)
+    user.save()
+    
+    user_token.used = True
+    user_token.save()
+    
+    return Response(
+        {"message" : "* MESSAGE: Password has been updated succesfully.",
+        "message_link" : "MESSAGE_PW_RESET_CONF_SUCCESS"},
+        status=200
+    )
