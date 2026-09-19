@@ -8,24 +8,18 @@ from PIL import Image
 from tktooltip import ToolTip
 import datetime
 import os
-# from utils import get_resource_path
+from utils import get_resource_path
 import webbrowser
 import comms
 import messages
-
 
 # Get the windows resolution regardless of rescaling
 user32 = ctypes.windll.user32
 user32.SetProcessDPIAware()
 
-# # Get the parent folder path and the image folder path.
-# main_path = get_resource_path("Interface")
-
-# # First letter is changed to upper.
-# main_path_edited = main_path.replace(main_path[0], main_path[0].upper(), 1)
-
-# image_path = os.path.join(main_path_edited, "Images")
-# sounds_path = os.path.join(main_path_edited, "Sounds")
+# Get the image and sounds folders path.
+image_path = os.path.join(get_resource_path("images"))
+sounds_path = os.path.join(get_resource_path("sounds"))
 
 # Set appearance.
 appearance = ctk.set_appearance_mode("dark")
@@ -72,7 +66,7 @@ class RelaxApp_Structure:
 
         # Set the title and the logo of the app.
         self.title = self.root.title("RelaxApp")
-        # self.root.after(200, lambda: self.root.iconbitmap(os.path.join(image_path, "logo.ico")))
+        self.root.after(200, lambda: self.root.iconbitmap(os.path.join(image_path, "logo.ico")))
 
         # The main menu is run.
         RelaxApp_Initial_Frame(self.root, self.general_frame)
@@ -115,39 +109,39 @@ class RelaxApp_Structure:
 ### Class that contains general settings of the Pop-ups ###
 ###########################################################
 
-# class RelaxApp_MessageBox_Structure:
-#     """This class defines the general structure of the pop-ups.
-#        Defines the dimensions, title and creates a frame."""
+class RelaxApp_MessageBox_Structure:
+    """This class defines the general structure of the pop-ups.
+       Defines the dimensions, title and creates a frame."""
 
-#     def __init__(self):
+    def __init__(self):
 
-#         # New pop-ups is created.
-#         self.window_MS = ctk.CTkToplevel()
-#         self.window_MS.grab_set()
+        # New pop-ups is created.
+        self.window_MS = ctk.CTkToplevel()
+        self.window_MS.grab_set()
 
-#         # Set the width, height, configuration and location of the windows.
-#         width = 550
-#         height = 150
-#         width_resolution = self.window_MS.winfo_screenwidth() // 2 - width // 2 - width // 3
-#         height_resolution = self.window_MS.winfo_screenheight() // 2 - height
-#         self.dimensions = self.window_MS.geometry(f"{width}x{height}+{width_resolution}+{height_resolution}")
-#         self.maximize = self.window_MS.resizable(False,False)
+        # Set the width, height, configuration and location of the windows.
+        width = 550
+        height = 150
+        width_resolution = self.window_MS.winfo_screenwidth() // 2 - width // 2 - width // 3
+        height_resolution = self.window_MS.winfo_screenheight() // 2 - height
+        self.dimensions = self.window_MS.geometry(f"{width}x{height}+{width_resolution}+{height_resolution}")
+        self.maximize = self.window_MS.resizable(False,False)
 
-#         # Set a frame at the background.
-#         self.frame_MS = ctk.CTkFrame(self.window_MS, height=200, width=550, fg_color=colors["soft_grey"])
-#         self.frame_MS.pack(pady=10, padx=10, fill="both")
+        # Set a frame at the background.
+        self.frame_MS = ctk.CTkFrame(self.window_MS, height=200, width=550, fg_color=colors["soft_grey"])
+        self.frame_MS.pack(pady=10, padx=10, fill="both")
 
-#         # Set the title and the logo of the app.
-#         self.title = self.window_MS.title("RelaxApp")
-#         self.window_MS.after(200, lambda: self.window_MS.iconbitmap(os.path.join(image_path, "logo.ico")))
+        # Set the title and the logo of the app.
+        self.title = self.window_MS.title("RelaxApp")
+        self.window_MS.after(200, lambda: self.window_MS.iconbitmap(os.path.join(image_path, "logo.ico")))
 
-#     # Method that remove widget from the main menu profile.
-#     def clean_MB_widgets(self, clean_MB_frame):
-#         counter = 1
-#         for wid in clean_MB_frame.winfo_children():
-#             if counter != 1:
-#                 wid.destroy()
-#             counter += 1
+    # Method that remove widget from the main menu profile.
+    def clean_MB_widgets(self, clean_MB_frame):
+        counter = 1
+        for wid in clean_MB_frame.winfo_children():
+            if counter != 1:
+                wid.destroy()
+            counter += 1
 
 
 ####################################################################
@@ -253,18 +247,21 @@ class RelaxApp_Structure:
 ### Class that contains general functions to set messages ###
 #############################################################
 
-class Set_Messages():
+class Set_Messages():       
+    """This class defines the general functions to convert messages
+       from backend in English to the interface in Spanish."""
     
+    # Messages related to the server connection.
     def server_messages(type):
         
-        # Messages related to the server connection.
         if type == "ERROR_SERVER_CONNECTION":
             return messages.ERROR_SERVER_CONNECTION
         elif type == "ERROR_SERVER_TIMEOUT":
             return messages.ERROR_SERVER_TIMEOUT
         else:
             return messages.ERROR_SERVER_GENERAL
-        
+    
+    # Messages related to the serializers errors.    
     def serializers_messages(key):
         if key == "first_name":
             return messages.ERROR_SERIALIZERS_INVALID_FIRST_NAME
@@ -287,6 +284,7 @@ class Set_Messages():
         else:
             return messages.ERROR_SERIALIZERS_GENERAL
     
+    # Messages related to the views errors. 
     def response_messages(type):
         if type == "MESSAGE_LOGIN_CORRECT":
             return messages.MESSAGE_LOGIN_CORRECT
@@ -494,8 +492,9 @@ class RelaxApp_Initial_Frame():
                                               hover_color=colors["dark_green"])
         self.button_forget_pw.place(rely=0.9, relx=0.6)
 
-    # Method to log in.
+    # Method to login.
     def sign_in(self):
+        valid_request = False
         get_login = self.entry_user.get()
         get_password = self.entry_password.get()
 
@@ -504,50 +503,44 @@ class RelaxApp_Initial_Frame():
             "password" : get_password
         }
 
+        # Request to login is started.
         response_dict = comms.login(data)
 
+        # Connection with the server is checked.
         if response_dict["connection_status"]:
 
             response = response_dict["response"]
             values = response.json()
             if response.status_code == 200:
+                # Message from backend is translated.
                 message = Set_Messages.response_messages(values["message_link"])
                 print(values["message"])
-                print(message)
+                valid_request = True
             else:
                 if values["error_type"] == "VIEWS":
                     message = Set_Messages.response_messages(values["error_link"])
                     print(values["error"])
-                    print(message)
                 elif values["error_type"] == "SERIALIZERS":
                     message = Set_Messages.serializers_messages(values["error_link"])
                     print("* ERROR: ", values["error"])
-                    print(message)
 
         else:
             message = Set_Messages.server_messages(response_dict["error_link"])
             print(response_dict["error"])
-            print(message)
 
-        # user["login"] = get_login
-        # user["password"] = get_password
-        # database.verify_login(databases["database1"], tables["users_table"], user)
+        # Label "self.login" is checked if exists or not to clean it from the interface.
+        if hasattr(self, "login"):
+            self.login.destroy()
 
-        # if database.valid_login:
-        #     waiting_logging = ctk.CTkLabel(self.frame, text="Iniciando Sesión...", font=(font,12))
-        #     waiting_logging.place(rely=0.81, relx=0.5, anchor="center")
-        #     self.frame.update_idletasks()
-        #     database.user_configuration(databases["database1"], tables["settings_table"], user["login"],
-        #                                 "Restore")
-
-        #     RelaxApp_Structure.close_create(self, RelaxApp_User_Main_Menu, self.root, self.frame)
-
-        # else:
-        #     self.error_login = ctk.CTkLabel(self.frame, text="Usuario o contraseña incorrecta. Vuelva a intentarlo.",
-        #                                     font=(font,11))
-        #     self.error_login.place(rely=0.81, relx=0.5, anchor="center")
-
-    # # Method that register users.
+        # Label to show information about the login whether the access is successful or not
+        self.login = ctk.CTkLabel(self.frame, text=message, font=(font,12))
+        self.login.place(rely=0.81, relx=0.5, anchor="center")
+        
+        if valid_request:
+            pass
+            #RelaxApp_Structure.close_create(self, RelaxApp_User_Main_Menu, self.root, self.frame) 
+        
+    # # Method to register users.
     def sign_up(self):
         RelaxApp_Structure.close_create(self, RelaxApp_User_Registration, self.root, self.frame)
 
@@ -639,7 +632,7 @@ class RelaxApp_User_Registration():
                                            hover_color=colors["dark_green"])
         self.cancel_button.place(rely=0.85, relx=0.5, anchor="center")
 
-    # This method gets the values registered and call the class to check them
+    # Method to start user registration.
     def accept_sign_up(self):
         get_first_name = self.name_entry.get()
         get_last_name = self.last_name_entry.get()
@@ -654,45 +647,12 @@ class RelaxApp_User_Registration():
             "email" : get_email,
             "password" : get_password,
         }
-               
-        response_dict = comms.register(data)
         
-        if response_dict["connection_status"]:
-            response = response_dict["response"]
-            values = response.json()
-            if response.status_code == 201:
-                message = Set_Messages.response_messages(values["message_link"])
-                print(values["message"])
-                print(message)
-            else:
-                if values["error_type"] == "VIEWS":
-                    message = Set_Messages.response_messages(values["error_link"])
-                    print(values["error"])
-                    print(message)
-    
-                elif values["error_type"] == "SERIALIZERS":
-                    keys = next(iter(values["error"]))
-                    message = Set_Messages.serializers_messages(keys)
-                    print(values["error"])
-                    print(message)
-        else:
-            message = Set_Messages.server_messages(response_dict["error_link"])
-            print(response_dict["error"])
-            print(message)
-                 
-        # user["action"] = "sign_up"
-        # user["name"] = get_name
-        # user["lastname"] = get_last_name
-        # user["login"] = get_username
-        # user["password"] = get_password
-
-        # RelaxApp_MessageBox_Options(self.root, self.frame, "Sign up", user)
+        RelaxApp_MessageBox_Options(self.root, self.frame, "Sign up", data=data)
 
     # This method cancel the user registration and turns back to the main menu.
     def cancel_sign_up (self):
-        print("se cancela el alta")
-        # RelaxApp_MessageBox_Options(self.root, self.frame, "Cancel", user)
-
+        RelaxApp_MessageBox_Options(self.root, self.frame, "Cancel")
 
 ##############################################################
 ###  Class that contains the window to change the password ###
@@ -746,50 +706,41 @@ class RelaxApp_User_Change_Password():
                                                      hover_color=colors["dark_green"])
         self.cancel_change_pw_button.place(rely=0.75, relx=0.5, anchor="center")
 
-    # This method gets the values registered and call the class to check them.
+    # Method to send a code to start the change of the password.
     def send_code(self):
-
-        # Variable to compare password 1 with password 2.
-        self.confirm_pw = False
 
         get_email_pw_menu = self.email_entry.get()
         
         data = {"email" : get_email_pw_menu}
         
+        # Request to reset the password is started.
         response_dict = comms.reset_password(data)
 
+        # Connection with the server is checked.
         if response_dict["connection_status"]:
             response = response_dict["response"]
             values = response.json()
             if response.status_code == 200:
                 print(values["message"])
+                # Second step to make a reset of the password is called.
                 RelaxApp_Structure.close_create(self, RelaxApp_User_Confirm_Change_Password, self.root, self.frame, get_email_pw_menu)
             else:
+                # The first key error from serializers is gotten.
                 keys = next(iter(values["error"]))
+                # Message from backend is translated.
                 message = Set_Messages.serializers_messages(keys)
                 print(values["error"])
-                print(message)
+                # Pop-up window is displayed error from serializers is displayed in Spanish.
+                RelaxApp_MessageBox_Options(self.root, self.frame, "Invalid Change PW", message=message)
         else:
             message = Set_Messages.server_messages(response_dict["error_link"])
             print(response_dict["error"])
-            print(message)
-            
-        
-        # user["action"] = "modify"
-        # user["login"] = get_username_pw_menu
-        # user["password"] = get_password1_pw_menu
-
-        # if user["password"] == get_password2_pw_menu:
-        #     self.confirm_pw = True
-        #     RelaxApp_MessageBox_Options(self.root, self.frame, "Password Correct", user)
-        # else:
-        #     RelaxApp_MessageBox_Options(self.root, self.frame, "Password Incorrect", user)
-
-    # This method cancel the user registration and turns back to the main menu.
+            # Pop-up window error from the server connection is displayed in Spanish.
+            RelaxApp_MessageBox_Options(self.root, self.frame, "Server Problem", message=message)
+ 
+    # This method cancel the change of password and turns back to the main menu.
     def cancel_change_pw (self):
-        print("Se cancela el cambio")
-        #RelaxApp_MessageBox_Options(self.root, self.frame, "Cancel Change PW", user)
-
+        RelaxApp_MessageBox_Options(self.root, self.frame, "Cancel Change PW")
 
 class RelaxApp_User_Confirm_Change_Password():
     """This class opens a new window to confirm the change of the password."""
@@ -855,11 +806,8 @@ class RelaxApp_User_Confirm_Change_Password():
                                                      hover_color=colors["dark_green"])
         self.cancel_change_pw_button.place(rely=0.75, relx=0.5, anchor="center")
 
-    # This method gets the values registered and call the class to check them.
+    # Method to confirm the change of the password.
     def accept_change_pw(self):
-
-        # Variable to compare password 1 with password 2.
-        self.confirm_pw = False
 
         get_code_pw_menu = self.code_entry.get()
         get_password1_pw_menu = self.pw1_entry.get()
@@ -872,44 +820,12 @@ class RelaxApp_User_Confirm_Change_Password():
             "password2" : get_password2_pw_menu
         }
         
-        response_dict = comms.reset_password_confirmation(data)
-        
-        if response_dict["connection_status"]:
-            response = response_dict["response"]
-            values = response.json()
-            if response.status_code == 200:
-                message = Set_Messages.response_messages(values["message_link"])
-                print(values["message"])
-                print(message)
-            else:
-                if values["error_type"] == "VIEWS":
-                    message = Set_Messages.response_messages(values["error_link"])
-                    print(values["error"])
-                    print(message)
-                    
-                elif values["error_type"] == "SERIALIZERS":
-                    keys = next(iter(values["error"]))
-                    message = Set_Messages.serializers_messages(keys)
-                    print(values["error"])
-                    print(message)
-        else:
-            message = Set_Messages.server_messages(response_dict["error_link"])
-            print(response_dict["error"])
-            print(message)
-        # user["action"] = "modify"
-        # user["login"] = get_username_pw_menu
-        # user["password"] = get_password1_pw_menu
-
-        # if user["password"] == get_password2_pw_menu:
-        #     self.confirm_pw = True
-        #     RelaxApp_MessageBox_Options(self.root, self.frame, "Password Correct", user)
-        # else:
-        #     RelaxApp_MessageBox_Options(self.root, self.frame, "Password Incorrect", user)
-
-    # This method cancel the user registration and turns back to the main menu.
+        RelaxApp_MessageBox_Options(self.root, self.frame, "Confirm Change PW", data=data)
+ 
+    # This method cancel the change of password and turns back to the main menu.
     def cancel_change_pw (self):
-        print("Se cancela el cambio")
-        #RelaxApp_MessageBox_Options(self.root, self.frame, "Cancel Change PW", user)
+        RelaxApp_MessageBox_Options(self.root, self.frame, "Cancel Confirm Change PW")
+        
 
 #########################################################
 ###  Class that contains the user's main menu window  ###
@@ -2658,320 +2574,399 @@ class RelaxApp_User_Confirm_Change_Password():
 ###  Class that contains all pop-ups of the App  ###
 ####################################################
 
-# class RelaxApp_MessageBox_Options(RelaxApp_MessageBox_Structure):
-#     """This class defines all pop-ups of the App.
-#        Inherit all structure from parent."""
+class RelaxApp_MessageBox_Options(RelaxApp_MessageBox_Structure):
+    """This class defines all pop-ups of the App.
+       Inherit all structure from parent."""
 
-#     def __init__(self, root, frame, message, user=None, values=None):
+    def __init__(self, root, frame, message_type, **kwargs):
 
-#         super().__init__()
+        super().__init__()
 
-#         self.root = root
-#         self.frame = frame
-#         self.message = message
-#         self.user = user
-#         self.values = values
+        self.root = root
+        self.frame = frame
+        self.message_type = message_type
+        self.message = kwargs.get("message")
+        self.data = kwargs.get("data")
 
-#         # Variable to set when the button "Accept", "Cancel" is activated
-#         self.select_button1 = False
-#         # Variable to set when the button "Return" is activated
-#         self.select_button2 = False
+        # Variable to set when the button "Accept", "Cancel" is activated
+        self.select_button1 = False
+        # Variable to set when the button "Return" is activated
+        self.select_button2 = False
+        
+        if self.message_type == "Server Problem":
+            # Label to inform a problem with the server connections.
+            self.server_failure = ctk.CTkLabel(self.window_MS, text=self.message,
+                                               font=(font,15), bg_color=colors["soft_grey"])
+            self.server_failure.place(rely=0.35, relx=0.5, anchor="center")
+            self.select_button2 = True
 
-#         if message == "Sign up":
-#             # Label ask/cancel user registration.
-#             self.ask_cancel_label = ctk.CTkLabel(self.window_MS, text="¿Está seguro que desea dar de alta el usuario indicado?",
-#                                                  font=(font,14), bg_color=colors["soft_grey"])
-#             self.ask_cancel_label.place(rely=0.3, relx=0.5, anchor="center")
-#             self.select_button1 = True
+        elif self.message_type == "Sign up":
+            # Label ask/cancel to confirm user registration.
+            self.confirm_user_registration_label = ctk.CTkLabel(self.window_MS, text=messages.MESSAGE_RELAXAPP_MB_OPTIONS_CONFIRM_ACCEPT_REGISTRATION,
+                                                   font=(font,15), bg_color=colors["soft_grey"])
+            self.confirm_user_registration_label.place(rely=0.3, relx=0.5, anchor="center")
+            self.select_button1 = True
 
-#         elif message == "Cancel":
-#             # Label ask/cancel to cancel user registration.
-#             self.ask_cancel_label = ctk.CTkLabel(self.window_MS, text="¿Está seguro que desea cancelar el alta del usuario indicado?",
-#                                                  font=(font,14), bg_color=colors["soft_grey"])
-#             self.ask_cancel_label.place(rely=0.3, relx=0.5, anchor="center")
-#             self.select_button1 = True
+        elif self.message_type == "Cancel":
+            # Label ask/cancel to cancel user registration.
+            self.cancel_user_registration_label = ctk.CTkLabel(self.window_MS, text=messages.MESSAGE_RELAXAPP_MB_OPTIONS_CONFIRM_CANCEL_REGISTRATION,
+                                                  font=(font,15), bg_color=colors["soft_grey"])
+            self.cancel_user_registration_label.place(rely=0.3, relx=0.5, anchor="center")
+            self.select_button1 = True
+                       
+        elif self.message_type == "Invalid Change PW":
+            # Label to inform that the values to change the password are invalid.
+            self.invalid_change_pw_label = ctk.CTkLabel(self.window_MS, text=self.message,
+                                           font=(font,15), bg_color=colors["soft_grey"])
+            self.invalid_change_pw_label.place(rely=0.35, relx=0.5, anchor="center")
+            self.select_button2 = True
 
-#         elif message == "Password Correct":
-#             # Label to confirm or not to change the password.
-#             self.pw_match = ctk.CTkLabel(self.window_MS, text="¿Está seguro que desea actualizar su contraseña?",
-#                                          font=(font,14), bg_color=colors["soft_grey"])
-#             self.pw_match.place(rely=0.3, relx=0.5, anchor="center")
-#             self.select_button1 = True
+        elif self.message_type == "Cancel Change PW":
+            # Label ask/cancel to cancel to change password.
+            self.cancel_change_pw_label = ctk.CTkLabel(self.window_MS, text=messages.MESSAGE_RELAXAPP_MB_OPTIONS_CONFIRM_CANCEL_PW_CHANGE,
+                                          font=(font,15), bg_color=colors["soft_grey"])
+            self.cancel_change_pw_label.place(rely=0.3, relx=0.5, anchor="center")
+            self.select_button1 = True
 
-#         elif message == "Password Incorrect":
-#             # Label to inform that the password 1 does not match with password 2.
-#             self.pw_unmatch = ctk.CTkLabel(self.window_MS, text="Las contraseñas introducidas no coinciden entre sí. \nVuelva a introducirlas.",
-#                                            font=(font,14), bg_color=colors["soft_grey"])
-#             self.pw_unmatch.place(rely=0.35, relx=0.5, anchor="center")
-#             self.select_button1 = True
+        elif self.message_type == "Confirm Change PW":
+            # Label ask/cancel to confirm the confirmation to change password.
+            self.accept_confirm_change_pw_label = ctk.CTkLabel(self.window_MS, text=messages.MESSAGE_RELAXAPP_MB_OPTIONS_CONFIRM_ACCEPT_PW_CHANGE,
+                                                  font=(font,15), bg_color=colors["soft_grey"])
+            self.accept_confirm_change_pw_label.place(rely=0.3, relx=0.5, anchor="center")
+            self.select_button1 = True
+        
+        elif self.message_type == "Cancel Confirm Change PW":
+            # Label ask/cancel to cancel the confirmation to change password.
+            self.cancel_confirm_change_pw_label = ctk.CTkLabel(self.window_MS, text=messages.MESSAGE_RELAXAPP_MB_OPTIONS_CONFIRM_CANCEL_PW_CHANGE,
+                                                  font=(font,15), bg_color=colors["soft_grey"])
+            self.cancel_confirm_change_pw_label.place(rely=0.3, relx=0.5, anchor="center")
+            self.select_button1 = True
+            
+        # elif self.message_type == "No Profile":
+        #     # Label to alert there's no profile set.
+        #     self.no_profile_label = ctk.CTkLabel(self.window_MS, text="No tienes ningún perfil creado actualmente. Configura al menos un \nvalue para poder habilitar la opción de perfiles.",
+        #                                          font=(font,14), bg_color=colors["soft_grey"])
+        #     self.no_profile_label.place(rely=0.35, relx=0.5, anchor="center")
+        #     self.select_button2 = True
 
-#         elif message == "Cancel Change PW":
-#             # Label ask/cancel to cancel to change password.
-#             self.pw_ask_cancel_label = ctk.CTkLabel(self.window_MS, text="¿Está seguro que desea cancelar el cambio de contraseña?",
-#                                                     font=(font,14), bg_color=colors["soft_grey"])
-#             self.pw_ask_cancel_label.place(rely=0.3, relx=0.5, anchor="center")
-#             self.select_button1 = True
+        # elif self.message_type == "File_Corrupt":
+        #     # Label to alert that the file was modified or is broken.
+        #     self.file_corrupt_label = ctk.CTkLabel(self.window_MS, text="El archivo que intenta abrir está dañado, ha sido modificado o \nya existe y no puede abrirse. Compruebe con otro archivo.",
+        #                                            font=(font,14), bg_color=colors["soft_grey"])
+        #     self.file_corrupt_label.place(rely=0.35, relx=0.5, anchor="center")
+        #     self.select_button2 = True
 
-#         elif message == "No Profile":
-#             # Label to alert there's no profile set.
-#             self.no_profile_label = ctk.CTkLabel(self.window_MS, text="No tienes ningún perfil creado actualmente. Configura al menos un \nvalue para poder habilitar la opción de perfiles.",
-#                                                  font=(font,14), bg_color=colors["soft_grey"])
-#             self.no_profile_label.place(rely=0.35, relx=0.5, anchor="center")
-#             self.select_button2 = True
+        # elif self.message_type == "Invalid_Format":
+        #     # Label to alert that the file was modified or is broken.
+        #     self.file_corrupt_label = ctk.CTkLabel(self.window_MS, text="El archivo que intenta abrir no tiene un formato soportado y \nno puede abrirse. Compruebe con otro archivo.",
+        #                                            font=(font,14), bg_color=colors["soft_grey"])
+        #     self.file_corrupt_label.place(rely=0.35, relx=0.5, anchor="center")
+        #     self.select_button2 = True
 
-#         elif message == "File_Corrupt":
-#             # Label to alert that the file was modified or is broken.
-#             self.file_corrupt_label = ctk.CTkLabel(self.window_MS, text="El archivo que intenta abrir está dañado, ha sido modificado o \nya existe y no puede abrirse. Compruebe con otro archivo.",
-#                                                    font=(font,14), bg_color=colors["soft_grey"])
-#             self.file_corrupt_label.place(rely=0.35, relx=0.5, anchor="center")
-#             self.select_button2 = True
+        # elif self.message_type == "Remove Account":
+        #     # Label ask/cancel to sign out.
+        #     self.pw_ask_cancel_label = ctk.CTkLabel(self.window_MS, text=f"Esta opción permite eliminar completamente la cuenta \nde '{self.user}'. ¿Está seguro que desea continuar?",
+        #                                             font=(font,14), bg_color=colors["soft_grey"])
+        #     self.pw_ask_cancel_label.place(rely=0.3, relx=0.5, anchor="center")
+        #     self.select_button1 = True
 
-#         elif message == "Invalid_Format":
-#             # Label to alert that the file was modified or is broken.
-#             self.file_corrupt_label = ctk.CTkLabel(self.window_MS, text="El archivo que intenta abrir no tiene un formato soportado y \nno puede abrirse. Compruebe con otro archivo.",
-#                                                    font=(font,14), bg_color=colors["soft_grey"])
-#             self.file_corrupt_label.place(rely=0.35, relx=0.5, anchor="center")
-#             self.select_button2 = True
+        # elif self.message_type == "Sign Out":
+        #     # Label ask/cancel to sign out.
+        #     self.pw_ask_cancel_label = ctk.CTkLabel(self.window_MS, text=f"¿Está seguro que desea cerrar la sesión de '{self.user}'?",
+        #                                             font=(font,14), bg_color=colors["soft_grey"])
+        #     self.pw_ask_cancel_label.place(rely=0.3, relx=0.5, anchor="center")
+        #     self.select_button1 = True
 
-#         elif message == "Remove Account":
-#             # Label ask/cancel to sign out.
-#             self.pw_ask_cancel_label = ctk.CTkLabel(self.window_MS, text=f"Esta opción permite eliminar completamente la cuenta \nde '{self.user}'. ¿Está seguro que desea continuar?",
-#                                                     font=(font,14), bg_color=colors["soft_grey"])
-#             self.pw_ask_cancel_label.place(rely=0.3, relx=0.5, anchor="center")
-#             self.select_button1 = True
+        # elif self.message_type == "Invalid Time":
+        #     # Label to alert not to leave entries unfilled.
+        #     self.empty_entry_label = ctk.CTkLabel(self.window_MS, text="Los campos tienen que tener 2 números entre el 0 y el 60 \npara guardarlos.",
+        #                                           font=(font,14), bg_color=colors["soft_grey"])
+        #     self.empty_entry_label.place(rely=0.35, relx=0.5, anchor="center")
+        #     self.select_button2 = True
 
-#         elif message == "Sign Out":
-#             # Label ask/cancel to sign out.
-#             self.pw_ask_cancel_label = ctk.CTkLabel(self.window_MS, text=f"¿Está seguro que desea cerrar la sesión de '{self.user}'?",
-#                                                     font=(font,14), bg_color=colors["soft_grey"])
-#             self.pw_ask_cancel_label.place(rely=0.3, relx=0.5, anchor="center")
-#             self.select_button1 = True
+        # elif self.message_type == "Extra Hours":
+        #     # Label to alert not to work extra hours.
+        #     self.extra_hours_label = ctk.CTkLabel(self.window_MS, text="No puedes configurar mas de 16hs de duración. Recuerda que \nmínimo debes dormir 8hs.",
+        #                                           font=(font,14), bg_color=colors["soft_grey"])
+        #     self.extra_hours_label.place(rely=0.35, relx=0.5, anchor="center")
+        #     self.select_button2 = True
 
-#         elif message == "Invalid Time":
-#             # Label to alert not to leave entries unfilled.
-#             self.empty_entry_label = ctk.CTkLabel(self.window_MS, text="Los campos tienen que tener 2 números entre el 0 y el 60 \npara guardarlos.",
-#                                                   font=(font,14), bg_color=colors["soft_grey"])
-#             self.empty_entry_label.place(rely=0.35, relx=0.5, anchor="center")
-#             self.select_button2 = True
+        # elif self.message_type == "Minimum Time":
+        #     # Label to alert not to work extra hours.
+        #     self.minimum_time_label = ctk.CTkLabel(self.window_MS, text="Debes configurar al menos 1 minuto de duración.",
+        #                                            font=(font,14), bg_color=colors["soft_grey"])
+        #     self.minimum_time_label.place(rely=0.3, relx=0.5, anchor="center")
+        #     self.select_button2 = True
 
-#         elif message == "Extra Hours":
-#             # Label to alert not to work extra hours.
-#             self.extra_hours_label = ctk.CTkLabel(self.window_MS, text="No puedes configurar mas de 16hs de duración. Recuerda que \nmínimo debes dormir 8hs.",
-#                                                   font=(font,14), bg_color=colors["soft_grey"])
-#             self.extra_hours_label.place(rely=0.35, relx=0.5, anchor="center")
-#             self.select_button2 = True
+        # elif self.message_type == "Over Duration":
+        #     # Label to alert not to set breaktime over lapse time.
+        #     self.over_lapse_label = ctk.CTkLabel(self.window_MS, text="El tiempo de intervalo no puede ser superior a la duración configurada.",
+        #                                          font=(font,14), bg_color=colors["soft_grey"])
+        #     self.over_lapse_label.place(rely=0.3, relx=0.5, anchor="center")
+        #     self.select_button2 = True
 
-#         elif message == "Minimum Time":
-#             # Label to alert not to work extra hours.
-#             self.minimum_time_label = ctk.CTkLabel(self.window_MS, text="Debes configurar al menos 1 minuto de duración.",
-#                                                    font=(font,14), bg_color=colors["soft_grey"])
-#             self.minimum_time_label.place(rely=0.3, relx=0.5, anchor="center")
-#             self.select_button2 = True
+        # elif self.message_type == "Over Lapse":
+        #     # Label to alert not to set breaktime over lapse time.
+        #     self.over_lapse_label = ctk.CTkLabel(self.window_MS, text="El tiempo de descanso no puede ser superior al intervalo \nde alertas configurado.",
+        #                                          font=(font,14), bg_color=colors["soft_grey"])
+        #     self.over_lapse_label.place(rely=0.35, relx=0.5, anchor="center")
+        #     self.select_button2 = True
 
-#         elif message == "Over Duration":
-#             # Label to alert not to set breaktime over lapse time.
-#             self.over_lapse_label = ctk.CTkLabel(self.window_MS, text="El tiempo de intervalo no puede ser superior a la duración configurada.",
-#                                                  font=(font,14), bg_color=colors["soft_grey"])
-#             self.over_lapse_label.place(rely=0.3, relx=0.5, anchor="center")
-#             self.select_button2 = True
+        # elif self.message_type == "No Lapse":
+        #     # Label to alert to set at least 1 minute between alerts.
+        #     self.no_lapse_label = ctk.CTkLabel(self.window_MS, text="El tiempo de intervalo entre alertas debe tener al menos 1 minuto.",
+        #                                        font=(font,14), bg_color=colors["soft_grey"])
+        #     self.no_lapse_label.place(rely=0.3, relx=0.5, anchor="center")
+        #     self.select_button2 = True
 
-#         elif message == "Over Lapse":
-#             # Label to alert not to set breaktime over lapse time.
-#             self.over_lapse_label = ctk.CTkLabel(self.window_MS, text="El tiempo de descanso no puede ser superior al intervalo \nde alertas configurado.",
-#                                                  font=(font,14), bg_color=colors["soft_grey"])
-#             self.over_lapse_label.place(rely=0.35, relx=0.5, anchor="center")
-#             self.select_button2 = True
+        # elif self.message_type == "No Break":
+        #     # Label to alert to set at least 1 minute between alerts.
+        #     self.no_break_label = ctk.CTkLabel(self.window_MS, text="El tiempo de descanso debe tener al menos 30 segundos.",
+        #                                        font=(font,14), bg_color=colors["soft_grey"])
+        #     self.no_break_label.place(rely=0.3, relx=0.5, anchor="center")
+        #     self.select_button2 = True
 
-#         elif message == "No Lapse":
-#             # Label to alert to set at least 1 minute between alerts.
-#             self.no_lapse_label = ctk.CTkLabel(self.window_MS, text="El tiempo de intervalo entre alertas debe tener al menos 1 minuto.",
-#                                                font=(font,14), bg_color=colors["soft_grey"])
-#             self.no_lapse_label.place(rely=0.3, relx=0.5, anchor="center")
-#             self.select_button2 = True
+        # elif self.message_type == "Valid Profile":
+        #     # Label to alert to set at least 1 minute between alerts.
+        #     self.valid_profile = ctk.CTkLabel(self.window_MS, text="Está seguro que desea importar el perfil seleccionado? Esto \neliminará el último de la lista  de perfiles si estuviera llena.",
+        #                                       font=(font,14), bg_color=colors["soft_grey"])
+        #     self.valid_profile.place(rely=0.35, relx=0.5, anchor="center")
+        #     self.select_button1 = True
 
-#         elif message == "No Break":
-#             # Label to alert to set at least 1 minute between alerts.
-#             self.no_break_label = ctk.CTkLabel(self.window_MS, text="El tiempo de descanso debe tener al menos 30 segundos.",
-#                                                font=(font,14), bg_color=colors["soft_grey"])
-#             self.no_break_label.place(rely=0.3, relx=0.5, anchor="center")
-#             self.select_button2 = True
+        # elif self.message_type == "No Settings":
+        #     # Label to alert to choose at least one option to start the App.
+        #     self.no_settings_label = ctk.CTkLabel(self.window_MS, text="Debes seleccionar al menos una opción antes de iniciar la aplicación.",
+        #                                           font=(font,14), bg_color=colors["soft_grey"])
+        #     self.no_settings_label.place(rely=0.3, relx=0.5, anchor="center")
+        #     self.select_button2 = True
 
-#         elif message == "Valid Profile":
-#             # Label to alert to set at least 1 minute between alerts.
-#             self.valid_profile = ctk.CTkLabel(self.window_MS, text="Está seguro que desea importar el perfil seleccionado? Esto \neliminará el último de la lista  de perfiles si estuviera llena.",
-#                                               font=(font,14), bg_color=colors["soft_grey"])
-#             self.valid_profile.place(rely=0.35, relx=0.5, anchor="center")
-#             self.select_button1 = True
+        # elif self.message_type == "No Values Set":
+        #     # Label to alert to set the values of the option chosen to start the App.
+        #     self.no_values_set_label = ctk.CTkLabel(self.window_MS, text="Cada opción elegida debe tener valores configurados antes \nde iniciar la aplicación.",
+        #                                             font=(font,14), bg_color=colors["soft_grey"])
+        #     self.no_values_set_label.place(rely=0.35, relx=0.5, anchor="center")
+        #     self.select_button2 = True
 
-#         elif message == "No Settings":
-#             # Label to alert to choose at least one option to start the App.
-#             self.no_settings_label = ctk.CTkLabel(self.window_MS, text="Debes seleccionar al menos una opción antes de iniciar la aplicación.",
-#                                                   font=(font,14), bg_color=colors["soft_grey"])
-#             self.no_settings_label.place(rely=0.3, relx=0.5, anchor="center")
-#             self.select_button2 = True
+        # elif self.message_type == "No Sound":
+        #     # Label to alert that a load sounds is trying to save but no file is loaded.
+        #     self.no_sound_label = ctk.CTkLabel(self.window_MS, text="No puedes guardar una configuración con un sonido propio \nsin cargarlo previamente.",
+        #                                        font=(font,14), bg_color=colors["soft_grey"])
+        #     self.no_sound_label.place(rely=0.35, relx=0.5, anchor="center")
+        #     self.select_button2 = True
 
-#         elif message == "No Values Set":
-#             # Label to alert to set the values of the option chosen to start the App.
-#             self.no_values_set_label = ctk.CTkLabel(self.window_MS, text="Cada opción elegida debe tener valores configurados antes \nde iniciar la aplicación.",
-#                                                     font=(font,14), bg_color=colors["soft_grey"])
-#             self.no_values_set_label.place(rely=0.35, relx=0.5, anchor="center")
-#             self.select_button2 = True
+        # elif self.message_type == "No Name":
+        #     # Label to alert that a load sounds is trying to save but no file is loaded.
+        #     self.no_name_label = ctk.CTkLabel(self.window_MS, text="El nombre del perfil deber tener al menos un caracter y un \nmáximo de 20.",
+        #                                       font=(font,14), bg_color=colors["soft_grey"])
+        #     self.no_name_label.place(rely=0.35, relx=0.5, anchor="center")
+        #     self.select_button2 = True
 
-#         elif message == "No Sound":
-#             # Label to alert that a load sounds is trying to save but no file is loaded.
-#             self.no_sound_label = ctk.CTkLabel(self.window_MS, text="No puedes guardar una configuración con un sonido propio \nsin cargarlo previamente.",
-#                                                font=(font,14), bg_color=colors["soft_grey"])
-#             self.no_sound_label.place(rely=0.35, relx=0.5, anchor="center")
-#             self.select_button2 = True
+        # elif self.message_type == "Full Profile":
+        #     # Label to alert that a load sounds is trying to save but no file is loaded.
+        #     self.full_profile_label = ctk.CTkLabel(self.window_MS, text="No se pueden agregar mas de 3 perfiles. Elimine alguno de los \nque tiene configurados.",
+        #                                            font=(font,14), bg_color=colors["soft_grey"])
+        #     self.full_profile_label.place(rely=0.35, relx=0.5, anchor="center")
+        #     self.select_button2 = True
 
-#         elif message == "No Name":
-#             # Label to alert that a load sounds is trying to save but no file is loaded.
-#             self.no_name_label = ctk.CTkLabel(self.window_MS, text="El nombre del perfil deber tener al menos un caracter y un \nmáximo de 20.",
-#                                               font=(font,14), bg_color=colors["soft_grey"])
-#             self.no_name_label.place(rely=0.35, relx=0.5, anchor="center")
-#             self.select_button2 = True
+        # elif self.message_type == "Duplicated":
+        #     # Label to alert that a load sounds is trying to save but no file is loaded.
+        #     self.duplicated_profile_label = ctk.CTkLabel(self.window_MS, text="El nombre del perfil que intenta agregar ya existe. Elija \nuno distinto.",
+        #                                     font=(font,14), bg_color=colors["soft_grey"])
+        #     self.duplicated_profile_label.place(rely=0.35, relx=0.5, anchor="center")
+        #     self.select_button2 = True
 
-#         elif message == "Full Profile":
-#             # Label to alert that a load sounds is trying to save but no file is loaded.
-#             self.full_profile_label = ctk.CTkLabel(self.window_MS, text="No se pueden agregar mas de 3 perfiles. Elimine alguno de los \nque tiene configurados.",
-#                                                    font=(font,14), bg_color=colors["soft_grey"])
-#             self.full_profile_label.place(rely=0.35, relx=0.5, anchor="center")
-#             self.select_button2 = True
+        if self.select_button1 == True:
+            # Button to accept a change.
+            self.accept_ask_cancel_button = ctk.CTkButton(self.window_MS, width=80, height=17, text="Aceptar", font=(font,14),
+                                                          command=lambda: self.accept_button(self.message_type), corner_radius=10,
+                                                          hover=True, fg_color=colors["soft_green"], hover_color=colors["dark_green"],
+                                                          bg_color=colors["soft_grey"])
+            self.accept_ask_cancel_button.place(rely=0.65, relx=0.25, anchor="w")
 
-#         elif message == "Duplicated":
-#             # Label to alert that a load sounds is trying to save but no file is loaded.
-#             self.duplicated_profile_label = ctk.CTkLabel(self.window_MS, text="El nombre del perfil que intenta agregar ya existe. Elija \nuno distinto.",
-#                                             font=(font,14), bg_color=colors["soft_grey"])
-#             self.duplicated_profile_label.place(rely=0.35, relx=0.5, anchor="center")
-#             self.select_button2 = True
+            # Button to cancel a change.
+            self.cancel_ask_cancel_button = ctk.CTkButton(self.window_MS, width=80, height=17, text="Cancelar", font=(font,14),
+                                                          command=self.cancel_button, corner_radius=10, hover=True,
+                                                          fg_color=colors["soft_green"], hover_color=colors["dark_green"],
+                                                          bg_color=colors["soft_grey"])
+            self.cancel_ask_cancel_button.place(rely=0.65, relx=0.75, anchor="e")
 
-#         if self.select_button1 == True:
-#             # Button to accept user registration.
-#             self.accept_ask_cancel_button = ctk.CTkButton(self.window_MS, width=80, height=17, text="Aceptar", font=(font,14),
-#                                                           command=lambda: self.accept_button(message), corner_radius=10,
-#                                                           hover=True, fg_color=colors["soft_green"], hover_color=colors["dark_green"],
-#                                                           bg_color=colors["soft_grey"])
-#             self.accept_ask_cancel_button.place(rely=0.65, relx=0.25, anchor="w")
+        if self.select_button2 == True:
+            # Button to continue after a change.
+            self.continue_registration_button = ctk.CTkButton(self.window_MS, width=80, height=17, text="Volver", font=(font,14),
+                                                              command=self.return_button, corner_radius=10, hover=True,
+                                                              fg_color=colors["soft_green"], hover_color=colors["dark_green"],
+                                                              bg_color=colors["soft_grey"])
+            self.continue_registration_button.place(rely=0.65, relx=0.5, anchor="center")
 
-#             # Button to cancel user registration.
-#             self.cancel_ask_cancel_button = ctk.CTkButton(self.window_MS, width=80, height=17, text="Cancelar", font=(font,14),
-#                                                           command=self.cancel_button, corner_radius=10, hover=True,
-#                                                           fg_color=colors["soft_green"], hover_color=colors["dark_green"],
-#                                                           bg_color=colors["soft_grey"])
-#             self.cancel_ask_cancel_button.place(rely=0.65, relx=0.75, anchor="e")
+    # This method confirm a change.
+    def accept_button(self, message_type):
+        
+        valid_request = False
+        
+        # This conditional accept the registration. 
+        if message_type == "Sign up":
+            
+            # Request to create an user is confirmed.
+            response_dict = comms.register(self.data)
+            
+            # Connection with the server is checked.     
+            if response_dict["connection_status"]:
+                response = response_dict["response"]
+                values = response.json()
+                if response.status_code == 201:
+                    # Message from backend is translated.
+                    message = Set_Messages.response_messages(values["message_link"])
+                    print(values["message"])
+                    valid_request = True
 
-#         if self.select_button2 == True:
-#             # Button to continue to the main menu.
-#             self.continue_registration_button = ctk.CTkButton(self.window_MS, width=80, height=17, text="Volver", font=(font,14),
-#                                                               command=self.return_button, corner_radius=10, hover=True,
-#                                                               fg_color=colors["soft_green"], hover_color=colors["dark_green"],
-#                                                               bg_color=colors["soft_grey"])
-#             self.continue_registration_button.place(rely=0.65, relx=0.5, anchor="center")
+                else:
+                    # These conditionals check if the error cames from views or serializers to set the correct translation.
+                    if values["error_type"] == "VIEWS":
+                        message = Set_Messages.response_messages(values["error_link"])
+                        print(values["error"])
+        
+                    elif values["error_type"] == "SERIALIZERS":
+                        keys = next(iter(values["error"]))
+                        message = Set_Messages.serializers_messages(keys)
+                        print(values["error"])
 
-#     # This method accepts registration or accepts cancelation
-#     def accept_button(self, message):
+            else:
+                message = Set_Messages.server_messages(response_dict["error_link"])
+                print(response_dict["error"])
 
-#         if message == "Sign up":
-#             # App connects with the database to check if the information is valid or not.
-#             database.edit_table(databases["database1"], tables["users_table"], self.user)
-#         elif message == "Password Correct":
-#              # App connects with the database to check if the information is valid or not.
-#             database.edit_table(databases["database1"], tables["users_table"], self.user)
-#         elif message == "Valid Profile":
-#             database.query(f"SELECT ID FROM {databases['database1']}.{tables['settings_table']} WHERE login = '{user['login']}'")
-#             id = []
+        # This conditional accept the change of password.
+        elif message_type == "Confirm Change PW":
+            # Request to reset a password is confirmed.
+            response_dict = comms.reset_password_confirmation(self.data)
+                    
+            if response_dict["connection_status"]:
+                response = response_dict["response"]
+                values = response.json()
+                if response.status_code == 200:
+                    message = Set_Messages.response_messages(values["message_link"])
+                    print(values["message"])
+                    valid_request = True
+                else:
+                    if values["error_type"] == "VIEWS":
+                        message = Set_Messages.response_messages(values["error_link"])
+                        print(values["error"])
+                        
+                    elif values["error_type"] == "SERIALIZERS":
+                        keys = next(iter(values["error"]))
+                        message = Set_Messages.serializers_messages(keys)
+                        print(values["error"])
+            else:
+                message = Set_Messages.server_messages(response_dict["error_link"])
+                print(response_dict["error"])
+                
+        # User registration or change of password are canceled and turn back to main menu as weel as sign out.
+        elif message_type == "Cancel" or message_type == "Cancel Change PW" or message_type == "Cancel Confirm Change PW" or message_type == "Sign Out":
+            self.window_MS.destroy()
+            RelaxApp_Structure.close_create2(self, RelaxApp_Initial_Frame, self.root, self.frame)
+            return
+        
+        # The request is checked. 
+        if valid_request:
+            # A pop-up window is displayed to confirm that the request has been succesful.
+            # First the pop-up window is cleaned.
+            RelaxApp_MessageBox_Structure.clean_MB_widgets(self, self.window_MS)
+            # Second a new label is created with a new message.
+            self.new_message_box("Continue", message)
+        else:
+            RelaxApp_MessageBox_Structure.clean_MB_widgets(self, self.window_MS)
+            self.new_message_box("Error", message)
+                     
+        # elif message_type == "Valid Profile":
+        #     database.query(f"SELECT ID FROM {databases['database1']}.{tables['settings_table']} WHERE login = '{user['login']}'")
+        #     id = []
 
-#             for index in range(len(database.value)):
-#                 id.append(database.value[index][0])
+        #     for index in range(len(database.value)):
+        #         id.append(database.value[index][0])
 
-#             self.values.append(id)
+        #     self.values.append(id)
 
-#             database.user_configuration(databases["database1"], tables["settings_table"], user["login"],
-#                                         "Import Profile", "Login, Profile_Name, Date_Time, Default_Profile, Visual_Configuration, \
-#                                         Stretch_Configuration, Final_Sounds_Configuration, Lapse_Sounds_Configuration", self.values)
+        #     database.user_configuration(databases["database1"], tables["settings_table"], user["login"],
+        #                                 "Import Profile", "Login, Profile_Name, Date_Time, Default_Profile, Visual_Configuration, \
+        #                                 Stretch_Configuration, Final_Sounds_Configuration, Lapse_Sounds_Configuration", self.values)
 
-#             RelaxApp_MessageBox_Structure.clean_MB_widgets(self, self.window_MS)
-#             self.new_message_box("Continue2")
+        #     RelaxApp_MessageBox_Structure.clean_MB_widgets(self, self.window_MS)
+        #     self.new_message_box("Continue2")
 
-#             RelaxApp_Structure.close_create(self, RelaxApp_User_Main_Menu, self.root, self.frame, None, None, True)
+        #     RelaxApp_Structure.close_create(self, RelaxApp_User_Main_Menu, self.root, self.frame, None, None, True)
 
-#             return
+        #     return
 
-#         # User registration is canceled and turn back to main menu.
-#         elif message == "Cancel" or message == "Cancel Change PW" or message == "Sign Out":
-#             self.window_MS.destroy()
-#             RelaxApp_Structure.close_create2(self, RelaxApp_Initial_Frame, self.root, self.frame)
-#             return
+        
 
-#         elif message == "Remove Account":
-#             database.user_configuration(databases["database1"], tables["users_table"], user["login"], "Remove Account")
-#             database.user_configuration(databases["database1"], tables["settings_table"], user["login"], "Remove Account")
-#             self.window_MS.destroy()
-#             RelaxApp_Structure.close_create2(self, RelaxApp_Initial_Frame, self.root, self.frame)
-#             return
+        # elif message_type == "Remove Account":
+        #     database.user_configuration(databases["database1"], tables["users_table"], user["login"], "Remove Account")
+        #     database.user_configuration(databases["database1"], tables["settings_table"], user["login"], "Remove Account")
+        #     self.window_MS.destroy()
+        #     RelaxApp_Structure.close_create2(self, RelaxApp_Initial_Frame, self.root, self.frame)
+        #     return
 
-#         # User is registered.
-#         if database.validate_editing == True:
+        # User is registered.
+        # if database.validate_editing == True:
 
-#             RelaxApp_MessageBox_Structure.clean_MB_widgets(self, self.window_MS)
-#             self.new_message_box("Continue")
+        #     RelaxApp_MessageBox_Structure.clean_MB_widgets(self, self.window_MS)
+        #     self.new_message_box("Continue")
 
-#         # User is not registered.
-#         else:
-#             # # Registration pop-up window is closed.
-#             RelaxApp_MessageBox_Structure.clean_MB_widgets(self, self.window_MS)
-#             self.new_message_box("Error")
+        # User is not registered.
+        # else:
+        #     # Registration pop-up window is closed.
+        #     RelaxApp_MessageBox_Structure.clean_MB_widgets(self, self.window_MS)
+        #     self.new_message_box("Error")
 
-#     # This method accepts cancelation or cancels cancelation.
-#     def cancel_button(self):
-#         self.window_MS.destroy()
+    # This method accepts cancelation or cancels cancelation.
+    def cancel_button(self):
+        self.window_MS.destroy()
 
-#     # This method is run after a message box is asking to "continue" or not.
-#     def continue_button(self, message):
-#         if message == "Continue":
-#             self.window_MS.destroy()
-#             RelaxApp_Structure.close_create(self, RelaxApp_Initial_Frame, self.root, self.frame)
-#         elif message == "Continue2":
-#             self.window_MS.destroy()
+    # This method is run after a message box is asking to "continue" or not.
+    def continue_button(self, message_type):
+        if message_type == "Continue":
+            self.window_MS.destroy()
+            RelaxApp_Structure.close_create(self, RelaxApp_Initial_Frame, self.root, self.frame)
+        elif message_type == "Continue2":
+            self.window_MS.destroy()
 
-#     # This method turns back to the last menu opened.
-#     def return_button(self):
-#         self.window_MS.destroy()
+    # This method turns back to the last menu opened.
+    def return_button(self):
+        self.window_MS.destroy()
 
-#     # This method runs a new message box after a message box when is needed a second confirmation.
-#     def new_message_box(self, message):
+    # This method runs a new message box after a message box when is needed a second confirmation.
+    def new_message_box(self, message_type, message):
 
-#         if message == "Error":
-#             # Label confirm user registration.
-#             self.continue_registration = ctk.CTkLabel(self.window_MS, text=database.message, font=(font,14),
-#                                                       bg_color=colors["soft_grey"])
-#             self.continue_registration.place(rely=0.35, relx=0.5, anchor="center")
+        if message_type == "Error":
+            # Label confirm user registration.
+            self.continue_registration = ctk.CTkLabel(self.window_MS, text=message, font=(font,15),
+                                                      bg_color=colors["soft_grey"])
+            self.continue_registration.place(rely=0.35, relx=0.5, anchor="center")
 
-#             # Button to continue to the main menu.
-#             self.continue_registration_button = ctk.CTkButton(self.window_MS, width=80, height=17, text="Volver", font=(font,14),
-#                                                               command=self.return_button, corner_radius=10, hover=True,
-#                                                               fg_color=colors["soft_green"], hover_color=colors["dark_green"],
-#                                                               bg_color=colors["soft_grey"])
-#             self.continue_registration_button.place(rely=0.65, relx=0.5, anchor="center")
+            # Button to continue to the main menu.
+            self.continue_registration_button = ctk.CTkButton(self.window_MS, width=80, height=17, text="Volver", font=(font,14),
+                                                              command=self.return_button, corner_radius=10, hover=True,
+                                                              fg_color=colors["soft_green"], hover_color=colors["dark_green"],
+                                                              bg_color=colors["soft_grey"])
+            self.continue_registration_button.place(rely=0.65, relx=0.5, anchor="center")
 
-#             return
+            return
 
-#         elif message == "Continue":
+        elif message_type == "Continue":
+            
+            # Label confirm user registration.
+            self.continue_registration = ctk.CTkLabel(self.window_MS, text=message, font=(font,15),
+                                                      bg_color=colors["soft_grey"])
+            self.continue_registration.place(rely=0.35, relx=0.5, anchor="center")
 
-#             # Label confirm user registration.
-#             self.continue_registration = ctk.CTkLabel(self.window_MS, text=database.message, font=(font,14),
-#                                                       bg_color=colors["soft_grey"])
-#             self.continue_registration.place(rely=0.35, relx=0.5, anchor="center")
+        # elif message_type == "Continue2":
+        #     # Label confirm user registration.
+        #     self.continue_registration = ctk.CTkLabel(self.window_MS, text="El perfil ha sido importado exitósamente y se ha establecido \ncomo predeterminado.", font=(font,14),
+        #                                               bg_color=colors["soft_grey"])
+        #     self.continue_registration.place(rely=0.35, relx=0.5, anchor="center")
 
-#         elif message == "Continue2":
-#             # Label confirm user registration.
-#             self.continue_registration = ctk.CTkLabel(self.window_MS, text="El perfil ha sido importado exitósamente y se ha establecido \ncomo predeterminado.", font=(font,14),
-#                                                       bg_color=colors["soft_grey"])
-#             self.continue_registration.place(rely=0.35, relx=0.5, anchor="center")
-
-#         # Button to continue to the main menu.
-#         self.continue_registration_button = ctk.CTkButton(self.window_MS, width=80, height=17, text="Continuar", font=(font,14),
-#                                                             command=lambda: self.continue_button(message), corner_radius=10, hover=True,
-#                                                             fg_color=colors["soft_green"], hover_color=colors["dark_green"],
-#                                                             bg_color=colors["soft_grey"])
-#         self.continue_registration_button.place(rely=0.65, relx=0.5, anchor="center")
+        # Button to continue to the main menu.
+        self.continue_registration_button = ctk.CTkButton(self.window_MS, width=80, height=17, text="Continuar", font=(font,14),
+                                                            command=lambda: self.continue_button(message_type), corner_radius=10, hover=True,
+                                                            fg_color=colors["soft_green"], hover_color=colors["dark_green"],
+                                                            bg_color=colors["soft_grey"])
+        self.continue_registration_button.place(rely=0.65, relx=0.5, anchor="center")

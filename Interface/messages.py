@@ -16,16 +16,22 @@ ERROR_SERIALIZERS_GENERAL = "Los campos no se han cumplimentado correctamente."
 
 ERROR_LOGIN_USERNAME_NOT_EXISTS = "El nombre de usuario no existe en nuestro sistema."
 ERROR_LOGIN_INVALID_PASSWORD = "La contraseña no es correcta. Vuelva a intentarlo."
-
-ERROR_REGISTER_USERNAME_EXISTS = "El nombre de usuario ya existe en nuestro sistema y no puede ser duplicado."
+                                  
+ERROR_REGISTER_USERNAME_EXISTS = "El nombre de usuario ya existe en nuestro sistema y no puede \nser duplicado."
 ERROR_REGISTER_EMAIL_EXISTS = "El email ya existe en nuestro sistema y no puede ser duplicado."
 
-ERROR_PW_RESET_CONF_INVALID_TOKEN = "El token proporcionado no es correcto. Confirme los valores introducidos o vuelva a solicitar otro."
-ERROR_PW_RESET_CONF_TOKEN_USED = "El token proporcionado ya ha sido utilizado. Vuelva a solicitar uno nuevamente."
-ERROR_PW_RESET_CONF_TOKEN_EXPIRED = "El token proporcionado ya ha expirado. Recuerde que sólo es válido por 2 minutos."
+ERROR_PW_RESET_CONF_INVALID_TOKEN = "El token proporcionado no es correcto. Confirme los valores \nintroducidos o vuelva a solicitar otro."
+ERROR_PW_RESET_CONF_TOKEN_USED = "El token proporcionado ya ha sido utilizado. Vuelva a solicitar \nuno nuevamente."
+ERROR_PW_RESET_CONF_TOKEN_EXPIRED = "El token proporcionado ya ha expirado. Recuerde que sólo es \nválido por 2 minutos."
 ERROR_PW_RESET_CONF_PW_NOT_MATCH = "Las contraseñas indicadas no son iguales."
 
 # ERRORS FROM COMMS.PY
 ERROR_SERVER_CONNECTION = "La conexión con el servidor ha fallado."
 ERROR_SERVER_TIMEOUT = "La solicitud ha superado el tiempo de espera."
 ERROR_SERVER_GENERAL = "Error al procesar su solicitud. Vuelva a intentarlo mas tarde."
+
+# MESSAGES FROM RelaxApp_MessageBox_Options
+MESSAGE_RELAXAPP_MB_OPTIONS_CONFIRM_ACCEPT_REGISTRATION = "¿Está seguro que desea dar de alta el usuario indicado?"
+MESSAGE_RELAXAPP_MB_OPTIONS_CONFIRM_CANCEL_REGISTRATION = "¿Está seguro que desea cancelar el alta del usuario indicado?"
+MESSAGE_RELAXAPP_MB_OPTIONS_CONFIRM_ACCEPT_PW_CHANGE = "¿Está seguro que desea actualizar su contraseña?"
+MESSAGE_RELAXAPP_MB_OPTIONS_CONFIRM_CANCEL_PW_CHANGE = "¿Está seguro que desea cancelar el cambio de contraseña?"

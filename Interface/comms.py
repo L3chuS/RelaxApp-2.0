@@ -10,7 +10,7 @@ def make_request(method, url, **kwargs):
             timeout=10,
             **kwargs
         )
-        perro = 123
+        
         return {
             "connection_status" : True,
             "response" : response,
@@ -45,12 +45,13 @@ def make_request(method, url, **kwargs):
         }
 
 def login(data):
-    
+
     response = make_request(
         "POST",
         f"{API_URL}login/",
         json=data
-    )    
+    )
+    
     return response
 
 def register(data):

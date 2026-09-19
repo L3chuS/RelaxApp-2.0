@@ -23,6 +23,8 @@ def user_login(request):
         password = login_serializer.validated_data["password"]
         
         user = User.objects.filter(username=username).first()
+        # import time
+        # time.sleep(15)
         
     else:
         return Response(
@@ -72,6 +74,9 @@ def user_registration(request):
 
         username_exist = User.objects.filter(username=username).exists()
         email_exist = User.objects.filter(email=email).exists()
+        
+        # import time
+        # time.sleep(15)
         
     else:
         return Response({
@@ -125,7 +130,9 @@ def user_pw_reset(request):
         email = change_pw_serializer.validated_data["email"]
 
         user = User.objects.filter(email=email).first()
-    
+
+        # import time
+        # time.sleep(15)
     else:
         return Response({
             "error" : change_pw_serializer.errors,
@@ -201,6 +208,9 @@ def user_pw_reset_confirmation(request):
         
         user = User.objects.filter(email=email).first()
         user_token = PasswordReset.objects.filter(user=user, code=code).first()
+        
+        # import time
+        # time.sleep(15)
     else:
         return Response({
             "error" : change_pw_confirm_serializer.errors,
