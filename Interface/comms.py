@@ -1,16 +1,24 @@
 import requests
 from settings import API_URL
+from user_temporary_settings import Session
 
 def make_request(method, url, **kwargs):
     
     try:
+        
+        headers = kwargs.pop("headers", {})
+        
+        if Session.token:
+            headers["Authorization"] = f"Token {Session.token}"
+
         response =  requests.request(
             method,
             url,
+            headers=headers,
             timeout=10,
             **kwargs
         )
-        
+
         return {
             "connection_status" : True,
             "response" : response,
@@ -78,4 +86,20 @@ def reset_password_confirmation(data):
             f"{API_URL}reset/confirm/",
             json=data
         )        
+    return response
+
+# def validate_profiles(data):
+#     response = make_request(
+#         "POST",
+#         f"{API_URL}profiles/validate/",
+#         json=data
+#     )
+#     return response
+
+def data_validate(data):
+    response = make_request(
+        "POST",
+        f"{API_URL}data/validate/",
+        json=data,
+    )
     return response

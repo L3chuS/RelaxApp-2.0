@@ -6,4 +6,7 @@ urlpatterns = [
     path("register/", views.user_registration, name="user_registration"),
     path("reset/", views.user_pw_reset, name="user_pw_reset"),
     path("reset/confirm/", views.user_pw_reset_confirmation, name="user_pw_reset_confirmation"),
+    path("profiles/", views.profiles, name="profiles"),
+    #path("profiles/validate/", views.profiles_validate, name="profiles_validate"),
+    path("data/validate/", views.data_validate, name="data_validate")
 ]

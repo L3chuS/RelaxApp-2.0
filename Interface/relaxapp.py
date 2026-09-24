@@ -12,6 +12,8 @@ from utils import get_resource_path
 import webbrowser
 import comms
 import messages
+from user_temporary_settings import *
+
 
 # Get the windows resolution regardless of rescaling
 user32 = ctypes.windll.user32
@@ -38,6 +40,7 @@ font = "Segoe Print"
 # Set all valid audio extension.
 audio_accepted_files = (("Audio Files", "*.mp3"),("Audio Files", "*.ogg"), ("Audio Files", "*.wav"),
                         ("Audio Files", "*.m4a"), ("Audio Files", "*.wma"), ("Audio Files", "*.flac"))
+
 
 #######################################################
 ### Class that contains general settings of the App ###
@@ -148,38 +151,38 @@ class RelaxApp_MessageBox_Structure:
 ### Class that contains general settings of the user's main menu ###
 ####################################################################
 
-# class RelaxApp_User_Settings_Structure:
-#     """This class defines the general structure of the user's main
-#        menu settings. Defines the appearance, dimensions and title."""
+class RelaxApp_User_Settings_Structure:
+    """This class defines the general structure of the user's main
+       menu settings. Defines the appearance, dimensions and title."""
 
-#     def __init__(self):
+    def __init__(self):
 
-#         # New pop-ups is created.
-#         self.window_User_SS = ctk.CTkToplevel()
-#         self.window_User_SS.grab_set()
+        # New pop-ups is created.
+        self.window_User_SS = ctk.CTkToplevel()
+        self.window_User_SS.grab_set()
 
-#         # Set the width, height, configuration and location of the windows.
-#         width = 260
-#         height = 300
-#         width_resolution = self.window_User_SS.winfo_screenwidth() // 2 - width // 2 - width // 3
-#         height_resolution = self.window_User_SS.winfo_screenheight() // 2 - height
-#         self.dimensions = self.window_User_SS.geometry(f"{width}x{height}+{width_resolution}+{height_resolution}")
-#         self.maximize = self.window_User_SS.resizable(False,False)
+        # Set the width, height, configuration and location of the windows.
+        width = 260
+        height = 300
+        width_resolution = self.window_User_SS.winfo_screenwidth() // 2 - width // 2 - width // 3
+        height_resolution = self.window_User_SS.winfo_screenheight() // 2 - height
+        self.dimensions = self.window_User_SS.geometry(f"{width}x{height}+{width_resolution}+{height_resolution}")
+        self.maximize = self.window_User_SS.resizable(False,False)
 
-#         # Set a frame at the background.
-#         self.frame_User_SS = ctk.CTkFrame(self.window_User_SS, height=300, width=260, fg_color=colors["soft_grey"])
-#         self.frame_User_SS.pack(pady=10, padx=10, fill="both")
+        # Set a frame at the background.
+        self.frame_User_SS = ctk.CTkFrame(self.window_User_SS, height=300, width=260, fg_color=colors["soft_grey"])
+        self.frame_User_SS.pack(pady=10, padx=10, fill="both")
 
-#         # Set the title and the logo of the app.
-#         self.title = self.window_User_SS.title("RelaxApp")
-#         self.window_User_SS.after(200, lambda: self.window_User_SS.iconbitmap(os.path.join(image_path, "logo.ico")))
+        # Set the title and the logo of the app.
+        self.title = self.window_User_SS.title("RelaxApp")
+        self.window_User_SS.after(200, lambda: self.window_User_SS.iconbitmap(os.path.join(image_path, "logo.ico")))
 
-#     # Method that creates a new root everytime the main root is destroyed.
-#     def close_create_profiles(self, new_window, root, clean_frame, *args):
-#         self.root = root
-#         for wid in clean_frame.winfo_children():
-#             wid.destroy()
-#         app = new_window(self.root, clean_frame)
+    # Method that creates a new root everytime the main root is destroyed.
+    def close_create_profiles(self, new_window, root, clean_frame, *args):
+        self.root = root
+        for wid in clean_frame.winfo_children():
+            wid.destroy()
+        app = new_window(self.root, clean_frame)
 
 ######################################################################
 ### Class that contains general settings while RelaxApp is running ###
@@ -263,23 +266,27 @@ class Set_Messages():
     
     # Messages related to the serializers errors.    
     def serializers_messages(key):
-        if key == "first_name":
+        if key == "USERNAME_BLANK":
+            return messages.ERROR_SERIALIZERS_USERNAME_BLANK
+        elif key == "PASSWORD_BLANK":
+            return messages.ERROR_SERIALIZERS_PASSWORD_BLANK
+        elif key == "FIRST_NAME_BLANK":
             return messages.ERROR_SERIALIZERS_INVALID_FIRST_NAME
-        elif key == "last_name":
+        elif key == "LAST_NAME_BLANK":
             return messages.ERROR_SERIALIZERS_INVALID_LAST_NAME
-        elif key == "username":
+        elif key == "USERNAME_BLANK":
             return messages.ERROR_SERIALIZERS_INVALID_USERNAME
-        elif key == "email":
+        elif key == "EMAIL_BLANK" or key == "EMAIL_INVALID":
             return messages.ERROR_SERIALIZERS_INVALID_EMAIL
-        elif key == "password":
+        elif key == "PASSWORD_BLANK":
             return messages.ERROR_SERIALIZERS_INVALID_PASSWORD
-        elif key == "code":
+        elif key == "CODE_BLANK":
             return messages.ERROR_SERIALIZERS_TOKEN_MISSING
-        elif key == "password1":
+        elif key == "PASSWORD1_BLANK":
             return messages.ERROR_SERIALIZERS_PASSWORD1_MISSING
-        elif key == "password2":
+        elif key == "PASSWORD2_BLANK":
             return messages.ERROR_SERIALIZERS_PASSWORD2_MISSING
-        elif key == "password_no_match":
+        elif key == "PASSWORD_NO_MATCH_INVALID":
             return messages.ERROR_PW_RESET_CONF_PW_NOT_MATCH
         else:
             return messages.ERROR_SERIALIZERS_GENERAL
@@ -308,6 +315,24 @@ class Set_Messages():
             return messages.ERROR_PW_RESET_CONF_TOKEN_USED
         elif type == "ERROR_PW_RESET_CONF_TOKEN_EXPIRED":
             return messages.ERROR_PW_RESET_CONF_TOKEN_EXPIRED
+        
+    def validators_messages(key):
+        if key == "INVALID_TIME":
+            return messages.ERROR_VALIDATORS_INVALID_TIME
+        elif key == "EXTRA_HOURS":
+            return messages.ERROR_VALIDATORS_EXTRA_HOURS
+        elif key == "MINIMUM_TIME":
+            return messages.ERROR_VALIDATORS_MINIMUM_TIME
+        elif key == "OVER_DURATION":
+            return messages.ERROR_VALIDATORS_OVER_DURATION
+        elif key == "OVER_LAPSE":
+            return messages.ERROR_VALIDATORS_OVER_LAPSE
+        elif key == "NO_LAPSE":
+            return messages.ERROR_VALIDATORS_NO_LAPSE
+        elif key == "NO_BREAK":
+            return messages.ERROR_VALIDATORS_NO_BREAK
+        elif key == "INVALID_SOUND":
+            return messages.ERROR_VALIDATORS_INVALID_SOUND
         
 
 #############################################################
@@ -404,42 +429,42 @@ class Set_Messages():
 ### Class that is used to validate entries in the user's main menu settings ###
 ###############################################################################
 
-# class Validate_CMD:
-#     """This class is used to validate the user's personal settings entries
-#        in the main menu."""
+class Validate_CMD:
+    """This class is used to validate the user's personal settings entries
+       in the main menu."""
 
-#     # Funtions to validate lenght of the hours entries.
-#     def validate_hours(text):
-#         if len(text) == 0:
-#             return True
-#         elif text == "HH":
-#             return True
-#         elif len(text) < 3 and text.isdigit():
-#             return True
-#         else:
-#             return False
+    # Funtions to validate lenght of the hours entries.
+    def validate_hours(text):
+        if len(text) == 0:
+            return True
+        elif text == "HH":
+            return True
+        elif len(text) < 3 and text.isdigit():
+            return True
+        else:
+            return False
 
-#     # Funtions to validate lenght of the minutes and seconds entries.
-#     def validate_min_sec(text):
-#         if len(text) == 0:
-#             return True
-#         elif text == "MM" or text == "SS":
-#             return True
-#         elif len(text) < 3 and text.isdigit():
-#             return True
-#         else:
-#             return False
+    # Funtions to validate lenght of the minutes and seconds entries.
+    def validate_min_sec(text):
+        if len(text) == 0:
+            return True
+        elif text == "MM" or text == "SS":
+            return True
+        elif len(text) < 3 and text.isdigit():
+            return True
+        else:
+            return False
 
-#     # Funtions to validate lenght of the profile name not to be larger than 20 characters.
-#     def validate_lenght_name(text):
-#         if len(text) == 0:
-#             return True
-#         elif text == "Nombre del Perfil":
-#             return True
-#         elif len(text) < 21:
-#             return True
-#         else:
-#             return False
+    # Funtions to validate lenght of the profile name not to be larger than 20 characters.
+    def validate_lenght_name(text):
+        if len(text) == 0:
+            return True
+        elif text == "Nombre del Perfil":
+            return True
+        elif len(text) < 21:
+            return True
+        else:
+            return False
 
 
 ######################################################
@@ -454,6 +479,7 @@ class RelaxApp_Initial_Frame():
         self.root = root
         self.frame = frame
 
+        print("Esto es Session.token: ",Session.token)
         # User label.
         self.user = ctk.CTkLabel(self.frame, text="Usuario", font=(font,19))
         self.user.place(rely=0.40, relx=0.5, anchor="center")
@@ -494,6 +520,7 @@ class RelaxApp_Initial_Frame():
 
     # Method to login.
     def sign_in(self):
+        
         valid_request = False
         get_login = self.entry_user.get()
         get_password = self.entry_password.get()
@@ -521,7 +548,8 @@ class RelaxApp_Initial_Frame():
                     message = Set_Messages.response_messages(values["error_link"])
                     print(values["error"])
                 elif values["error_type"] == "SERIALIZERS":
-                    message = Set_Messages.serializers_messages(values["error_link"])
+                    key = values["error_link"].upper()
+                    message = Set_Messages.serializers_messages(key)
                     print("* ERROR: ", values["error"])
 
         else:
@@ -535,10 +563,11 @@ class RelaxApp_Initial_Frame():
         # Label to show information about the login whether the access is successful or not
         self.login = ctk.CTkLabel(self.frame, text=message, font=(font,12))
         self.login.place(rely=0.81, relx=0.5, anchor="center")
-        
+
         if valid_request:
-            pass
-            #RelaxApp_Structure.close_create(self, RelaxApp_User_Main_Menu, self.root, self.frame) 
+            Session.token = values["token"]
+            Session.username = get_login
+            RelaxApp_Structure.close_create(self, RelaxApp_User_Main_Menu, self.root, self.frame) 
         
     # # Method to register users.
     def sign_up(self):
@@ -654,6 +683,7 @@ class RelaxApp_User_Registration():
     def cancel_sign_up (self):
         RelaxApp_MessageBox_Options(self.root, self.frame, "Cancel")
 
+
 ##############################################################
 ###  Class that contains the window to change the password ###
 ##############################################################
@@ -726,10 +756,10 @@ class RelaxApp_User_Change_Password():
                 RelaxApp_Structure.close_create(self, RelaxApp_User_Confirm_Change_Password, self.root, self.frame, get_email_pw_menu)
             else:
                 # The first key error from serializers is gotten.
-                keys = next(iter(values["error"]))
+                key = values["error_link"].upper()
                 # Message from backend is translated.
-                message = Set_Messages.serializers_messages(keys)
-                print(values["error"])
+                message = Set_Messages.serializers_messages(key)
+                print("* ERROR: ", values["error"])
                 # Pop-up window is displayed error from serializers is displayed in Spanish.
                 RelaxApp_MessageBox_Options(self.root, self.frame, "Invalid Change PW", message=message)
         else:
@@ -741,6 +771,11 @@ class RelaxApp_User_Change_Password():
     # This method cancel the change of password and turns back to the main menu.
     def cancel_change_pw (self):
         RelaxApp_MessageBox_Options(self.root, self.frame, "Cancel Change PW")
+
+
+#############################################################################
+###  Class that contains the window to confirm the change of the password ###
+#############################################################################
 
 class RelaxApp_User_Confirm_Change_Password():
     """This class opens a new window to confirm the change of the password."""
@@ -831,360 +866,370 @@ class RelaxApp_User_Confirm_Change_Password():
 ###  Class that contains the user's main menu window  ###
 #########################################################
 
-# class RelaxApp_User_Main_Menu():
-#     """This class contains the user's main menu. It allows to start
-#        the app, set, save and load settings and knows about RelaxApp."""
-
-#     def __init__(self, root, frame, visual_set=False, stretch_set=False, value=False):
-
-#         self.root = root
-#         self.frame = frame
-
-#         self.visual_set = visual_set
-#         self.stretch_set = stretch_set
-#         self.value_test = value
-
-#         # Frame at the back.
-#         self.frame.configure(fg_color=colors["black"])
-
-#         # Frame at the top that contains menu options.
-#         self.frame_top_menu = ctk.CTkFrame(self.frame, height=30, width=340, fg_color=colors["soft_grey"],
-#                                            corner_radius=3)
-#         self.frame_top_menu.place(rely=0.0)
-
-#         # Main frame that contains all user options.
-#         self.frame_main = ctk.CTkFrame(self.frame, height=450, width=336, fg_color=colors["soft_grey"],
-#                                        corner_radius=10)
-#         self.frame_main.place(rely=0.07)
-
-#         # Archieve button menu.
-#         self.archieve_menu_button = tk.Menubutton(self.frame_top_menu, text="Archivo", font=(font,9), width=5,
-#                                                   height=2, background=colors["soft_grey"], foreground=colors["white"],
-#                                                   activebackground=colors["dark_green"], activeforeground=colors["white"])
-#         self.archieve_menu_button.place(rely=0.5, relx=0, anchor="w")
-
-#         # Help button menu.
-#         self.help_button = tk.Menubutton(self.frame_top_menu, text="Ayuda", font=(font,9), width=4,
-#                                          height=2, background=colors["soft_grey"], foreground=colors["white"],
-#                                          activebackground=colors["dark_green"], activeforeground=colors["white"])
-#         self.help_button.place(rely=0.5, relx=0.18, anchor="w")
-
-#         # Profile button menu.
-#         self.profile_button = tk.Menubutton(self.frame_top_menu, text="Cuenta", font=(font,9), width=4,
-#                                             height=2, background=colors["soft_grey"], foreground=colors["white"],
-#                                             activebackground=colors["dark_green"], activeforeground=colors["white"])
-#         self.profile_button.place(rely=0.5, relx=0.34, anchor="w")
-
-#         # Sign out button menu.
-#         self.sign_out_button = ctk.CTkButton(self.frame_top_menu, width=10, height=50, text="Cerrar Sesión",
-#                                              font=(font,12), command=self.sign_out, hover=True, fg_color=colors["soft_grey"],
-#                                              hover_color=colors["dark_green"])
-#         self.sign_out_button.place(rely=0.5, relx=1, anchor="e")
-
-#         # Archieve menu cascade.
-#         self.menu_archieve = tk.Menu(self.archieve_menu_button, tearoff=0)
-#         self.archieve_menu_button.config(menu=self.menu_archieve)
-
-#         # Help menu cascade.
-#         self.menu_help = tk.Menu(self.help_button, tearoff=0)
-#         self.help_button.config(menu=self.menu_help)
-
-#         # Profile menu cascade.
-#         self.menu_profile = tk.Menu(self.profile_button, tearoff=0)
-#         self.profile_button.config(menu=self.menu_profile)
-
-#         # Labels of archieve menu cascade.
-#         self.menu_archieve.add_command(label=" Importar Perfil  ", font=(font,9), command=self.import_profile,
-#                                        background=colors["soft_grey"], foreground=colors["white"], activebackground=colors["dark_green"],
-#                                        hidemargin=True)
-#         self.menu_archieve.add_command(label=" Exportar Perfil  ", font=(font,9), command=self.export_profile,
-#                                        background=colors["soft_grey"], foreground=colors["white"], activebackground=colors["dark_green"],
-#                                        hidemargin=True)
-
-#         # Label of help menu cascade.
-#         self.menu_help.add_command(label=" Conozca RelaxApp  ", font=(font,9), command=self.about_us, background=colors["soft_grey"],
-#                                    foreground=colors["white"], activebackground=colors["dark_green"], hidemargin=True)
-
-#         # Label of profile menu cascade.
-#         self.menu_profile.add_command(label=" Eliminar Cuenta  ", font=(font,9), command=self.remove_account, background=colors["soft_grey"],
-#                                       foreground=colors["white"], activebackground=colors["dark_green"], hidemargin=True)
-
-#         # Options label.
-#         self.options = ctk.CTkLabel(self.frame_main, text="Configurar", font=(font, 16), corner_radius=10, height=35)
-#         self.options.place(rely=0.2, relx=0.5, anchor="center")
-
-#         database.query(f"SELECT Profile_Name FROM {databases['database1']}.{tables['settings_table']} WHERE login = '{user['login']}'")
-#         len_profiles = database.value
-
-#         # Profile button is set as active or deactive when a profile exists.
-#         if len(len_profiles) > 1 or self.value_test == True:
-#             self.profile_state = "normal"
-#         else:
-#             self.profile_state = ctk.DISABLED
-
-#         # Button to create profiles.
-#         self.profile_options = ctk.CTkButton(self.frame_main, text="Perfiles", font=(font, 14),
-#                                              command=self.create_profile, corner_radius=10, height=35,
-#                                              hover=True, fg_color=colors["soft_green"], hover_color=colors["dark_green"],
-#                                              state=self.profile_state)
-#         self.profile_options.place(rely=0.3, relx=0.25, anchor="w")
-
-#         # Variable to save the information of "profile_options_CB" when is marked or unmarked.
-#         self.profile_options_choice = ctk.IntVar()
-
-#         # Checkbox to activate or deactivate "profile_options".
-#         self.profile_options_CB = ctk.CTkCheckBox(self.frame_main, text=None, variable=self.profile_options_choice , width=20, height=20, hover=True,
-#                                                   command=self.checkbox_option1, state=self.profile_state,
-#                                                   fg_color=colors["soft_green"], hover_color=colors["dark_green"])
-#         self.profile_options_CB.place(rely=0.3, relx=0.8, anchor="e")
-
-#         # Button to set visual options.
-#         self.visual_options = ctk.CTkButton(self.frame_main, text="Descanso Visual", font=(font, 14),
-#                                             command=self.set_visual_options, corner_radius=10, height=35,
-#                                             hover=True, fg_color=colors["soft_green"], hover_color=colors["dark_green"])
-#         self.visual_options.place(rely=0.4, relx=0.25, anchor="w")
-
-#         # Variable to save the information of "visual_options_CB" when is marked or unmarked.
-#         self.visual_options_choice = ctk.IntVar()
-
-#         # Checkbox to activate or deactivate "visual_options".
-#         self.visual_options_CB = ctk.CTkCheckBox(self.frame_main, text=None, variable=self.visual_options_choice , width=20, height=20, hover=True,
-#                                                  command=self.checkbox_option2, fg_color=colors["soft_green"], hover_color=colors["dark_green"])
-#         self.visual_options_CB.place(rely=0.4, relx=0.8, anchor="e")
-
-#         # Image of a restart simbol.
-#         self.restart_button = ctk.CTkImage(Image.open(os.path.join(image_path, "Restart.png")))
-
-
-#         # Button to restart VO values set.
-#         self.restart_button1 = ctk.CTkButton(self.frame_main, text=None, image=self.restart_button, width=20, height=20, hover=True,
-#                                              command=lambda: self.restart_values("VO"), fg_color=colors["soft_grey"], hover_color=colors["dark_green"])
-#         self.restart_button1.place(rely=0.4, relx=0.9, anchor="e")
-
-#         # Button to set stretch options.
-#         self.stretch_options = ctk.CTkButton(self.frame_main, text="Estirar", font=(font, 14),
-#                                              command=self.set_stretch_options, corner_radius=10, height=35,
-#                                              hover=True, fg_color=colors["soft_green"], hover_color=colors["dark_green"])
-#         self.stretch_options.place(rely=0.5, relx=0.25, anchor="w")
-
-#         # Variable to save the information of "stretch_options_CB" when is marked or unmarked.
-#         self.stretch_options_choice = ctk.IntVar()
-
-#         # Checkbox to activate or deactivate "stretch_options".
-#         self.stretch_options_CB = ctk.CTkCheckBox(self.frame_main, text=None, variable=self.stretch_options_choice, width=20, height=20, hover=True,
-#                                                   command=self.checkbox_option3,
-#                                                   fg_color=colors["soft_green"], hover_color=colors["dark_green"])
-#         self.stretch_options_CB.place(rely=0.5, relx=0.8, anchor="e")
-
-#         # Button to restart SO values set.
-#         self.restart_button2 = ctk.CTkButton(self.frame_main, text=None, image=self.restart_button, width=20, height=20, hover=True,
-#                                              command=lambda: self.restart_values("SO"), fg_color=colors["soft_grey"], hover_color=colors["dark_green"])
-#         self.restart_button2.place(rely=0.5, relx=0.9, anchor="e")
-
-#         # Button to set sounds options.
-#         self.sounds_options = ctk.CTkButton(self.frame_main, text="Sonidos", font=(font, 14),
-#                                             command=self.set_sounds_options, corner_radius=10, height=35,
-#                                             hover=True, fg_color=colors["soft_green"], hover_color=colors["dark_green"])
-#         self.sounds_options.place(rely=0.6, relx=0.25, anchor="w")
-
-#         # Button to set start RelaxApp.
-#         self.start_relaxapp_button = ctk.CTkButton(self.frame_main, text="Iniciar", font=(font, 20),
-#                                                    command=self.start_relaxapp, height=70, corner_radius=50,
-#                                                    hover=True, fg_color=colors["soft_green"], hover_color=colors["dark_green"])
-#         self.start_relaxapp_button.place(rely=0.8, relx=0.5, anchor="center")
-
-#     # Next 3 functions unmark values when user choose between use a profile or not.
-#     def checkbox_option1(self):
-#         self.visual_options_choice.set(0)
-#         self.stretch_options_choice.set(0)
-
-#     def checkbox_option2(self):
-#         self.profile_options_choice.set(0)
-
-#     def checkbox_option3(self):
-#         self.profile_options_choice.set(0)
-
-#     # This method creates profiles.
-#     def create_profile(self):
-#         RelaxApp_User_Main_Menu_Profiles(user["login"])
-
-#     # This method import profiles.
-#     def import_profile(self):
-#         try:
-#             import_file = ctk.filedialog.askopenfilename(title="Importar Perfil")
-
-#             with open(import_file, mode="r", encoding="utf-8") as file:
-#                 read_file = file.readlines()
-#                 self.corrupt_file = False
-#                 file_values = []
-
-#                 # Bucle that add values in a list to check them easily.
-#                 for value in read_file:
-#                     file_values.append(value[:-1])
-
-#                 while self.corrupt_file == False:
-#                     # Lenght of the profile name is checked.
-#                     check_profile = Check_Values_Configuration.check_profile_lenght(self, file_values[0])
-#                     if check_profile == False:
-#                         self.corrupt_file = True
-
-#                     # Name of the profile is checked to avoid duplicated name.
-#                     check_profile_duplicated = Check_Values_Configuration.check_profile_duplicated(self, file_values[0])
-#                     if check_profile_duplicated == True:
-#                         self.corrupt_file = True
-
-#                     # Settings of the profile values are checked.
-#                     check_settings_1 = Check_Values_Configuration.check_settings(self, file_values[1])
-#                     check_settings_2 = Check_Values_Configuration.check_settings(self, file_values[2])
-
-#                     if check_settings_1[0] == False or check_settings_2[0] == False:
-#                         self.corrupt_file = True
-
-#                     if file_values[1] == "" and file_values[2] == "":
-#                         self.corrupt_file = True
-
-#                     check_sounds_settings_1 = Check_Values_Configuration.check_sounds_settings(self, file_values[3])
-#                     check_sounds_settings_2 = Check_Values_Configuration.check_sounds_settings(self, file_values[4])
-
-#                     if check_sounds_settings_1 == False or check_sounds_settings_2 == False:
-#                         self.corrupt_file = True
-
-#                     if check_sounds_settings_1 != check_sounds_settings_2:
-#                         self.corrupt_file = True
-#                     break
-
-#                 if self.corrupt_file == True:
-#                     return RelaxApp_MessageBox_Options(self.root, self.frame, "File_Corrupt")
-#                 else:
-#                     RelaxApp_MessageBox_Options(self.root, self.frame, "Valid Profile", None, file_values)
-
-#         except FileNotFoundError:
-#             pass
-#         except UnicodeDecodeError:
-#             RelaxApp_MessageBox_Options(self.root, self.frame, "Invalid_Format")
-#         except:
-#             RelaxApp_MessageBox_Options(self.root, self.frame, "File_Corrupt")
-
-#     # This method saves profiles set.
-#     def export_profile(self):
-
-#         # Query method is called to check or get profiles information.
-#         database.query(f"SELECT Profile_Name, Default_Profile, Visual_Configuration, Stretch_Configuration, Final_Sounds_Configuration, \
-#                        Lapse_Sounds_Configuration FROM {databases['database1']}.{tables['settings_table']} WHERE \
-#                        login = '{user['login']}' and Default_Profile = 'True'")
-
-#         # Message box is called if there no profile to export.
-#         if database.value == []:
-#             RelaxApp_MessageBox_Options(self.root, self.frame, "No Profile")
-#         else:
-#             try:
-#                 save_file = ctk.filedialog.asksaveasfilename(title="Exportar Perfil")
-
-#                 # Bucle to go through each value saved in the profile.
-#                 with open(save_file, mode="w", encoding="utf-8") as file:
-#                     for line in database.value[0]:
-#                         if line == "True" or line == "False":
-#                             pass
-#                         elif line == "":
-#                             file.write("\n")
-#                         else:
-#                             file.write(line + "\n")
-#             except:
-#                 pass
-
-#     def about_us(self):
-#         webbrowser.open("https://github.com/L3chuS/Relaxapp.git")
-
-#     # This method removes profiles set.
-#     def remove_account(self):
-#         RelaxApp_MessageBox_Options(self.root, self.frame, "Remove Account", user["login"])
-
-#     # This method signs out of the App.
-#     def sign_out(self):
-#         RelaxApp_MessageBox_Options(self.root, self.frame, "Sign Out", user["login"])
-
-#     # This method sets visual options of the App.
-#     def set_visual_options(self):
-#         self.visual_options_values = True
-#         RelaxApp_User_Main_Menu_Settings(self.root, self.frame, self.visual_options_values)
-
-#     # This method sets stretch options of the App.
-#     def set_stretch_options(self):
-#         self.stretch_options_values = True
-#         RelaxApp_User_Main_Menu_Settings(self.root, self.frame, None, self.stretch_options_values)
-
-#     # This method restarts values set.
-#     def restart_values(self, value):
-#         if value == "VO":
-#             database.user_configuration(databases["database1"], tables["settings_table"], user["login"], "Restart", "Visual_Configuration")
-#         elif value == "SO":
-#             database.user_configuration(databases["database1"], tables["settings_table"], user["login"], "Restart", "Stretch_Configuration")
-
-#     # This method sets sound options of the App.
-#     def set_sounds_options(self):
-#         RelaxApp_User_Main_Menu_Sounds(self.frame)
-
-#     # This method starts the App.
-#     def start_relaxapp(self):
-#         self.visual_set = False
-#         self.stretch_set = False
-#         self.value_VO = ""
-#         self.value_SO = ""
-
-#         # Get if "self.visual_options_CB" is checked.
-#         if self.profile_options_choice.get() == 1:
-#             try:
-#                 database.query(f"SELECT Visual_Configuration FROM {databases['database1']}.{tables['settings_table']} WHERE login = '{user['login']}' and Default_Profile = 'True'")
-#                 self.value_VO = database.value[0][0]
-
-#                 database.query(f"SELECT Stretch_Configuration FROM {databases['database1']}.{tables['settings_table']} WHERE login = '{user['login']}' and Default_Profile = 'True'")
-#                 self.value_SO = database.value[0][0]
-#                 if self.value_VO != "":
-#                     self.visual_set = True
-#                 if self.value_SO != "":
-#                     self.stretch_set = True
-#                 if self.value_VO == "" and self.value_SO == "":
-#                     RelaxApp_MessageBox_Options(self.root, self.frame, "No Values Set")
-#                     return
-#                 database.query(f"SELECT Final_Sounds_Configuration, Lapse_Sounds_Configuration FROM {databases['database1']}.{tables['settings_table']} WHERE login = '{user['login']}' and Default_Profile = 'True'")
-#                 self.final_sound = database.value[0][0]
-#                 self.lapse_sound = database.value[0][1]
-
-#             except:
-#                 RelaxApp_MessageBox_Options(self.root, self.frame, "No Values Set")
-#                 return
-
-#         # Get if "self.visual_options_CB" is checked.
-#         if self.visual_options_choice.get() == 1:
-#             self.visual_set = True
-#             database.query(f"SELECT Visual_Configuration FROM {databases['database1']}.{tables['settings_table']} WHERE login = '{user['login']}' and Default_Profile is NULL")
-#             self.value_VO = database.value[0][0]
-
-#             if self.value_VO == "":
-#                 RelaxApp_MessageBox_Options(self.root, self.frame, "No Values Set")
-#                 return
-
-#         # Get if "self.stretch_options_CB" is checked.
-#         if self.stretch_options_choice.get() == 1:
-#             self.stretch_set = True
-#             database.query(f"SELECT Stretch_Configuration FROM {databases['database1']}.{tables['settings_table']} WHERE login = '{user['login']}' and Default_Profile is NULL")
-#             self.value_SO = database.value[0][0]
-
-#             if self.value_SO == "":
-#                 RelaxApp_MessageBox_Options(self.root, self.frame, "No Values Set")
-#                 return
-
-#         if self.visual_set == False and self.stretch_set == False:
-#             RelaxApp_MessageBox_Options(self.root, self.frame, "No Settings")
-#             return
-
-#         if self.visual_options_choice.get() == 1 or self.stretch_options_choice.get() == 1:
-#             database.query(f"SELECT Final_Sounds_Configuration, Lapse_Sounds_Configuration FROM {databases['database1']}.{tables['settings_table']} WHERE login = '{user['login']}' and Default_Profile is NULL")
-#             self.final_sound = database.value[0][0]
-#             self.lapse_sound = database.value[0][1]
-
-#         RelaxApp_Structure.hide_unhide_window(self, self.root)
-#         RelaxApp_Running(self.root, self.frame, self.visual_set, self.stretch_set, self.value_VO, self.value_SO, self.final_sound, self.lapse_sound)
+class RelaxApp_User_Main_Menu():
+    """This class contains the user's main menu. It allows to start
+       the app, set, save and load settings and knows about RelaxApp."""
+
+    def __init__(self, root, frame, visual_set=False, stretch_set=False, value=False):
+
+        self.root = root
+        self.frame = frame
+        
+        self.visual_set = visual_set
+        self.stretch_set = stretch_set
+        self.value_test = value
+
+        # Frame at the back.
+        self.frame.configure(fg_color=colors["black"])
+
+        # Frame at the top that contains menu options.
+        self.frame_top_menu = ctk.CTkFrame(self.frame, height=30, width=340, fg_color=colors["soft_grey"],
+                                           corner_radius=3)
+        self.frame_top_menu.place(rely=0.0)
+
+        # Main frame that contains all user options.
+        self.frame_main = ctk.CTkFrame(self.frame, height=450, width=336, fg_color=colors["soft_grey"],
+                                       corner_radius=10)
+        self.frame_main.place(rely=0.07)
+
+        # Archieve button menu.
+        self.archieve_menu_button = tk.Menubutton(self.frame_top_menu, text="Archivo", font=(font,9), width=5,
+                                                  height=2, background=colors["soft_grey"], foreground=colors["white"],
+                                                  activebackground=colors["dark_green"], activeforeground=colors["white"])
+        self.archieve_menu_button.place(rely=0.5, relx=0, anchor="w")
+
+        # Help button menu.
+        self.help_button = tk.Menubutton(self.frame_top_menu, text="Ayuda", font=(font,9), width=4,
+                                         height=2, background=colors["soft_grey"], foreground=colors["white"],
+                                         activebackground=colors["dark_green"], activeforeground=colors["white"])
+        self.help_button.place(rely=0.5, relx=0.18, anchor="w")
+
+        # Profile button menu.
+        self.profile_button = tk.Menubutton(self.frame_top_menu, text="Cuenta", font=(font,9), width=4,
+                                            height=2, background=colors["soft_grey"], foreground=colors["white"],
+                                            activebackground=colors["dark_green"], activeforeground=colors["white"])
+        self.profile_button.place(rely=0.5, relx=0.34, anchor="w")
+
+        # Sign out button menu.
+        self.sign_out_button = ctk.CTkButton(self.frame_top_menu, width=10, height=50, text="Cerrar Sesión",
+                                             font=(font,12), command=self.sign_out, hover=True, fg_color=colors["soft_grey"],
+                                             hover_color=colors["dark_green"])
+        self.sign_out_button.place(rely=0.5, relx=1, anchor="e")
+
+        # Archieve menu cascade.
+        self.menu_archieve = tk.Menu(self.archieve_menu_button, tearoff=0)
+        self.archieve_menu_button.config(menu=self.menu_archieve)
+
+        # Help menu cascade.
+        self.menu_help = tk.Menu(self.help_button, tearoff=0)
+        self.help_button.config(menu=self.menu_help)
+
+        # Profile menu cascade.
+        self.menu_profile = tk.Menu(self.profile_button, tearoff=0)
+        self.profile_button.config(menu=self.menu_profile)
+
+        # Labels of archieve menu cascade.
+        self.menu_archieve.add_command(label=" Importar Perfil  ", font=(font,9), command=self.import_profile,
+                                       background=colors["soft_grey"], foreground=colors["white"], activebackground=colors["dark_green"],
+                                       hidemargin=True)
+        self.menu_archieve.add_command(label=" Exportar Perfil  ", font=(font,9), command=self.export_profile,
+                                       background=colors["soft_grey"], foreground=colors["white"], activebackground=colors["dark_green"],
+                                       hidemargin=True)
+
+        # Label of help menu cascade.
+        self.menu_help.add_command(label=" Conozca RelaxApp  ", font=(font,9), command=self.about_us, background=colors["soft_grey"],
+                                   foreground=colors["white"], activebackground=colors["dark_green"], hidemargin=True)
+
+        # Label of profile menu cascade.
+        self.menu_profile.add_command(label=" Eliminar Cuenta  ", font=(font,9), command=self.remove_account, background=colors["soft_grey"],
+                                      foreground=colors["white"], activebackground=colors["dark_green"], hidemargin=True)
+
+        # Options label.
+        self.options = ctk.CTkLabel(self.frame_main, text="Configurar", font=(font, 16), corner_radius=10, height=35)
+        self.options.place(rely=0.2, relx=0.5, anchor="center")
+
+        # database.query(f"SELECT Profile_Name FROM {databases['database1']}.{tables['settings_table']} WHERE login = '{user['login']}'")
+        # len_profiles = database.value
+
+        # Profile button is set as active or deactive when a profile exists.
+        # if len(len_profiles) > 1 or self.value_test == True:
+        #     self.profile_state = "normal"
+        # else:
+        #     self.profile_state = ctk.DISABLED
+
+        # BORRAR LA SIGUIENTE LINEA:
+        self.profile_state = "normal"
+        
+        # Button to create profiles.
+        self.profile_options = ctk.CTkButton(self.frame_main, text="Perfiles", font=(font, 14),
+                                             command=self.create_profile, corner_radius=10, height=35,
+                                             hover=True, fg_color=colors["soft_green"], hover_color=colors["dark_green"],
+                                             state=self.profile_state)
+        self.profile_options.place(rely=0.3, relx=0.25, anchor="w")
+
+        # Variable to save the information of "profile_options_CB" when is marked or unmarked.
+        self.profile_options_choice = ctk.IntVar()
+
+        # Checkbox to activate or deactivate "profile_options".
+        self.profile_options_CB = ctk.CTkCheckBox(self.frame_main, text=None, variable=self.profile_options_choice , width=20, height=20, hover=True,
+                                                  command=self.checkbox_option1, state=self.profile_state,
+                                                  fg_color=colors["soft_green"], hover_color=colors["dark_green"])
+        self.profile_options_CB.place(rely=0.3, relx=0.8, anchor="e")
+
+        # Button to set visual options.
+        self.visual_options = ctk.CTkButton(self.frame_main, text="Descanso Visual", font=(font, 14),
+                                            command=self.set_visual_options, corner_radius=10, height=35,
+                                            hover=True, fg_color=colors["soft_green"], hover_color=colors["dark_green"])
+        self.visual_options.place(rely=0.4, relx=0.25, anchor="w")
+
+        # Variable to save the information of "visual_options_CB" when is marked or unmarked.
+        self.visual_options_choice = ctk.IntVar()
+
+        # Checkbox to activate or deactivate "visual_options".
+        self.visual_options_CB = ctk.CTkCheckBox(self.frame_main, text=None, variable=self.visual_options_choice , width=20, height=20, hover=True,
+                                                 command=self.checkbox_option2, fg_color=colors["soft_green"], hover_color=colors["dark_green"])
+        self.visual_options_CB.place(rely=0.4, relx=0.8, anchor="e")
+
+        # Image of a restart simbol.
+        self.restart_button = ctk.CTkImage(Image.open(os.path.join(image_path, "Restart.png")))
+
+
+        # Button to restart VO values set.
+        self.restart_button1 = ctk.CTkButton(self.frame_main, text=None, image=self.restart_button, width=20, height=20, hover=True,
+                                             command=lambda: self.restart_values("VO"), fg_color=colors["soft_grey"], hover_color=colors["dark_green"])
+        self.restart_button1.place(rely=0.4, relx=0.9, anchor="e")
+
+        # Button to set stretch options.
+        self.stretch_options = ctk.CTkButton(self.frame_main, text="Estirar", font=(font, 14),
+                                             command=self.set_stretch_options, corner_radius=10, height=35,
+                                             hover=True, fg_color=colors["soft_green"], hover_color=colors["dark_green"])
+        self.stretch_options.place(rely=0.5, relx=0.25, anchor="w")
+
+        # Variable to save the information of "stretch_options_CB" when is marked or unmarked.
+        self.stretch_options_choice = ctk.IntVar()
+
+        # Checkbox to activate or deactivate "stretch_options".
+        self.stretch_options_CB = ctk.CTkCheckBox(self.frame_main, text=None, variable=self.stretch_options_choice, width=20, height=20, hover=True,
+                                                  command=self.checkbox_option3,
+                                                  fg_color=colors["soft_green"], hover_color=colors["dark_green"])
+        self.stretch_options_CB.place(rely=0.5, relx=0.8, anchor="e")
+
+        # Button to restart SO values set.
+        self.restart_button2 = ctk.CTkButton(self.frame_main, text=None, image=self.restart_button, width=20, height=20, hover=True,
+                                             command=lambda: self.restart_values("SO"), fg_color=colors["soft_grey"], hover_color=colors["dark_green"])
+        self.restart_button2.place(rely=0.5, relx=0.9, anchor="e")
+
+        # Button to set sounds options.
+        self.sounds_options = ctk.CTkButton(self.frame_main, text="Sonidos", font=(font, 14),
+                                            command=self.set_sounds_options, corner_radius=10, height=35,
+                                            hover=True, fg_color=colors["soft_green"], hover_color=colors["dark_green"])
+        self.sounds_options.place(rely=0.6, relx=0.25, anchor="w")
+
+        # Button to set start RelaxApp.
+        self.start_relaxapp_button = ctk.CTkButton(self.frame_main, text="Iniciar", font=(font, 20),
+                                                   command=self.start_relaxapp, height=70, corner_radius=50,
+                                                   hover=True, fg_color=colors["soft_green"], hover_color=colors["dark_green"])
+        self.start_relaxapp_button.place(rely=0.8, relx=0.5, anchor="center")
+
+    # Next 3 functions unmark values when user choose between use a profile or not.
+    def checkbox_option1(self):
+        self.visual_options_choice.set(0)
+        self.stretch_options_choice.set(0)
+
+    def checkbox_option2(self):
+        self.profile_options_choice.set(0)
+
+    def checkbox_option3(self):
+        self.profile_options_choice.set(0)
+
+    # This method creates profiles.
+    def create_profile(self):
+        print("create_profile")
+        #RelaxApp_User_Main_Menu_Profiles(user["login"])
+
+    # This method import profiles.
+    def import_profile(self):
+        print("import_profile")
+        # try:
+        #     import_file = ctk.filedialog.askopenfilename(title="Importar Perfil")
+
+        #     with open(import_file, mode="r", encoding="utf-8") as file:
+        #         read_file = file.readlines()
+        #         self.corrupt_file = False
+        #         file_values = []
+
+        #         # Bucle that add values in a list to check them easily.
+        #         for value in read_file:
+        #             file_values.append(value[:-1])
+
+        #         while self.corrupt_file == False:
+        #             # Lenght of the profile name is checked.
+        #             check_profile = Check_Values_Configuration.check_profile_lenght(self, file_values[0])
+        #             if check_profile == False:
+        #                 self.corrupt_file = True
+
+        #             # Name of the profile is checked to avoid duplicated name.
+        #             check_profile_duplicated = Check_Values_Configuration.check_profile_duplicated(self, file_values[0])
+        #             if check_profile_duplicated == True:
+        #                 self.corrupt_file = True
+
+        #             # Settings of the profile values are checked.
+        #             check_settings_1 = Check_Values_Configuration.check_settings(self, file_values[1])
+        #             check_settings_2 = Check_Values_Configuration.check_settings(self, file_values[2])
+
+        #             if check_settings_1[0] == False or check_settings_2[0] == False:
+        #                 self.corrupt_file = True
+
+        #             if file_values[1] == "" and file_values[2] == "":
+        #                 self.corrupt_file = True
+
+        #             check_sounds_settings_1 = Check_Values_Configuration.check_sounds_settings(self, file_values[3])
+        #             check_sounds_settings_2 = Check_Values_Configuration.check_sounds_settings(self, file_values[4])
+
+        #             if check_sounds_settings_1 == False or check_sounds_settings_2 == False:
+        #                 self.corrupt_file = True
+
+        #             if check_sounds_settings_1 != check_sounds_settings_2:
+        #                 self.corrupt_file = True
+        #             break
+
+        #         if self.corrupt_file == True:
+        #             return RelaxApp_MessageBox_Options(self.root, self.frame, "File_Corrupt")
+        #         else:
+        #             RelaxApp_MessageBox_Options(self.root, self.frame, "Valid Profile", None, file_values)
+
+        # except FileNotFoundError:
+        #     pass
+        # except UnicodeDecodeError:
+        #     RelaxApp_MessageBox_Options(self.root, self.frame, "Invalid_Format")
+        # except:
+        #     RelaxApp_MessageBox_Options(self.root, self.frame, "File_Corrupt")
+
+    # This method saves profiles set.
+    def export_profile(self):
+        print("export_profile")
+
+        # # Query method is called to check or get profiles information.
+        # database.query(f"SELECT Profile_Name, Default_Profile, Visual_Configuration, Stretch_Configuration, Final_Sounds_Configuration, \
+        #                Lapse_Sounds_Configuration FROM {databases['database1']}.{tables['settings_table']} WHERE \
+        #                login = '{user['login']}' and Default_Profile = 'True'")
+
+        # # Message box is called if there no profile to export.
+        # if database.value == []:
+        #     RelaxApp_MessageBox_Options(self.root, self.frame, "No Profile")
+        # else:
+        #     try:
+        #         save_file = ctk.filedialog.asksaveasfilename(title="Exportar Perfil")
+
+        #         # Bucle to go through each value saved in the profile.
+        #         with open(save_file, mode="w", encoding="utf-8") as file:
+        #             for line in database.value[0]:
+        #                 if line == "True" or line == "False":
+        #                     pass
+        #                 elif line == "":
+        #                     file.write("\n")
+        #                 else:
+        #                     file.write(line + "\n")
+        #     except:
+        #         pass
+
+    def about_us(self):
+        webbrowser.open("https://github.com/L3chuS/Relaxapp.git")
+
+    # This method removes profiles set.
+    def remove_account(self):
+        print("remove_account")
+        #RelaxApp_MessageBox_Options(self.root, self.frame, "Remove Account", user["login"])
+
+    # This method signs out of the App.
+    def sign_out(self):
+        RelaxApp_MessageBox_Options(self.root, self.frame, "Sign Out")
+
+    # This method sets visual options of the App.
+    def set_visual_options(self):
+        self.visual_options_values = True
+        RelaxApp_User_Main_Menu_Settings(self.root, self.frame, self.visual_options_values)
+
+    # This method sets stretch options of the App.
+    def set_stretch_options(self):
+        self.stretch_options_values = True
+        RelaxApp_User_Main_Menu_Settings(self.root, self.frame, None, self.stretch_options_values)
+
+    # This method restarts values set.
+    def restart_values(self, value):
+        print("restart_values")
+        # if value == "VO":
+        #     database.user_configuration(databases["database1"], tables["settings_table"], user["login"], "Restart", "Visual_Configuration")
+        # elif value == "SO":
+        #     database.user_configuration(databases["database1"], tables["settings_table"], user["login"], "Restart", "Stretch_Configuration")
+
+    # This method sets sound options of the App.
+    def set_sounds_options(self):
+        print("set_sounds_options")
+        #RelaxApp_User_Main_Menu_Sounds(self.frame)
+
+    # This method starts the App.
+    def start_relaxapp(self):
+        print("start_relaxapp")
+        # self.visual_set = False
+        # self.stretch_set = False
+        # self.value_VO = ""
+        # self.value_SO = ""
+
+        # # Get if "self.visual_options_CB" is checked.
+        # if self.profile_options_choice.get() == 1:
+        #     try:
+        #         database.query(f"SELECT Visual_Configuration FROM {databases['database1']}.{tables['settings_table']} WHERE login = '{user['login']}' and Default_Profile = 'True'")
+        #         self.value_VO = database.value[0][0]
+
+        #         database.query(f"SELECT Stretch_Configuration FROM {databases['database1']}.{tables['settings_table']} WHERE login = '{user['login']}' and Default_Profile = 'True'")
+        #         self.value_SO = database.value[0][0]
+        #         if self.value_VO != "":
+        #             self.visual_set = True
+        #         if self.value_SO != "":
+        #             self.stretch_set = True
+        #         if self.value_VO == "" and self.value_SO == "":
+        #             RelaxApp_MessageBox_Options(self.root, self.frame, "No Values Set")
+        #             return
+        #         database.query(f"SELECT Final_Sounds_Configuration, Lapse_Sounds_Configuration FROM {databases['database1']}.{tables['settings_table']} WHERE login = '{user['login']}' and Default_Profile = 'True'")
+        #         self.final_sound = database.value[0][0]
+        #         self.lapse_sound = database.value[0][1]
+
+        #     except:
+        #         RelaxApp_MessageBox_Options(self.root, self.frame, "No Values Set")
+        #         return
+
+        # # Get if "self.visual_options_CB" is checked.
+        # if self.visual_options_choice.get() == 1:
+        #     self.visual_set = True
+        #     database.query(f"SELECT Visual_Configuration FROM {databases['database1']}.{tables['settings_table']} WHERE login = '{user['login']}' and Default_Profile is NULL")
+        #     self.value_VO = database.value[0][0]
+
+        #     if self.value_VO == "":
+        #         RelaxApp_MessageBox_Options(self.root, self.frame, "No Values Set")
+        #         return
+
+        # # Get if "self.stretch_options_CB" is checked.
+        # if self.stretch_options_choice.get() == 1:
+        #     self.stretch_set = True
+        #     database.query(f"SELECT Stretch_Configuration FROM {databases['database1']}.{tables['settings_table']} WHERE login = '{user['login']}' and Default_Profile is NULL")
+        #     self.value_SO = database.value[0][0]
+
+        #     if self.value_SO == "":
+        #         RelaxApp_MessageBox_Options(self.root, self.frame, "No Values Set")
+        #         return
+
+        # if self.visual_set == False and self.stretch_set == False:
+        #     RelaxApp_MessageBox_Options(self.root, self.frame, "No Settings")
+        #     return
+
+        # if self.visual_options_choice.get() == 1 or self.stretch_options_choice.get() == 1:
+        #     database.query(f"SELECT Final_Sounds_Configuration, Lapse_Sounds_Configuration FROM {databases['database1']}.{tables['settings_table']} WHERE login = '{user['login']}' and Default_Profile is NULL")
+        #     self.final_sound = database.value[0][0]
+        #     self.lapse_sound = database.value[0][1]
+
+        # RelaxApp_Structure.hide_unhide_window(self, self.root)
+        # RelaxApp_Running(self.root, self.frame, self.visual_set, self.stretch_set, self.value_VO, self.value_SO, self.final_sound, self.lapse_sound)
 
 
 ##########################################################
@@ -1520,219 +1565,221 @@ class RelaxApp_User_Confirm_Change_Password():
 ###  Class that contains the user's personal settings  ###
 ##########################################################
 
-# class RelaxApp_User_Main_Menu_Settings(RelaxApp_User_Settings_Structure):
-#     """This class opens a new window to set the user's personal settings
-#        of the App. Inherit all structure from parent."""
+class RelaxApp_User_Main_Menu_Settings(RelaxApp_User_Settings_Structure):
+    """This class opens a new window to set the user's personal settings
+       of the App. Inherit all structure from parent."""
 
-#     def __init__(self, root, frame, visual_values=None, stretch_values=None):
-#         super().__init__()
+    def __init__(self, root, frame, visual_values=None, stretch_values=None):
+        super().__init__()
 
-#         self.root = root
-#         self.frame = frame
+        self.root = root
+        self.frame = frame
+        
+        self.visual_options_values = visual_values
+        self.stretch_options_values = stretch_values
 
-#         self.visual_options_values = visual_values
-#         self.stretch_options_values = stretch_values
+        # An empty string which is going to save all values when user save a configuration.
+        self.values = ""
 
-#         # An empty string which is going to save all values when user save a configuration.
-#         self.values = ""
+        # Frame at the back.
+        self.frame_User_SS.configure(fg_color=colors["black"])
+        self.frame_User_SS.pack(pady=0, padx=0, fill="both")
 
-#         # Frame at the back.
-#         self.frame_User_SS.configure(fg_color=colors["black"])
-#         self.frame_User_SS.pack(pady=0, padx=0, fill="both")
+        # Frame that contains the alert configuration label.
+        self.frame1 = ctk.CTkFrame(self.frame_User_SS, height=50, width=250, fg_color=colors["soft_grey"], corner_radius=3)
+        self.frame1.pack(pady=10, padx=10)
 
-#         # Frame that contains the alert configuration label.
-#         self.frame1 = ctk.CTkFrame(self.frame_User_SS, height=50, width=250, fg_color=colors["soft_grey"], corner_radius=3)
-#         self.frame1.pack(pady=10, padx=10)
+        # Frame that contains the lenght configuration label.
+        self.frame2 = ctk.CTkFrame(self.frame_User_SS, height=40, width=250, fg_color=colors["soft_grey"], corner_radius=3)
+        self.frame2.pack(pady=1, padx=10)
 
-#         # Frame that contains the lenght configuration label.
-#         self.frame2 = ctk.CTkFrame(self.frame_User_SS, height=40, width=250, fg_color=colors["soft_grey"], corner_radius=3)
-#         self.frame2.pack(pady=1, padx=10)
+        # Frame that contains the lapse configuration label.
+        self.frame3 = ctk.CTkFrame(self.frame_User_SS, height=40, width=250, fg_color=colors["soft_grey"], corner_radius=3)
+        self.frame3.pack(pady=1, padx=10)
 
-#         # Frame that contains the lapse configuration label.
-#         self.frame3 = ctk.CTkFrame(self.frame_User_SS, height=40, width=250, fg_color=colors["soft_grey"], corner_radius=3)
-#         self.frame3.pack(pady=1, padx=10)
+        # Frame that contains the break time configuration label.
+        self.frame4 = ctk.CTkFrame(self.frame_User_SS, height=40, width=250, fg_color=colors["soft_grey"], corner_radius=3)
+        self.frame4.pack(pady=1, padx=10)
 
-#         # Frame that contains the break time configuration label.
-#         self.frame4 = ctk.CTkFrame(self.frame_User_SS, height=40, width=250, fg_color=colors["soft_grey"], corner_radius=3)
-#         self.frame4.pack(pady=1, padx=10)
+        # Frame that contains the sound configuration checkbox.
+        self.frame5 = ctk.CTkFrame(self.frame_User_SS, height=40, width=250, fg_color=colors["soft_grey"], corner_radius=3)
+        self.frame5.pack(pady=1, padx=10)
 
-#         # Frame that contains the sound configuration checkbox.
-#         self.frame5 = ctk.CTkFrame(self.frame_User_SS, height=40, width=250, fg_color=colors["soft_grey"], corner_radius=3)
-#         self.frame5.pack(pady=1, padx=10)
+        # Frame that contains the save and cancel buttons.
+        self.frame6 = ctk.CTkFrame(self.frame_User_SS, height=40, width=250, fg_color=colors["soft_grey"], corner_radius=3)
+        self.frame6.pack(pady=10, padx=10)
 
-#         # Frame that contains the save and cancel buttons.
-#         self.frame6 = ctk.CTkFrame(self.frame_User_SS, height=40, width=250, fg_color=colors["soft_grey"], corner_radius=3)
-#         self.frame6.pack(pady=10, padx=10)
+        # Alert configuration label.
+        self.setting_title = ctk.CTkLabel(self.frame1, text="Configurar Alertas", font=(font, 15),
+                                          corner_radius=5, fg_color=colors["soft_green"])
+        self.setting_title.place(rely=0.5, relx=0.5, anchor="center")
 
-#         # Alert configuration label.
-#         self.setting_title = ctk.CTkLabel(self.frame1, text="Configurar Alertas", font=(font, 15),
-#                                           corner_radius=5, fg_color=colors["soft_green"])
-#         self.setting_title.place(rely=0.5, relx=0.5, anchor="center")
+        # Lenght label.
+        self.lenght = ctk.CTkLabel(self.frame2, text="Duración", font=(font, 14))
+        self.lenght.place(rely=0.5, relx=0.03, anchor="w")
 
-#         # Lenght label.
-#         self.lenght = ctk.CTkLabel(self.frame2, text="Duración", font=(font, 14))
-#         self.lenght.place(rely=0.5, relx=0.03, anchor="w")
+        # Validate hours.
+        self.hours_entry = self.root.register(Validate_CMD.validate_hours)
 
-#         # Validate hours.
-#         self.hours_entry = self.root.register(Validate_CMD.validate_hours)
+        # Validate minutes or seconds.
+        self.min_sec_entry = self.root.register(Validate_CMD.validate_min_sec)
 
-#         # Validate minutes or seconds.
-#         self.min_sec_entry = self.root.register(Validate_CMD.validate_min_sec)
+        # Lenght entry hours.
+        self.lenght_entryHH = ctk.CTkEntry(self.frame2, font=(font,14), width=40, justify="center",
+                                           validate="key", validatecommand=(self.hours_entry, "%P"))
+        self.lenght_entryHH.place(rely=0.5, relx=0.76, anchor="e")
+        self.lenght_entryHH.insert(0, "HH")
+        self.lenght_entryHH.bind("<Button-1>", lambda remove: self.lenght_entryHH.delete(0, tk.END))
 
-#         # Lenght entry hours.
-#         self.lenght_entryHH = ctk.CTkEntry(self.frame2, font=(font,14), width=40, justify="center",
-#                                            validate="key", validatecommand=(self.hours_entry, "%P"))
-#         self.lenght_entryHH.place(rely=0.5, relx=0.76, anchor="e")
-#         self.lenght_entryHH.insert(0, "HH")
-#         self.lenght_entryHH.bind("<Button-1>", lambda remove: self.lenght_entryHH.delete(0, tk.END))
+        # Two points separator.
+        self.colon_lenght_entry = ctk.CTkLabel(self.frame2, text=":", font=(font, 14))
+        self.colon_lenght_entry.place(rely=0.5, relx=0.79, anchor="e")
 
-#         # Two points separator.
-#         self.colon_lenght_entry = ctk.CTkLabel(self.frame2, text=":", font=(font, 14))
-#         self.colon_lenght_entry.place(rely=0.5, relx=0.79, anchor="e")
+        # Lenght entry minutes.
+        self.lenght_entryMM = ctk.CTkEntry(self.frame2, font=(font,14), width=40, justify="center",
+                                           validate="key", validatecommand=(self.min_sec_entry, "%P"))
+        self.lenght_entryMM.place(rely=0.5, relx=0.97, anchor="e")
+        self.lenght_entryMM.insert(0, "MM")
+        self.lenght_entryMM.bind("<Button-1>", lambda remove: self.lenght_entryMM.delete(0, tk.END))
 
-#         # Lenght entry minutes.
-#         self.lenght_entryMM = ctk.CTkEntry(self.frame2, font=(font,14), width=40, justify="center",
-#                                            validate="key", validatecommand=(self.min_sec_entry, "%P"))
-#         self.lenght_entryMM.place(rely=0.5, relx=0.97, anchor="e")
-#         self.lenght_entryMM.insert(0, "MM")
-#         self.lenght_entryMM.bind("<Button-1>", lambda remove: self.lenght_entryMM.delete(0, tk.END))
+        # Lapse label.
+        self.lapse = ctk.CTkLabel(self.frame3, text="Intervalo Alertas", font=(font, 14))
+        self.lapse.place(rely=0.5, relx=0.03, anchor="w")
 
-#         # Lapse label.
-#         self.lapse = ctk.CTkLabel(self.frame3, text="Intervalo Alertas", font=(font, 14))
-#         self.lapse.place(rely=0.5, relx=0.03, anchor="w")
+        # Lapse entry.
+        self.lapse_entry = ctk.CTkEntry(self.frame3, font=(font,14), width=40, justify="center",
+                                        validate="key", validatecommand=(self.min_sec_entry, "%P"))
+        self.lapse_entry.place(rely=0.5, relx=0.97, anchor="e")
+        self.lapse_entry.insert(0, "MM")
+        self.lapse_entry.bind("<Button-1>", lambda remove: self.lapse_entry.delete(0, tk.END))
 
-#         # Lapse entry.
-#         self.lapse_entry = ctk.CTkEntry(self.frame3, font=(font,14), width=40, justify="center",
-#                                         validate="key", validatecommand=(self.min_sec_entry, "%P"))
-#         self.lapse_entry.place(rely=0.5, relx=0.97, anchor="e")
-#         self.lapse_entry.insert(0, "MM")
-#         self.lapse_entry.bind("<Button-1>", lambda remove: self.lapse_entry.delete(0, tk.END))
+        # Break time label.
+        self.break_time = ctk.CTkLabel(self.frame4, text="Tiempo Descanso", font=(font, 14))
+        self.break_time.place(rely=0.5, relx=0.03, anchor="w")
 
-#         # Break time label.
-#         self.break_time = ctk.CTkLabel(self.frame4, text="Tiempo Descanso", font=(font, 14))
-#         self.break_time.place(rely=0.5, relx=0.03, anchor="w")
+        # Break time entry minutes.
+        self.break_time_entryMM = ctk.CTkEntry(self.frame4, font=(font,14), width=40, justify="center",
+                                               validate="key", validatecommand=(self.min_sec_entry, "%P"))
 
-#         # Break time entry minutes.
-#         self.break_time_entryMM = ctk.CTkEntry(self.frame4, font=(font,14), width=40, justify="center",
-#                                                validate="key", validatecommand=(self.min_sec_entry, "%P"))
+        self.break_time_entryMM.place(rely=0.5, relx=0.76, anchor="e")
+        self.break_time_entryMM.insert(0, "MM")
+        self.break_time_entryMM.bind("<Button-1>", lambda remove: self.break_time_entryMM.delete(0, tk.END))
 
-#         self.break_time_entryMM.place(rely=0.5, relx=0.76, anchor="e")
-#         self.break_time_entryMM.insert(0, "MM")
-#         self.break_time_entryMM.bind("<Button-1>", lambda remove: self.break_time_entryMM.delete(0, tk.END))
+        # Two points separator.
+        self.colon_break_time_entry = ctk.CTkLabel(self.frame4, text=":", font=(font, 14))
+        self.colon_break_time_entry.place(rely=0.5, relx=0.79, anchor="e")
 
-#         # Two points separator.
-#         self.colon_break_time_entry = ctk.CTkLabel(self.frame4, text=":", font=(font, 14))
-#         self.colon_break_time_entry.place(rely=0.5, relx=0.79, anchor="e")
+        # Break time entry seconds.
+        self.break_time_entrySS = ctk.CTkEntry(self.frame4, font=(font,14), width=40, justify="center",
+                                               validate="key", validatecommand=(self.min_sec_entry, "%P"))
 
-#         # Break time entry seconds.
-#         self.break_time_entrySS = ctk.CTkEntry(self.frame4, font=(font,14), width=40, justify="center",
-#                                                validate="key", validatecommand=(self.min_sec_entry, "%P"))
+        self.break_time_entrySS.place(rely=0.5, relx=0.97, anchor="e")
+        self.break_time_entrySS.insert(0, "SS")
+        self.break_time_entrySS.bind("<Button-1>", lambda remove: self.break_time_entrySS.delete(0, tk.END))
 
-#         self.break_time_entrySS.place(rely=0.5, relx=0.97, anchor="e")
-#         self.break_time_entrySS.insert(0, "SS")
-#         self.break_time_entrySS.bind("<Button-1>", lambda remove: self.break_time_entrySS.delete(0, tk.END))
+        # Sound alert label.
+        self.sound_alert = ctk.CTkLabel(self.frame5, text="Activar Sonido", font=(font, 14))
+        self.sound_alert.place(rely=0.5, relx=0.03, anchor="w")
 
-#         # Sound alert label.
-#         self.sound_alert = ctk.CTkLabel(self.frame5, text="Activar Sonido", font=(font, 14))
-#         self.sound_alert.place(rely=0.5, relx=0.03, anchor="w")
+        # Sound alert checkbox.
+        self.sound_alert_choice = ctk.IntVar()
+        self.sound_alert_CB = ctk.CTkCheckBox(self.frame5, text=None, variable=self.sound_alert_choice, width=20, height=20, hover=True,
+                                              fg_color=colors["soft_green"], hover_color=colors["dark_green"])
+        self.sound_alert_CB.place(rely=0.5, relx=1, anchor="e")
 
-#         # Sound alert checkbox.
-#         self.sound_alert_choice = ctk.IntVar()
-#         self.sound_alert_CB = ctk.CTkCheckBox(self.frame5, text=None, variable=self.sound_alert_choice, width=20, height=20, hover=True,
-#                                               fg_color=colors["soft_green"], hover_color=colors["dark_green"])
-#         self.sound_alert_CB.place(rely=0.5, relx=1, anchor="e")
+        # Save button.
+        self.save_button = ctk.CTkButton(self.frame6, width=10, height=10, text="Guardar", font=(font,14),
+                                              command=self.save_settings, corner_radius=10, hover=True,
+                                              fg_color=colors["soft_grey"], hover_color=colors["dark_green"])
+        self.save_button.place(rely=0.5, relx=0.1, anchor="w")
 
-#         # Save button.
-#         self.save_button = ctk.CTkButton(self.frame6, width=10, height=10, text="Guardar", font=(font,14),
-#                                               command=self.save_settings, corner_radius=10, hover=True,
-#                                               fg_color=colors["soft_grey"], hover_color=colors["dark_green"])
-#         self.save_button.place(rely=0.5, relx=0.1, anchor="w")
+        # Cancel button.
+        self.cancel_button = ctk.CTkButton(self.frame6, width=10, height=10, text="Cancelar", font=(font,14),
+                                           command=self.cancel_settings, corner_radius=10, hover=True,
+                                           fg_color=colors["soft_grey"], hover_color=colors["dark_green"])
+        self.cancel_button.place(rely=0.5, relx=0.9, anchor="e")
 
-#         # Cancel button.
-#         self.cancel_button = ctk.CTkButton(self.frame6, width=10, height=10, text="Cancelar", font=(font,14),
-#                                            command=self.cancel_settings, corner_radius=10, hover=True,
-#                                            fg_color=colors["soft_grey"], hover_color=colors["dark_green"])
-#         self.cancel_button.place(rely=0.5, relx=0.9, anchor="e")
+    # This method saves settings in the user's main menu.
+    def save_settings(self):
+        valid_request = False
+        
+        # Get when the sound checkbox is activated or not.
+        if self.sound_alert_choice.get() == 1:
+            self.sound = True
+        else:
+            self.sound = False
 
-#     # This method saves settings in the user's main menu.
-#     def save_settings(self):
-#         # Get when the sound checkbox is activated or not.
-#         if self.sound_alert_choice.get() == 1:
-#             self.sound = True
-#         else:
-#             self.sound = False
+        lenght_HH = self.lenght_entryHH.get()
+        lenght_MM = self.lenght_entryMM.get()
+        lapse = self.lapse_entry.get()
+        break_time_MM = self.break_time_entryMM.get()
+        break_time_SS = self.break_time_entrySS.get()
 
-#         lenght_HH = self.lenght_entryHH.get()
-#         lenght_MM = self.lenght_entryMM.get()
-#         lapse = self.lapse_entry.get()
-#         break_time_MM = self.break_time_entryMM.get()
-#         break_time_SS = self.break_time_entrySS.get()
+        to_validate = lenght_HH + lenght_MM + lapse + break_time_MM + break_time_SS + str(self.sound)
+        check_values = comms.data_validate({"data": to_validate})
 
-#         to_validate = lenght_HH + lenght_MM + lapse + break_time_MM + break_time_SS + str(self.sound)
-#         check_values = Check_Values_Configuration.check_settings(self, to_validate)
+        if check_values["connection_status"]:
+            response = check_values["response"]
+            values = response.json()
+            if response.status_code == 200:
+                valid_request = True
+            else:
+                message = Set_Messages.validators_messages(values["error_link"])
+                print("* ERROR: ", values["error"])
+                RelaxApp_MessageBox_Options(self.root, self.window_User_SS, "Invalid Data", message=message)
+        else:
+            message = Set_Messages.server_messages(check_values["error_link"])
+            print(check_values["error"])
+        
+        # All entries are format to create the timer.
+        if valid_request:
 
-#         # Verify if all entries are filled.
-#         if check_values[0] != True:
-#             # Pop-ups a message box if any entry is unfilled.
-#             if check_values[1] == "Invalid Time":
-#                 RelaxApp_MessageBox_Options(self.root, self.window_User_SS, "Invalid Time")
-#             # Verify if lenght entry is not higher than 16hs.
-#             elif check_values[1] == "Extra Hours":
-#                 RelaxApp_MessageBox_Options(self.root, self.window_User_SS, "Extra Hours")
-#             # Verify if lenght entry is not lower than 1 minute.
-#             elif check_values[1] == "Minimum Time":
-#                 RelaxApp_MessageBox_Options(self.root, self.window_User_SS, "Minimum Time")
-#             # Verify if lapse is not higher than lenght.
-#             elif check_values[1] == "Over Duration":
-#                 RelaxApp_MessageBox_Options(self.root, self.window_User_SS, "Over Duration")
-#             # Verify if break is not higher than lapse.
-#             elif check_values[1] == "Over Lapse":
-#                 RelaxApp_MessageBox_Options(self.root, self.window_User_SS, "Over Lapse")
-#             # Verify if lapse is at least 1 minute.
-#             elif check_values[1] == "No Lapse":
-#                 RelaxApp_MessageBox_Options(self.root, self.window_User_SS, "No Lapse")
-#             # Verify if break is at least 30 seconds.
-#             elif check_values[1] == "No Break":
-#                 RelaxApp_MessageBox_Options(self.root, self.window_User_SS, "No Break")
+        # Convert 60 minutes in 1 hour.
+            if lenght_MM == "60":
+                lenght_MM = "00"
+                lenght_HH = str(int(lenght_HH) + 1)
+                if len(lenght_HH) == 1:
+                    lenght_HH = "0" + str(lenght_HH)
+            # Convert 60 seconds in 1 minute.
+            if break_time_SS == "60":
+                break_time_SS = "00"
+                break_time_MM = str(int(break_time_MM) + 1)
+                if len(break_time_MM) == 1:
+                    break_time_MM = "0" + str(break_time_MM)
 
-#         else:
-#             # Convert 60 minutes in 1 hour.
-#             if lenght_MM == "60":
-#                 lenght_MM = "00"
-#                 lenght_HH = str(int(lenght_HH) + 1)
-#                 if len(lenght_HH) == 1:
-#                     lenght_HH = "0" + str(lenght_HH)
-#             # Convert 60 seconds in 1 minute.
-#             if break_time_SS == "60":
-#                 break_time_SS = "00"
-#                 break_time_MM = str(int(break_time_MM) + 1)
-#                 if len(break_time_MM) == 1:
-#                     break_time_MM = "0" + str(break_time_MM)
+            # All entries are concatenated in one string.
+            self.values += lenght_HH
+            self.values += lenght_MM
+            self.values += lapse
+            self.values += break_time_MM
+            self.values += break_time_SS
+            self.values += str(self.sound)
+        
+            # Varible "self.values" is saved as a temporary configuration in the instance of temporary_profile.
+            if self.visual_options_values == True: 
+                TemporaryProfile.visual_configuration = self.values
+            elif self.stretch_options_values == True:
+                TemporaryProfile.stretch_configuration = self.values
+            
+            self.window_User_SS.destroy()
+            #RelaxApp_Structure.close_create2(self, RelaxApp_User_Main_Menu, self.root, self.frame, None, None, True)
 
-#             # All entries are concatenated in one string.
-#             self.values += lenght_HH
-#             self.values += lenght_MM
-#             self.values += lapse
-#             self.values += break_time_MM
-#             self.values += break_time_SS
-#             self.values += str(self.sound)
+            # # Varible "self.values" is saved in the database inside the "Visual_Configuration" column.
+            # if self.visual_options_values == True:
+            #     database.user_configuration(databases["database1"], tables["settings_table"], user["login"],
+            #                                 "UpdateNULL", ("Profile_Name", "Visual_Configuration"), self.values)
 
-#             # Varible "self.values" is saved in the database inside the "Visual_Configuration" column.
-#             if self.visual_options_values == True:
-#                 database.user_configuration(databases["database1"], tables["settings_table"], user["login"],
-#                                             "UpdateNULL", ("Profile_Name", "Visual_Configuration"), self.values)
+            # # Varible "self.values" is saved in the database inside the "Stretch_Configuration" column.
+            # elif self.stretch_options_values == True:
+            #     database.user_configuration(databases["database1"], tables["settings_table"], user["login"],
+            #                                 "UpdateNULL", ("Profile_Name", "Stretch_Configuration"), self.values)
 
-#             # Varible "self.values" is saved in the database inside the "Stretch_Configuration" column.
-#             elif self.stretch_options_values == True:
-#                 database.user_configuration(databases["database1"], tables["settings_table"], user["login"],
-#                                             "UpdateNULL", ("Profile_Name", "Stretch_Configuration"), self.values)
+            #self.window_User_SS.destroy()
+            #RelaxApp_Structure.close_create2(self, RelaxApp_User_Main_Menu, self.root, self.frame, None, None, True)
 
-#             self.window_User_SS.destroy()
-#             RelaxApp_Structure.close_create2(self, RelaxApp_User_Main_Menu, self.root, self.frame, None, None, True)
-
-#     # This method cancel the configuration and close the windows in the front.
-#     def cancel_settings(self):
-#         self.window_User_SS.destroy()
+    # This method cancel the configuration and close the windows in the front.
+    def cancel_settings(self):
+        self.window_User_SS.destroy()
 
 
 ##########################################################
@@ -2641,6 +2688,13 @@ class RelaxApp_MessageBox_Options(RelaxApp_MessageBox_Structure):
                                                   font=(font,15), bg_color=colors["soft_grey"])
             self.cancel_confirm_change_pw_label.place(rely=0.3, relx=0.5, anchor="center")
             self.select_button1 = True
+
+        elif self.message_type == "Invalid Data":
+            # Label to inform that the values to set the timers are invalid.
+            self.invalid_data_label = ctk.CTkLabel(self.window_MS, text=self.message,
+                                      font=(font,15), bg_color=colors["soft_grey"])
+            self.invalid_data_label.place(rely=0.35, relx=0.5, anchor="center")
+            self.select_button2 = True
             
         # elif self.message_type == "No Profile":
         #     # Label to alert there's no profile set.
@@ -2670,61 +2724,12 @@ class RelaxApp_MessageBox_Options(RelaxApp_MessageBox_Structure):
         #     self.pw_ask_cancel_label.place(rely=0.3, relx=0.5, anchor="center")
         #     self.select_button1 = True
 
-        # elif self.message_type == "Sign Out":
-        #     # Label ask/cancel to sign out.
-        #     self.pw_ask_cancel_label = ctk.CTkLabel(self.window_MS, text=f"¿Está seguro que desea cerrar la sesión de '{self.user}'?",
-        #                                             font=(font,14), bg_color=colors["soft_grey"])
-        #     self.pw_ask_cancel_label.place(rely=0.3, relx=0.5, anchor="center")
-        #     self.select_button1 = True
-
-        # elif self.message_type == "Invalid Time":
-        #     # Label to alert not to leave entries unfilled.
-        #     self.empty_entry_label = ctk.CTkLabel(self.window_MS, text="Los campos tienen que tener 2 números entre el 0 y el 60 \npara guardarlos.",
-        #                                           font=(font,14), bg_color=colors["soft_grey"])
-        #     self.empty_entry_label.place(rely=0.35, relx=0.5, anchor="center")
-        #     self.select_button2 = True
-
-        # elif self.message_type == "Extra Hours":
-        #     # Label to alert not to work extra hours.
-        #     self.extra_hours_label = ctk.CTkLabel(self.window_MS, text="No puedes configurar mas de 16hs de duración. Recuerda que \nmínimo debes dormir 8hs.",
-        #                                           font=(font,14), bg_color=colors["soft_grey"])
-        #     self.extra_hours_label.place(rely=0.35, relx=0.5, anchor="center")
-        #     self.select_button2 = True
-
-        # elif self.message_type == "Minimum Time":
-        #     # Label to alert not to work extra hours.
-        #     self.minimum_time_label = ctk.CTkLabel(self.window_MS, text="Debes configurar al menos 1 minuto de duración.",
-        #                                            font=(font,14), bg_color=colors["soft_grey"])
-        #     self.minimum_time_label.place(rely=0.3, relx=0.5, anchor="center")
-        #     self.select_button2 = True
-
-        # elif self.message_type == "Over Duration":
-        #     # Label to alert not to set breaktime over lapse time.
-        #     self.over_lapse_label = ctk.CTkLabel(self.window_MS, text="El tiempo de intervalo no puede ser superior a la duración configurada.",
-        #                                          font=(font,14), bg_color=colors["soft_grey"])
-        #     self.over_lapse_label.place(rely=0.3, relx=0.5, anchor="center")
-        #     self.select_button2 = True
-
-        # elif self.message_type == "Over Lapse":
-        #     # Label to alert not to set breaktime over lapse time.
-        #     self.over_lapse_label = ctk.CTkLabel(self.window_MS, text="El tiempo de descanso no puede ser superior al intervalo \nde alertas configurado.",
-        #                                          font=(font,14), bg_color=colors["soft_grey"])
-        #     self.over_lapse_label.place(rely=0.35, relx=0.5, anchor="center")
-        #     self.select_button2 = True
-
-        # elif self.message_type == "No Lapse":
-        #     # Label to alert to set at least 1 minute between alerts.
-        #     self.no_lapse_label = ctk.CTkLabel(self.window_MS, text="El tiempo de intervalo entre alertas debe tener al menos 1 minuto.",
-        #                                        font=(font,14), bg_color=colors["soft_grey"])
-        #     self.no_lapse_label.place(rely=0.3, relx=0.5, anchor="center")
-        #     self.select_button2 = True
-
-        # elif self.message_type == "No Break":
-        #     # Label to alert to set at least 1 minute between alerts.
-        #     self.no_break_label = ctk.CTkLabel(self.window_MS, text="El tiempo de descanso debe tener al menos 30 segundos.",
-        #                                        font=(font,14), bg_color=colors["soft_grey"])
-        #     self.no_break_label.place(rely=0.3, relx=0.5, anchor="center")
-        #     self.select_button2 = True
+        elif self.message_type == "Sign Out":
+            # Label ask/cancel to sign out.
+            self.sign_out_label = ctk.CTkLabel(self.window_MS, text=messages.MESSAGE_RELAXAPP_MB_OPTIONS_SIGN_OUT.format(username=Session.username),
+                                               font=(font,14), bg_color=colors["soft_grey"])
+            self.sign_out_label.place(rely=0.3, relx=0.5, anchor="center")
+            self.select_button1 = True
 
         # elif self.message_type == "Valid Profile":
         #     # Label to alert to set at least 1 minute between alerts.
@@ -2800,7 +2805,6 @@ class RelaxApp_MessageBox_Options(RelaxApp_MessageBox_Structure):
 
     # This method confirm a change.
     def accept_button(self, message_type):
-        
         valid_request = False
         
         # This conditional accept the registration. 
@@ -2826,9 +2830,9 @@ class RelaxApp_MessageBox_Options(RelaxApp_MessageBox_Structure):
                         print(values["error"])
         
                     elif values["error_type"] == "SERIALIZERS":
-                        keys = next(iter(values["error"]))
-                        message = Set_Messages.serializers_messages(keys)
-                        print(values["error"])
+                        key = values["error_link"].upper()
+                        message = Set_Messages.serializers_messages(key)
+                        print("* ERROR: ", values["error"])
 
             else:
                 message = Set_Messages.server_messages(response_dict["error_link"])
@@ -2852,19 +2856,26 @@ class RelaxApp_MessageBox_Options(RelaxApp_MessageBox_Structure):
                         print(values["error"])
                         
                     elif values["error_type"] == "SERIALIZERS":
-                        keys = next(iter(values["error"]))
-                        message = Set_Messages.serializers_messages(keys)
-                        print(values["error"])
+                        key = values["error_link"].upper()
+                        message = Set_Messages.serializers_messages(key)
+                        print("* ERROR: ", values["error"])
             else:
                 message = Set_Messages.server_messages(response_dict["error_link"])
                 print(response_dict["error"])
-                
-        # User registration or change of password are canceled and turn back to main menu as weel as sign out.
-        elif message_type == "Cancel" or message_type == "Cancel Change PW" or message_type == "Cancel Confirm Change PW" or message_type == "Sign Out":
+        
+        elif message_type == "Sign Out":
+            Session.clear()
+            TemporaryProfile.clear()
             self.window_MS.destroy()
             RelaxApp_Structure.close_create2(self, RelaxApp_Initial_Frame, self.root, self.frame)
             return
-        
+                
+        # User registration or change of password are canceled and turn back to main menu as weel as sign out.
+        elif message_type == "Cancel" or message_type == "Cancel Change PW" or message_type == "Cancel Confirm Change PW":
+            self.window_MS.destroy()
+            RelaxApp_Structure.close_create2(self, RelaxApp_Initial_Frame, self.root, self.frame)
+            return
+  
         # The request is checked. 
         if valid_request:
             # A pop-up window is displayed to confirm that the request has been succesful.

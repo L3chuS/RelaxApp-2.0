@@ -1,36 +1,45 @@
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, authentication_classes, permission_classes
 from rest_framework.response import Response
 from rest_framework.authtoken.models import Token
+from rest_framework.authentication import TokenAuthentication
+from rest_framework.permissions import IsAuthenticated
 from datetime import timedelta
 from django.utils import timezone
 from django.template.loader import render_to_string
 from django.contrib.auth.models import User
+from django.core.exceptions import ValidationError
 import secrets
 import resend
 import base64
 from django.conf import settings
 from .models import *
 from .serializers import *
+from .validators import *
+from .handle_errors import *
 
 
 @api_view(["POST"])
 def user_login(request):
     
-    login_serializer = UserLoginSerializer(data=request.data)
-    
-    if login_serializer.is_valid():
+    try:
+        login_serializer = UserLoginSerializer(data=request.data)
+        
+        login_serializer.is_valid(raise_exception=True)
         username = login_serializer.validated_data["username"]
         password = login_serializer.validated_data["password"]
         
         user = User.objects.filter(username=username).first()
         # import time
         # time.sleep(15)
+    
+    except serializers.ValidationError as error:
         
-    else:
+        code = format_serializers_code_errors(error.get_codes())
+
         return Response(
-            {"error" : login_serializer.errors,
+            {"error" : error.detail,
             "error_type" : "SERIALIZERS",
-            "error_link" : "ERROR_SERIALIZERS_GENERAL"}, 
+            "error_link" : code}, 
             status=400
             )
              
@@ -63,9 +72,10 @@ def user_login(request):
 @api_view(["POST"])
 def user_registration(request):
     
-    register_serializer = UserRegistrationSerializer(data=request.data)
+    try: 
+        register_serializer = UserRegistrationSerializer(data=request.data)
     
-    if register_serializer.is_valid():
+        register_serializer.is_valid(raise_exception=True)
         first_name = register_serializer.validated_data["first_name"]
         last_name = register_serializer.validated_data["last_name"]
         username = register_serializer.validated_data["username"]
@@ -78,11 +88,14 @@ def user_registration(request):
         # import time
         # time.sleep(15)
         
-    else:
+    except serializers.ValidationError as error:
+        
+        code = format_serializers_code_errors(error.get_codes())
+        
         return Response({
-            "error" : register_serializer.errors,
+            "error" : error.detail,
             "error_type" : "SERIALIZERS",
-            "error_link" : "ERROR_SERIALIZERS_GENERAL"}, 
+            "error_link" : code},
             status=400
         )
     
@@ -124,20 +137,25 @@ def user_registration(request):
 
 @api_view(["POST"])     
 def user_pw_reset(request):
-    change_pw_serializer = UserChangePasswordSerializer(data=request.data)
     
-    if change_pw_serializer.is_valid():
+    try:
+        change_pw_serializer = UserChangePasswordSerializer(data=request.data)
+    
+        change_pw_serializer.is_valid(raise_exception=True)
         email = change_pw_serializer.validated_data["email"]
 
         user = User.objects.filter(email=email).first()
 
         # import time
         # time.sleep(15)
-    else:
+    except serializers.ValidationError as error:
+        
+        code = format_serializers_code_errors(error.get_codes())
+        
         return Response({
-            "error" : change_pw_serializer.errors,
+            "error" : error.detail,
             "error_type" : "SERIALIZERS",
-            "error_link" : "ERROR_SERIALIZERS_GENERAL"}, 
+            "error_link" : code},
             status=400
         )    
         
@@ -199,9 +217,10 @@ def user_pw_reset(request):
 @api_view(["PUT"])     
 def user_pw_reset_confirmation(request):
     
-    change_pw_confirm_serializer =  UserChangePasswordConfirmationSerializer(data=request.data)
+    try:
+        change_pw_confirm_serializer =  UserChangePasswordConfirmationSerializer(data=request.data)
     
-    if change_pw_confirm_serializer.is_valid():
+        change_pw_confirm_serializer.is_valid(raise_exception=True)
         email = change_pw_confirm_serializer.validated_data["email"]
         code = change_pw_confirm_serializer.validated_data["code"]
         password1 = change_pw_confirm_serializer.validated_data["password1"]
@@ -211,11 +230,16 @@ def user_pw_reset_confirmation(request):
         
         # import time
         # time.sleep(15)
-    else:
+    except serializers.ValidationError as error:
+        
+        print("Esto es error.get_codes(): ", error.get_codes())
+        code = format_serializers_code_errors(error.get_codes())
+        print("esto es code: ", code)
+        
         return Response({
-            "error" : change_pw_confirm_serializer.errors,
+            "error" : error.detail,
             "error_type" : "SERIALIZERS",
-            "error_link" : "ERROR_SERIALIZERS_GENERAL"}, 
+            "error_link" : code},
             status=400
         )
 
@@ -252,5 +276,37 @@ def user_pw_reset_confirmation(request):
     return Response(
         {"message" : "* MESSAGE: Password has been updated succesfully.",
         "message_link" : "MESSAGE_PW_RESET_CONF_SUCCESS"},
+        status=200
+    )
+    
+@api_view(["GET", "POST", "PUT"])  
+def profiles(request):
+    pass
+
+# @api_view(["POST"])
+# @authentication_classes([TokenAuthentication])
+# @permission_classes([IsAuthenticated])
+# def profiles_validate(request):
+    
+#     valid_data = check_timer_settings(request.data)
+
+@api_view(["POST"])
+@authentication_classes([TokenAuthentication])
+@permission_classes([IsAuthenticated])
+def data_validate(request):
+    
+    try: 
+        check_timer_settings(request.data["data"])
+
+    except ValidationError as error:
+        return Response({
+            "error" : error.message,
+            "error_type" : "VALIDATORS",
+            "error_link" : error.code
+        }, status=400)
+    
+    return Response(
+        {"message" : "* MESSAGE: Data is valid",
+        "message_link" : None},
         status=200
     )

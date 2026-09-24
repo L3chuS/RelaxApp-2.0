@@ -1,5 +1,4 @@
 from rest_framework import serializers
-#from django.contrib.auth.models import User
 
 class UserLoginSerializer(serializers.Serializer):
     
@@ -29,6 +28,26 @@ class UserChangePasswordConfirmationSerializer(serializers.Serializer):
     def validate(self, data):
         if data["password1"] != data["password2"]:
             raise serializers.ValidationError({
-                "password_no_match": "Passwords do not match."
-            })
+                "PASSWORD_NO_MATCH": "Passwords do not match."
+            }) 
         return data
+    
+
+class ProfilesSerializer(serializers.Serializer):
+    profile_name = serializers.CharField()
+    visual_configuration = serializers.CharField(
+        required=False,
+        allow_blank=True
+    )
+    stretch_configuration = serializers.CharField(
+        required=False,
+        allow_blank=True
+    )
+    final_sounds_configuration = serializers.CharField(
+        required=False,
+        allow_blank=True
+    )
+    lapse_sounds_configuration = serializers.CharField(
+        required=False,
+        allow_blank=True
+    )
