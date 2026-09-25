@@ -65,7 +65,8 @@ def user_login(request):
         {"message" : "* MESSAGE: Logging in.",
         "username" : user.username,
         "token" : token.key,
-        "message_link" : "MESSAGE_LOGIN_CORRECT"}
+        "message_link" : "MESSAGE_LOGIN_CORRECT",
+        "request_type" : "user_login"}
     )
     
 
@@ -129,8 +130,8 @@ def user_registration(request):
         "last_name" : last_name,
         "username" : username,
         "email" : email,
-        "message_link" : "MESSAGE_REGISTER_USER_CREATED"
-        },
+        "message_link" : "MESSAGE_REGISTER_USER_CREATED",
+        "request_type" : "user_registration"},
         status=201
     )
 
@@ -162,7 +163,8 @@ def user_pw_reset(request):
     if user is None:
         return Response({
             "message" : "* MESSAGE: If the email is registered, a recovery code has been sent.",
-            "message_link" : None}, 
+            "message_link" : None,
+            "request_type" : "user_pw_reset"}, 
             status=200
         )
 
@@ -210,7 +212,8 @@ def user_pw_reset(request):
        
     return Response({
         "message": "* MESSAGE: If the email is registered, a recovery code has been sent.",
-        "message_link" : None},
+        "message_link" : None,
+        "request_type" : "user_pw_reset"},
         status=200)
     
    
@@ -232,9 +235,7 @@ def user_pw_reset_confirmation(request):
         # time.sleep(15)
     except serializers.ValidationError as error:
         
-        print("Esto es error.get_codes(): ", error.get_codes())
         code = format_serializers_code_errors(error.get_codes())
-        print("esto es code: ", code)
         
         return Response({
             "error" : error.detail,
@@ -275,9 +276,11 @@ def user_pw_reset_confirmation(request):
     
     return Response(
         {"message" : "* MESSAGE: Password has been updated succesfully.",
-        "message_link" : "MESSAGE_PW_RESET_CONF_SUCCESS"},
+        "message_link" : "MESSAGE_PW_RESET_CONF_SUCCESS",
+        "request_type" : "user_pw_reset_confirmation"},
         status=200
     )
+    
     
 @api_view(["GET", "POST", "PUT"])  
 def profiles(request):
@@ -307,6 +310,31 @@ def data_validate(request):
     
     return Response(
         {"message" : "* MESSAGE: Data is valid",
-        "message_link" : None},
+        "message_link" : None,
+        "request_type" : "data_validate"},
+        status=200
+    )
+
+
+@api_view(["DELETE"])
+@authentication_classes([TokenAuthentication])
+@permission_classes([IsAuthenticated])
+def remove_account(request):
+    
+    try:
+        request.user.delete()
+        
+    except Exception as error:
+        return Response({
+            "error" : "* ERROR: Unexpected error while removing account.",
+            "error_type" : "VIEWS",
+            "error_link" : "ERROR_ACCOUNT_REMOVE_UNEXPECTED"},
+            status=500
+        )
+    
+    return Response(
+        {"message" : f"* MESSAGE: Account '{request.user}' has been removed.",
+        "message_link" : None,
+        "request_type" : "remove_account"},
         status=200
     )

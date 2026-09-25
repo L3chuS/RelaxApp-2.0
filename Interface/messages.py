@@ -28,6 +28,7 @@ ERROR_PW_RESET_CONF_TOKEN_USED = "El token proporcionado ya ha sido utilizado. V
 ERROR_PW_RESET_CONF_TOKEN_EXPIRED = "El token proporcionado ya ha expirado. Recuerde que sólo es \nválido por 2 minutos."
 ERROR_PW_RESET_CONF_PW_NOT_MATCH = "Las contraseñas indicadas no son iguales."
 
+ERROR_ACCOUNT_REMOVE_UNEXPECTED = "Hubo un error al intentar eliminar su cuenta. Vuelva a \nintentarlo más tarde."
 ERROR_VALIDATORS_INVALID_TIME = "Los campos tienen que tener 2 números entre el 0 y el 60 \npara guardarlos."
 ERROR_VALIDATORS_EXTRA_HOURS = "No puedes configurar mas de 16hs de duración. Recuerda que \nmínimo debes dormir 8hs."
 ERROR_VALIDATORS_MINIMUM_TIME = "Debes configurar al menos 1 minuto de duración."
@@ -48,3 +49,4 @@ MESSAGE_RELAXAPP_MB_OPTIONS_CONFIRM_CANCEL_REGISTRATION = "¿Está seguro que de
 MESSAGE_RELAXAPP_MB_OPTIONS_CONFIRM_ACCEPT_PW_CHANGE = "¿Está seguro que desea actualizar su contraseña?"
 MESSAGE_RELAXAPP_MB_OPTIONS_CONFIRM_CANCEL_PW_CHANGE = "¿Está seguro que desea cancelar el cambio de contraseña?"
 MESSAGE_RELAXAPP_MB_OPTIONS_SIGN_OUT = "¿Está seguro que desea cerrar la sesión de '{username}'?"
+MESSAGE_RELAXAPP_MB_OPTIONS_REMOVE_ACCOUNT = "Esta opción permite eliminar completamente la cuenta \nde '{username}'. ¿Está seguro que desea continuar?"

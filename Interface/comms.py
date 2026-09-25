@@ -7,7 +7,7 @@ def make_request(method, url, **kwargs):
     try:
         
         headers = kwargs.pop("headers", {})
-        
+
         if Session.token:
             headers["Authorization"] = f"Token {Session.token}"
 
@@ -103,3 +103,12 @@ def data_validate(data):
         json=data,
     )
     return response
+
+def remove_account(data):
+    response = make_request(
+        "DELETE",
+        f"{API_URL}account/remove/",
+        json=data
+    )
+    return response
+    

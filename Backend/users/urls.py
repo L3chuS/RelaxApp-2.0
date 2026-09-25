@@ -8,5 +8,6 @@ urlpatterns = [
     path("reset/confirm/", views.user_pw_reset_confirmation, name="user_pw_reset_confirmation"),
     path("profiles/", views.profiles, name="profiles"),
     #path("profiles/validate/", views.profiles_validate, name="profiles_validate"),
-    path("data/validate/", views.data_validate, name="data_validate")
+    path("data/validate/", views.data_validate, name="data_validate"),
+    path("account/remove/", views.remove_account, name="remove_account")
 ]

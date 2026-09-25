@@ -315,6 +315,8 @@ class Set_Messages():
             return messages.ERROR_PW_RESET_CONF_TOKEN_USED
         elif type == "ERROR_PW_RESET_CONF_TOKEN_EXPIRED":
             return messages.ERROR_PW_RESET_CONF_TOKEN_EXPIRED
+        elif type == "ERROR_ACCOUNT_REMOVE_UNEXPECTED":
+            return messages.ERROR_ACCOUNT_REMOVE_UNEXPECTED
         
     def validators_messages(key):
         if key == "INVALID_TIME":
@@ -479,7 +481,6 @@ class RelaxApp_Initial_Frame():
         self.root = root
         self.frame = frame
 
-        print("Esto es Session.token: ",Session.token)
         # User label.
         self.user = ctk.CTkLabel(self.frame, text="Usuario", font=(font,19))
         self.user.place(rely=0.40, relx=0.5, anchor="center")
@@ -1138,8 +1139,7 @@ class RelaxApp_User_Main_Menu():
 
     # This method removes profiles set.
     def remove_account(self):
-        print("remove_account")
-        #RelaxApp_MessageBox_Options(self.root, self.frame, "Remove Account", user["login"])
+        RelaxApp_MessageBox_Options(self.root, self.frame, "Remove Account")
 
     # This method signs out of the App.
     def sign_out(self):
@@ -2717,12 +2717,12 @@ class RelaxApp_MessageBox_Options(RelaxApp_MessageBox_Structure):
         #     self.file_corrupt_label.place(rely=0.35, relx=0.5, anchor="center")
         #     self.select_button2 = True
 
-        # elif self.message_type == "Remove Account":
-        #     # Label ask/cancel to sign out.
-        #     self.pw_ask_cancel_label = ctk.CTkLabel(self.window_MS, text=f"Esta opción permite eliminar completamente la cuenta \nde '{self.user}'. ¿Está seguro que desea continuar?",
-        #                                             font=(font,14), bg_color=colors["soft_grey"])
-        #     self.pw_ask_cancel_label.place(rely=0.3, relx=0.5, anchor="center")
-        #     self.select_button1 = True
+        elif self.message_type == "Remove Account":
+            # Label ask/cancel to sign out.
+            self.pw_ask_cancel_label = ctk.CTkLabel(self.window_MS, text=messages.MESSAGE_RELAXAPP_MB_OPTIONS_REMOVE_ACCOUNT.format(username=Session.username),
+                                                    font=(font,14), bg_color=colors["soft_grey"])
+            self.pw_ask_cancel_label.place(rely=0.3, relx=0.5, anchor="center")
+            self.select_button1 = True
 
         elif self.message_type == "Sign Out":
             # Label ask/cancel to sign out.
@@ -2806,62 +2806,17 @@ class RelaxApp_MessageBox_Options(RelaxApp_MessageBox_Structure):
     # This method confirm a change.
     def accept_button(self, message_type):
         valid_request = False
+        server_ok = True
         
         # This conditional accept the registration. 
         if message_type == "Sign up":
-            
             # Request to create an user is confirmed.
             response_dict = comms.register(self.data)
             
-            # Connection with the server is checked.     
-            if response_dict["connection_status"]:
-                response = response_dict["response"]
-                values = response.json()
-                if response.status_code == 201:
-                    # Message from backend is translated.
-                    message = Set_Messages.response_messages(values["message_link"])
-                    print(values["message"])
-                    valid_request = True
-
-                else:
-                    # These conditionals check if the error cames from views or serializers to set the correct translation.
-                    if values["error_type"] == "VIEWS":
-                        message = Set_Messages.response_messages(values["error_link"])
-                        print(values["error"])
-        
-                    elif values["error_type"] == "SERIALIZERS":
-                        key = values["error_link"].upper()
-                        message = Set_Messages.serializers_messages(key)
-                        print("* ERROR: ", values["error"])
-
-            else:
-                message = Set_Messages.server_messages(response_dict["error_link"])
-                print(response_dict["error"])
-
         # This conditional accept the change of password.
         elif message_type == "Confirm Change PW":
             # Request to reset a password is confirmed.
             response_dict = comms.reset_password_confirmation(self.data)
-                    
-            if response_dict["connection_status"]:
-                response = response_dict["response"]
-                values = response.json()
-                if response.status_code == 200:
-                    message = Set_Messages.response_messages(values["message_link"])
-                    print(values["message"])
-                    valid_request = True
-                else:
-                    if values["error_type"] == "VIEWS":
-                        message = Set_Messages.response_messages(values["error_link"])
-                        print(values["error"])
-                        
-                    elif values["error_type"] == "SERIALIZERS":
-                        key = values["error_link"].upper()
-                        message = Set_Messages.serializers_messages(key)
-                        print("* ERROR: ", values["error"])
-            else:
-                message = Set_Messages.server_messages(response_dict["error_link"])
-                print(response_dict["error"])
         
         elif message_type == "Sign Out":
             Session.clear()
@@ -2869,13 +2824,57 @@ class RelaxApp_MessageBox_Options(RelaxApp_MessageBox_Structure):
             self.window_MS.destroy()
             RelaxApp_Structure.close_create2(self, RelaxApp_Initial_Frame, self.root, self.frame)
             return
-                
+        
+        elif message_type == "Remove Account":
+            # Request to remove the account is confirmed.
+            response_dict = comms.remove_account(Session.username)
+             
         # User registration or change of password are canceled and turn back to main menu as weel as sign out.
         elif message_type == "Cancel" or message_type == "Cancel Change PW" or message_type == "Cancel Confirm Change PW":
             self.window_MS.destroy()
             RelaxApp_Structure.close_create2(self, RelaxApp_Initial_Frame, self.root, self.frame)
             return
-  
+ 
+        # Connection with the server is checked.
+        # This is only for request with comms: Sign up, Confirm Change PW and Remove Account.  
+        if response_dict["connection_status"]:
+            response = response_dict["response"]
+            values = response.json()
+            if response.status_code == 200 or response.status_code == 201:
+                request_type = values["request_type"]
+                if request_type == "user_registration" or request_type == "user_pw_reset_confirmation":
+                    # Message from backend is translated.
+                    message = Set_Messages.response_messages(values["message_link"])
+                    print(values["message"])
+                    valid_request = True
+                
+                elif request_type == "remove_account":
+                    Session.clear()
+                    TemporaryProfile.clear()
+                    print(values["message"])
+                    self.window_MS.destroy()
+                    RelaxApp_Structure.close_create2(self, RelaxApp_Initial_Frame, self.root, self.frame)
+                    return
+
+            else:
+                # These conditionals check if the error cames from views or serializers to set the correct translation.
+                if values["error_type"] == "VIEWS":
+                    message = Set_Messages.response_messages(values["error_link"])
+                    print(values["error"])
+    
+                elif values["error_type"] == "SERIALIZERS":
+                    key = values["error_link"].upper()
+                    message = Set_Messages.serializers_messages(key)
+                    print("* ERROR: ", values["error"])
+
+        else:
+            server_ok = False
+
+        # Message displayed when the connection with the server fails.
+        if server_ok == False:
+            message = Set_Messages.server_messages(response_dict["error_link"])
+            print(response_dict["error"])
+           
         # The request is checked. 
         if valid_request:
             # A pop-up window is displayed to confirm that the request has been succesful.
@@ -2909,12 +2908,7 @@ class RelaxApp_MessageBox_Options(RelaxApp_MessageBox_Structure):
 
         
 
-        # elif message_type == "Remove Account":
-        #     database.user_configuration(databases["database1"], tables["users_table"], user["login"], "Remove Account")
-        #     database.user_configuration(databases["database1"], tables["settings_table"], user["login"], "Remove Account")
-        #     self.window_MS.destroy()
-        #     RelaxApp_Structure.close_create2(self, RelaxApp_Initial_Frame, self.root, self.frame)
-        #     return
+        
 
         # User is registered.
         # if database.validate_editing == True:
