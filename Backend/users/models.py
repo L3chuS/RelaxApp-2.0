@@ -1,7 +1,5 @@
 from django.db import models
 from django.contrib.auth.models import User
-from django.core.validators import RegexValidator
-
 from .validators import *
 
 
@@ -17,7 +15,7 @@ class Profiles(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     profile_name = models.CharField(max_length=20, blank=False)
     created_at = models.DateTimeField(auto_now_add=True)
-    default_profile = models.BooleanField(default=False)
+    default_profile = models.BooleanField(default=True)
     visual_configuration = models.CharField(
         max_length=15,
         validators=[check_timer_settings],

@@ -8,6 +8,7 @@ from django.utils import timezone
 from django.template.loader import render_to_string
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
+from django.db import transaction
 import secrets
 import resend
 import base64
@@ -117,19 +118,15 @@ def user_registration(request):
         )
     
     User.objects.create_user(
-        username=username,
-        password=password,
-        first_name=first_name,
-        last_name=last_name,
-        email=email
+        username = username,
+        password = password,
+        first_name = first_name,
+        last_name = last_name,
+        email = email
     )
 
     return Response(
         {"message" : "* MESSAGE: User has been registered.",
-        "first_name" : first_name,
-        "last_name" : last_name,
-        "username" : username,
-        "email" : email,
         "message_link" : "MESSAGE_REGISTER_USER_CREATED",
         "request_type" : "user_registration"},
         status=201
@@ -282,17 +279,6 @@ def user_pw_reset_confirmation(request):
     )
     
     
-@api_view(["GET", "POST", "PUT"])  
-def profiles(request):
-    pass
-
-# @api_view(["POST"])
-# @authentication_classes([TokenAuthentication])
-# @permission_classes([IsAuthenticated])
-# def profiles_validate(request):
-    
-#     valid_data = check_timer_settings(request.data)
-
 @api_view(["POST"])
 @authentication_classes([TokenAuthentication])
 @permission_classes([IsAuthenticated])
@@ -338,3 +324,171 @@ def remove_account(request):
         "request_type" : "remove_account"},
         status=200
     )
+    
+    
+
+@api_view(["GET", "POST"])
+@authentication_classes([TokenAuthentication])
+@permission_classes([IsAuthenticated])
+def profiles(request):
+    
+    try:
+
+        if request.method == "GET":
+            
+            profiles_list = Profiles.objects.filter(user=request.user)
+            
+            serializer = ProfilesSerializer(
+                profiles_list,
+                many=True
+            )
+            # raise Exception
+        
+            return Response(
+                {"message" : f"* MESSAGE: List of profiles for user '{request.user}' are displayed.",
+                "message_link" : None,
+                "request_type" : "get_profiles",
+                "profiles_list" : serializer.data},
+                status=200
+            )
+            
+        elif request.method == "POST":
+            
+            profile_serializer = ProfilesSerializer(data=request.data)
+            
+            if profile_serializer.is_valid(raise_exception=True):
+
+                profile_exists = Profiles.objects.filter(
+                    user=request.user, 
+                    profile_name=profile_serializer.validated_data["profile_name"]
+                )
+                
+                profile_list = Profiles.objects.filter(user=request.user)
+ 
+            if profile_exists:
+                return Response(
+                    {"error" : "* ERROR: Profile already exists.",
+                    "error_type" : "VIEWS",
+                    "error_link" : "ERROR_PROFILES_PROFILE_EXISTS"},
+                    status=400
+                )
+                
+            if len(profile_list) >= 3:
+                return Response(
+                    {"error" : "* ERROR: The list of profiles can't be more than 3.",
+                    "error_type" : "VIEWS",
+                    "error_link" : "ERROR_PROFILES_PROFILE_LIMIT"},
+                    status=400
+                )
+            
+            with transaction.atomic():
+
+                update_default_profiles("CREATE", request.user)
+                
+                Profiles.objects.create(
+                    user = request.user,
+                    **profile_serializer.validated_data
+                )
+            
+            return Response(
+                {"message" : "* MESSAGE: Profile has been registered.",
+                "message_link" : "MESSAGE_PROFILES_PROFILE_CREATED",
+                "request_type" : "create_profiles"},
+                status=201
+            )   
+    
+    except serializers.ValidationError as error:
+        
+        code = format_serializers_code_errors(error.get_codes())
+          
+        return Response({
+            "error" : error.detail,
+            "error_type" : "SERIALIZERS",
+            "error_link" : code},
+            status=400
+        )
+                
+    except Exception as error:
+        return Response({
+            "error" : "* ERROR: Unexpected error while processing your request." + str(error),
+            "error_type" : "VIEWS",
+            "error_link" : "ERROR_PROFILES_GENERAL"},
+            status=500
+        )    
+
+
+@api_view(["PUT", "DELETE"])
+@authentication_classes([TokenAuthentication])
+@permission_classes([IsAuthenticated])
+def profile_details(request, pk):
+    
+    try:
+        if request.method == "PUT":
+            
+            with transaction.atomic():
+                
+                update_default_profiles("UPDATE", request.user)
+                profile = Profiles.objects.get(
+                    user=request.user,
+                    pk=pk
+                )
+                
+                profile.default_profile = True
+                profile.save()
+
+                return Response(
+                    {"message" : f"* MESSAGE: The indicated profile has been set as default.",
+                    "message_link" : None,
+                    "request_type" : "set_profile_default"},
+                    status=200
+                ) 
+     
+        elif request.method == "DELETE":
+            
+            with transaction.atomic():
+                
+                Profiles.objects.get(
+                    user=request.user,
+                    pk=pk
+                ).delete()
+                
+                update_default_profiles("DELETE", request.user)
+
+                # raise Exception
+      
+            return Response(
+                {"message" : f"* MESSAGE: The indicated profile has been removed.",
+                "message_link" : None,
+                "request_type" : "remove_profile"},
+                status=200
+            )        
+    
+    except Exception as error:
+        return Response({
+            "error" : "* ERROR: Unexpected error while processing your request." + str(error),
+            "error_type" : "VIEWS",
+            "error_link" : "ERROR_PROFILES_GENERAL"},
+            status=500
+        )   
+    
+def update_default_profiles(request_type, user):
+    
+    if request_type == "CREATE" or request_type == "UPDATE":
+        
+        profile_list = Profiles.objects.filter(user=user)
+        profile_list.update(default_profile=False)       
+         
+    elif request_type == "DELETE":
+        
+        default_profile_exists = Profiles.objects.filter(
+            user=user, 
+            default_profile=True
+        ).exists()
+       
+        profile_to_default = Profiles.objects.filter(
+            user=user
+        ).order_by("-created_at").first()
+        
+        if not default_profile_exists and profile_to_default:
+            profile_to_default.default_profile = True
+            profile_to_default.save()

@@ -13,6 +13,15 @@ class TemporaryProfile:
         cls.final_sounds_configuration = ""
         cls.lapse_sounds_configuration = ""
 
+    @classmethod
+    def display_values(cls):
+        print("---------------------------------")
+        print("La configuración es:")
+        print("* visual_configuration:       ", cls.visual_configuration)
+        print("* stretch_configuration:      ", cls.stretch_configuration)
+        print("* final_sounds_configuration: ", cls.final_sounds_configuration)
+        print("* lapse_sounds_configuration: ", cls.lapse_sounds_configuration)
+        print("---------------------------------")
         
 class Session:
     token = None

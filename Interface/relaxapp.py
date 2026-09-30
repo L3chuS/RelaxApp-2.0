@@ -188,63 +188,63 @@ class RelaxApp_User_Settings_Structure:
 ### Class that contains general settings while RelaxApp is running ###
 ######################################################################
 
-# class RelaxApp_Running_Structure:
-#     """This class defines the general structure while app is running.
-#        Defines the appearance, dimensions and title."""
+class RelaxApp_Running_Structure:
+    """This class defines the general structure while app is running.
+       Defines the appearance, dimensions and title."""
 
-#     def __init__(self):
+    def __init__(self):
 
-#         # New pop-ups is created.
-#         self.window_RS = ctk.CTkToplevel()
-#         self.window_RS.grab_set()
+        # New pop-ups is created.
+        self.window_RS = ctk.CTkToplevel()
+        self.window_RS.grab_set()
 
-#         # Set the width, height, configuration and location of the windows.
-#         width = 280
-#         height = 400
-#         width_resolution = self.window_RS.winfo_screenwidth() // 2 - width // 2 - width // 3
-#         height_resolution = self.window_RS.winfo_screenheight() // 2 - height
-#         self.dimensions = self.window_RS.geometry(f"{width}x{height}+{width_resolution}+{height_resolution}")
-#         self.maximize = self.window_RS.resizable(False,False)
+        # Set the width, height, configuration and location of the windows.
+        width = 280
+        height = 400
+        width_resolution = self.window_RS.winfo_screenwidth() // 2 - width // 2 - width // 3
+        height_resolution = self.window_RS.winfo_screenheight() // 2 - height
+        self.dimensions = self.window_RS.geometry(f"{width}x{height}+{width_resolution}+{height_resolution}")
+        self.maximize = self.window_RS.resizable(False,False)
 
-#         # Set a frame at the background.
-#         self.frame_RS = ctk.CTkFrame(self.window_RS, height=400, width=280, fg_color=colors["soft_grey"])
-#         self.frame_RS.pack(pady=10, padx=10, fill="both")
+        # Set a frame at the background.
+        self.frame_RS = ctk.CTkFrame(self.window_RS, height=400, width=280, fg_color=colors["soft_grey"])
+        self.frame_RS.pack(pady=10, padx=10, fill="both")
 
-#         # Set the title and the logo of the app.
-#         self.title = self.window_RS.title("RelaxApp")
-#         self.window_RS.after(200, lambda: self.window_RS.iconbitmap(os.path.join(image_path, "logo.ico")))
+        # Set the title and the logo of the app.
+        self.title = self.window_RS.title("RelaxApp")
+        self.window_RS.after(200, lambda: self.window_RS.iconbitmap(os.path.join(image_path, "logo.ico")))
 
 
 ############################################################################
 ### Class that contains general settings while Profile's menu is running ###
 ############################################################################
 
-# class RelaxApp_Profile_Name_Structure:
-#     """This class defines the general structure while profile name is
-#        requested. Defines the appearance, dimensions and title."""
+class RelaxApp_Profile_Name_Structure:
+    """This class defines the general structure while profile name is
+       requested. Defines the appearance, dimensions and title."""
 
-#     def __init__(self, root):
-#         self.root = root
+    def __init__(self, root):
+        self.root = root
 
-#         # New pop-ups is created.
-#         self.window_PFS = ctk.CTkToplevel()
-#         self.window_PFS.grab_set()
+        # New pop-ups is created.
+        self.window_PFS = ctk.CTkToplevel()
+        self.window_PFS.grab_set()
 
-#         # Set the width, height, configuration and location of the windows.
-#         width = 310
-#         height = 50
-#         width_resolution = self.window_PFS.winfo_screenwidth() // 2 - width // 2 - width // 3
-#         height_resolution = self.window_PFS.winfo_screenheight() // 2 - height - 45
-#         self.dimensions = self.window_PFS.geometry(f"{width}x{height}+{width_resolution}+{height_resolution}")
-#         self.maximize = self.window_PFS.resizable(False,False)
+        # Set the width, height, configuration and location of the windows.
+        width = 310
+        height = 50
+        width_resolution = self.window_PFS.winfo_screenwidth() // 2 - width // 2 - width // 3
+        height_resolution = self.window_PFS.winfo_screenheight() // 2 - height - 45
+        self.dimensions = self.window_PFS.geometry(f"{width}x{height}+{width_resolution}+{height_resolution}")
+        self.maximize = self.window_PFS.resizable(False,False)
 
-#         # Set a frame at the background.
-#         self.frame_PFS = ctk.CTkFrame(self.window_PFS, height=100, width=310, fg_color=colors["soft_grey"])
-#         self.frame_PFS.pack(pady=10, padx=10, fill="both")
+        # Set a frame at the background.
+        self.frame_PFS = ctk.CTkFrame(self.window_PFS, height=100, width=310, fg_color=colors["soft_grey"])
+        self.frame_PFS.pack(pady=10, padx=10, fill="both")
 
-#         # Set the title and the logo of the app.
-#         self.title = self.window_PFS.title("RelaxApp")
-#         self.window_PFS.after(200, lambda: self.window_PFS.iconbitmap(os.path.join(image_path, "logo.ico")))
+        # Set the title and the logo of the app.
+        self.title = self.window_PFS.title("RelaxApp")
+        self.window_PFS.after(200, lambda: self.window_PFS.iconbitmap(os.path.join(image_path, "logo.ico")))
 
 #############################################################
 ### Class that contains general functions to set messages ###
@@ -288,6 +288,10 @@ class Set_Messages():
             return messages.ERROR_SERIALIZERS_PASSWORD2_MISSING
         elif key == "PASSWORD_NO_MATCH_INVALID":
             return messages.ERROR_PW_RESET_CONF_PW_NOT_MATCH
+        elif key == "PROFILE_NAME_BLANK":
+            return messages.ERROR_SERIALIZERS_PROFILE_NAME_MISSING
+        elif key == "PROFILE_VALUES_EMPTY_INVALID":
+            return messages.ERROR_SERIALIZERS_VC_SC_BOTH_EMPTY
         else:
             return messages.ERROR_SERIALIZERS_GENERAL
     
@@ -299,7 +303,7 @@ class Set_Messages():
             return messages.ERROR_LOGIN_USERNAME_NOT_EXISTS
         elif type == "ERROR_LOGIN_INVALID_PASSWORD":
             return messages.ERROR_LOGIN_INVALID_PASSWORD
-        
+
         elif type == "MESSAGE_REGISTER_USER_CREATED":
             return messages.MESSAGE_REGISTER_USER_CREATED
         elif type == "ERROR_REGISTER_USERNAME_EXISTS":
@@ -317,6 +321,13 @@ class Set_Messages():
             return messages.ERROR_PW_RESET_CONF_TOKEN_EXPIRED
         elif type == "ERROR_ACCOUNT_REMOVE_UNEXPECTED":
             return messages.ERROR_ACCOUNT_REMOVE_UNEXPECTED
+        
+        elif type == "ERROR_PROFILES_PROFILE_EXISTS":
+            return messages.ERROR_PROFILES_PROFILE_EXISTS
+        elif type == "ERROR_PROFILES_PROFILE_LIMIT":
+            return messages.ERROR_PROFILES_PROFILE_LIMIT
+        elif type == "ERROR_PROFILES_GENERAL":
+            return messages.ERROR_PROFILES_GENERAL
         
     def validators_messages(key):
         if key == "INVALID_TIME":
@@ -1045,8 +1056,7 @@ class RelaxApp_User_Main_Menu():
 
     # This method creates profiles.
     def create_profile(self):
-        print("create_profile")
-        #RelaxApp_User_Main_Menu_Profiles(user["login"])
+        RelaxApp_User_Main_Menu_Profiles()
 
     # This method import profiles.
     def import_profile(self):
@@ -1157,16 +1167,14 @@ class RelaxApp_User_Main_Menu():
 
     # This method restarts values set.
     def restart_values(self, value):
-        print("restart_values")
-        # if value == "VO":
-        #     database.user_configuration(databases["database1"], tables["settings_table"], user["login"], "Restart", "Visual_Configuration")
-        # elif value == "SO":
-        #     database.user_configuration(databases["database1"], tables["settings_table"], user["login"], "Restart", "Stretch_Configuration")
-
+        if value == "VO":
+            TemporaryProfile.visual_configuration = ""
+        elif value == "SO":
+            TemporaryProfile.stretch_configuration = ""
+                
     # This method sets sound options of the App.
     def set_sounds_options(self):
-        print("set_sounds_options")
-        #RelaxApp_User_Main_Menu_Sounds(self.frame)
+        RelaxApp_User_Main_Menu_Sounds(self.frame)
 
     # This method starts the App.
     def start_relaxapp(self):
@@ -1236,329 +1244,307 @@ class RelaxApp_User_Main_Menu():
 ###  Class that contains the user's personal settings  ###
 ##########################################################
 
-# class RelaxApp_User_Main_Menu_Profiles(RelaxApp_User_Settings_Structure):
-#     """This class opens a new window to set the user's personal profiles
-#        of the App. Inherit all structure from parent."""
+class RelaxApp_User_Main_Menu_Profiles(RelaxApp_User_Settings_Structure):
+    """This class opens a new window to set the user's personal profiles
+       of the App. Inherit all structure from parent."""
 
-#     def __init__(self, user):
+    def __init__(self):
 
-#         super().__init__()
+        super().__init__()
 
-#         # User logged in is gotten.
-#         self.user = user
+        # Frame at the back.
+        self.frame_User_SS.configure(fg_color=colors["black"])
+        self.frame_User_SS.pack(pady=0, padx=0, fill="both")
 
-#         # Frame at the back.
-#         self.frame_User_SS.configure(fg_color=colors["black"])
-#         self.frame_User_SS.pack(pady=0, padx=0, fill="both")
+        # Frame that contains the tittle of the class.
+        self.frame1 = ctk.CTkFrame(self.frame_User_SS, height=50, width=250, fg_color=colors["soft_grey"], corner_radius=3)
+        self.frame1.pack(pady=10, padx=10)
 
-#         # Frame that contains the tittle of the class.
-#         self.frame1 = ctk.CTkFrame(self.frame_User_SS, height=50, width=250, fg_color=colors["soft_grey"], corner_radius=3)
-#         self.frame1.pack(pady=10, padx=10)
+        # Frame that contains the create and remove buttons.
+        self.frame2 = ctk.CTkFrame(self.frame_User_SS, height=40, width=250, fg_color=colors["soft_grey"], corner_radius=3)
+        self.frame2.pack(pady=1, padx=10)
 
-#         # Frame that contains the create and remove buttons.
-#         self.frame2 = ctk.CTkFrame(self.frame_User_SS, height=40, width=250, fg_color=colors["soft_grey"], corner_radius=3)
-#         self.frame2.pack(pady=1, padx=10)
+        # Frame that contains the first profile.
+        self.frame3 = ctk.CTkFrame(self.frame_User_SS, height=40, width=250, fg_color=colors["soft_grey"], corner_radius=3)
+        self.frame3.pack(pady=1, padx=10)
 
-#         # Frame that contains the first profile.
-#         self.frame3 = ctk.CTkFrame(self.frame_User_SS, height=40, width=250, fg_color=colors["soft_grey"], corner_radius=3)
-#         self.frame3.pack(pady=1, padx=10)
+        # Frame that contains the second profile.
+        self.frame4 = ctk.CTkFrame(self.frame_User_SS, height=40, width=250, fg_color=colors["soft_grey"], corner_radius=3)
+        self.frame4.pack(pady=1, padx=10)
 
-#         # Frame that contains the second profile.
-#         self.frame4 = ctk.CTkFrame(self.frame_User_SS, height=40, width=250, fg_color=colors["soft_grey"], corner_radius=3)
-#         self.frame4.pack(pady=1, padx=10)
+        # Frame that contains the third profile.
+        self.frame5 = ctk.CTkFrame(self.frame_User_SS, height=40, width=250, fg_color=colors["soft_grey"], corner_radius=3)
+        self.frame5.pack(pady=1, padx=10)
 
-#         # Frame that contains the third profile.
-#         self.frame5 = ctk.CTkFrame(self.frame_User_SS, height=40, width=250, fg_color=colors["soft_grey"], corner_radius=3)
-#         self.frame5.pack(pady=1, padx=10)
+        # Frame that contains the save and cancel buttons.
+        self.frame6 = ctk.CTkFrame(self.frame_User_SS, height=40, width=250, fg_color=colors["soft_grey"], corner_radius=3)
+        self.frame6.pack(pady=10, padx=10)
 
-#         # Frame that contains the save and cancel buttons.
-#         self.frame6 = ctk.CTkFrame(self.frame_User_SS, height=40, width=250, fg_color=colors["soft_grey"], corner_radius=3)
-#         self.frame6.pack(pady=10, padx=10)
+        # Tittle label of the class.
+        self.setting_title = ctk.CTkLabel(self.frame1, text="Perfil Predeterminado", font=(font, 15),
+                                        corner_radius=5, fg_color=colors["soft_green"])
+        self.setting_title.place(rely=0.5, relx=0.5, anchor="center")
 
-#         # Tittle label of the class.
-#         self.setting_title = ctk.CTkLabel(self.frame1, text="Perfil Predeterminado", font=(font, 15),
-#                                         corner_radius=5, fg_color=colors["soft_green"])
-#         self.setting_title.place(rely=0.5, relx=0.5, anchor="center")
+        # Image of a create simbol.
+        self.create_button = ctk.CTkImage(Image.open(os.path.join(image_path, "Create.png")))
+        # Image of a remove simbol.
+        self.remove_button = ctk.CTkImage(Image.open(os.path.join(image_path, "Remove.png")))
 
-#         # Image of a create simbol.
-#         self.create_button = ctk.CTkImage(Image.open(os.path.join(image_path, "Create.png")))
-#         # Image of a remove simbol.
-#         self.remove_button = ctk.CTkImage(Image.open(os.path.join(image_path, "Remove.png")))
+        # Button to create new profile.
+        self.create_profile_button = ctk.CTkButton(self.frame2, text=None, image=self.create_button, width=0, command=self.create_profile,
+                                                hover=True, fg_color=colors["soft_grey"], hover_color=colors["dark_green"])
+        self.create_profile_button.place(rely=0.5, relx=0.3, anchor="center")
 
-#         # Button to create new profile.
-#         self.create_profile_button = ctk.CTkButton(self.frame2, text=None, image=self.create_button, width=0, command=self.create_profile,
-#                                                 hover=True, fg_color=colors["soft_grey"], hover_color=colors["dark_green"])
-#         self.create_profile_button.place(rely=0.5, relx=0.3, anchor="center")
+        # Button to remove profile selected.
+        self.remove_profile_button = ctk.CTkButton(self.frame2, text=None, image=self.remove_button, width=0, command=self.remove_profile,
+                                                hover=True, fg_color=colors["soft_grey"], hover_color=colors["dark_green"])
+        self.remove_profile_button.place(rely=0.5, relx=0.7, anchor="center")
 
-#         # Button to remove profile selected.
-#         self.remove_profile_button = ctk.CTkButton(self.frame2, text=None, image=self.remove_button, width=0, command=self.remove_profile,
-#                                                 hover=True, fg_color=colors["soft_grey"], hover_color=colors["dark_green"])
-#         self.remove_profile_button.place(rely=0.5, relx=0.7, anchor="center")
+        # Save button.
+        self.save_button = ctk.CTkButton(self.frame6, width=10, height=10, text="Guardar", font=(font,14),
+                                        command=self.save_settings, corner_radius=10, hover=True,
+                                        fg_color=colors["soft_grey"], hover_color=colors["dark_green"])
+        self.save_button.place(rely=0.5, relx=0.1, anchor="w")
 
-#         # Save button.
-#         self.save_button = ctk.CTkButton(self.frame6, width=10, height=10, text="Guardar", font=(font,14),
-#                                         command=self.save_settings, corner_radius=10, hover=True,
-#                                         fg_color=colors["soft_grey"], hover_color=colors["dark_green"])
-#         self.save_button.place(rely=0.5, relx=0.1, anchor="w")
+        # Cancel button.
+        self.cancel_button = ctk.CTkButton(self.frame6, width=10, height=10, text="Cancelar", font=(font,14),
+                                        command=self.cancel_settings, corner_radius=10, hover=True,
+                                        fg_color=colors["soft_grey"], hover_color=colors["dark_green"])
+        self.cancel_button.place(rely=0.5, relx=0.9, anchor="e")
 
-#         # Cancel button.
-#         self.cancel_button = ctk.CTkButton(self.frame6, width=10, height=10, text="Cancelar", font=(font,14),
-#                                         command=self.cancel_settings, corner_radius=10, hover=True,
-#                                         fg_color=colors["soft_grey"], hover_color=colors["dark_green"])
-#         self.cancel_button.place(rely=0.5, relx=0.9, anchor="e")
+        # Frames which will be cleaned when creating and removing profiles.
+        self.dinamics_frames = (self.frame3, self.frame4, self.frame5)
 
-#         # Frames which will be cleaned when creating and removing profiles.
-#         self.dinamics_frames = (self.frame3, self.frame4, self.frame5)
+        # Profile list is gotten to run or not the profile function.
+        self.profile_list = self.get_profile_list()
 
-#         # Profile list is gotten to run or not the profile function.
-#         profile_list = self.get_profile_list()
-#         # Variable to save the option chosen with the radiobuttons.
-#         self.get_profile_saved = [self.get_profile_chosen_default()]
+        # Profiles are run if there's any.
+        if self.profile_list == None:
+            self.window_User_SS.destroy()
+            return
+        
+        if len(self.profile_list) > 0:
+            self.run_profiles(self.profile_list)
+                  
+    # This method gets all profiles names of the current user from the database.
+    def get_profile_list(self):
 
-#         # Profiles are run if there's any.
-#         if len(profile_list) > 1:
-#             self.run_profiles(profile_list)
+        response_dict = comms.get_profiles()
+        
+        response = self.check_comms(response_dict)
+        if response:
+            return response["profiles_list"]
+            
+    # This method set the first profile and set it as default. Is used when none profiles is set as default.
+    def get_profile_selected(self):
 
-#     # This method gets all profiles names of the current user from the database.
-#     def get_profile_list(self):
+        profile_chosen = self.profile_choice.get()
+        profile_ID = self.get_profiles_ID[profile_chosen]["id"]
+            
+        return profile_ID
 
-#         # Search method is called to get all the profile set for current user.
-#         database.query(f"SELECT Profile_Name FROM {databases['database1']}.{tables['settings_table']} WHERE login = '{user['login']}'")
-#         profile_list = database.value
-#         return profile_list
+    # This method creates the radio buttons based on the amount of profiles.
+    def create_RB_profile(self, profile_list, dinamics_frames, profile_choice):   
+        # Var to work with the radio buttons.
+        self.profile_choice = ctk.IntVar(value=profile_choice)
 
-#     # This method gets all default profiles of the current user from the database.
-#     def get_default_profile(self):
+        # Radio button 1 that contains the first profile set.
+        profile_set1 = ctk.CTkRadioButton(dinamics_frames[0], text=None, value=0, variable=self.profile_choice, command=lambda:RelaxApp_User_Main_Menu_Profiles.get_profile_selected(self),
+                                          hover=True, border_width_unchecked=2, border_width_checked=5, fg_color=colors["soft_green"],
+                                          hover_color=colors["dark_green"])
+        profile_set1.place(rely=0.5, relx=0.87, anchor="w")
 
-#         # Search method is called to get if there's a profile set as default.
-#         database.query(f"SELECT Default_Profile FROM {databases['database1']}.{tables['settings_table']} WHERE login = '{user['login']}'")
-#         default_profile = database.value
-#         return default_profile
+        # Radio button 2 that contains the second profile set.
+        if len(profile_list) > 1:
+            profile_set2 = ctk.CTkRadioButton(dinamics_frames[1], text=None, value=1, variable=self.profile_choice, command=lambda:RelaxApp_User_Main_Menu_Profiles.get_profile_selected(self),
+                                              hover=True, border_width_unchecked=2, border_width_checked=5, fg_color=colors["soft_green"],
+                                              hover_color=colors["dark_green"])
+            profile_set2.place(rely=0.5, relx=0.87, anchor="w")
 
-#     # This method checks if there's any profile set as default.
-#     def check_profile_true(self):
+        # Radio button 3 that contains the third profile set.
+        if len(profile_list) > 2:
+            profile_set3 = ctk.CTkRadioButton(dinamics_frames[2], text=None, value=2, variable=self.profile_choice, command=lambda:RelaxApp_User_Main_Menu_Profiles.get_profile_selected(self),
+                                              hover=True, border_width_unchecked=2, border_width_checked=5, fg_color=colors["soft_green"],
+                                              hover_color=colors["dark_green"])
+            profile_set3.place(rely=0.5, relx=0.87, anchor="w")
 
-#         default_profile = RelaxApp_User_Main_Menu_Profiles.get_default_profile(self)
-#         for profile in default_profile:
-#             if profile[0] == "True":
-#                 return True
+    # This method writes all profiles set if there's any.
+    def run_profiles(self, profile_list):
+        
+        self.get_profiles_ID = []
+        profile_choice = 0
+        profile_counter = 0
+        frame_counter = 3
+        
+        profile_list.reverse()
+        
+        for value in profile_list:
+            if frame_counter == 3:
+                frame = self.dinamics_frames[0]
+            elif frame_counter == 4:
+                frame = self.dinamics_frames[1]
+            elif frame_counter == 5:
+                frame = self.dinamics_frames[2]
+                
+            if value["default_profile"] == True:
+                profile_choice = profile_counter
+                
+            self.get_profiles_ID.append({
+                "id" : value["id"],
+                "profile_name" : value["profile_name"]
+            })
+                
+            profile_counter += 1
+                
+            profile_set = ctk.CTkLabel(frame, text=value["profile_name"], font=(font, 15))
+            profile_set.place(rely=0.5, relx=0.02, anchor="w")
+            frame_counter += 1
 
-#     # This method gets the option chosen by the radio buttons.
-#     def get_choice(self):
+        if profile_list:
+            RelaxApp_User_Main_Menu_Profiles.create_RB_profile(self, profile_list, self.dinamics_frames, profile_choice)
 
-#         try:
-#             # Try to get the option.
-#             profile_chosen = self.profile_choice.get()
-#         except:
-#             # Set an option by default when none is chosen (after a profile is created).
-#             profile_chosen = 0
+    # This method creates the profiles.
+    def create_profile(self):      
+        RelaxApp_Profile_Name(self, self.frame_User_SS, self.window_User_SS, self.dinamics_frames)
+        
+    # This method removes the profile selected.
+    def remove_profile(self):
+        # The radiobutton is gotten to use it to get the profile ID.      
+        profile_list = self.get_profile_list()
+        
+        if not profile_list:
+            return
 
-#         # The value is saved in a list and the last one is removed.
-#         self.get_profile_saved.append(profile_chosen)
-#         self.get_profile_saved.remove(self.get_profile_saved[0])
-#         return self.get_profile_saved
+        profile_chosen = self.profile_choice.get()
+        profile_ID = self.get_profiles_ID[profile_chosen]["id"]
+        
+        response_dict = comms.remove_profile(profile_ID)
+        
+        response = self.check_comms(response_dict)
+        if response:
+            self.update_profiles()
 
-#     # This method gets the profile set as default to set the correct option for the radio buttons.
-#     def get_profile_chosen_default(self):
+    def update_profiles(self):
+        profile_list = self.get_profile_list()                    
+        RelaxApp_Structure.clean_MMP_widgets(self, self.dinamics_frames)
+        self.run_profiles(profile_list)
 
-#         default = RelaxApp_User_Main_Menu_Profiles.get_default_profile(self)
-#         choice_counter = -1
-#         profile_choice = 0
-#         # This for function iterates from the profiles to get the one set as "True" and set the correct
-#         # option for the radio buttons.
-#         for value in default:
-#             if value[0] == "True":
-#                 profile_choice = choice_counter
-#                 break
-#             choice_counter += 1
-#         return profile_choice
+    # This method saves the profile/s created and selected as default.
+    def save_settings(self):
+        
+        profile_list = self.get_profile_list()
+        if profile_list:
+            profile_ID = self.get_profile_selected()
+            response_dict = comms.set_profile_dafault(profile_ID)
+            self.check_comms(response_dict)             
 
-#     # This method set the first profile and set it as default. Is used when none profiles is set as default.
-#     def set_profile_true(self, profile_list):
+            self.window_User_SS.destroy()
 
-#         self.profile_choice = ctk.IntVar(value=0)
-#         # When there's no profile set as "True" database is modified to set the first one as default.
-#         database.user_configuration(databases["database1"], tables["settings_table"], user["login"], "Update",
-#                                             ("Profile_Name", "Default_Profile"), (profile_list[1][0], "True"))
-
-#     # This method creates the radio buttons based on the amount of profiles.
-#     def create_RB_profile(self, profile_list, dinamics_frames, profile_choice=0, *args):
-
-#         # Var to work with the radio buttons.
-#         self.profile_choice = ctk.IntVar(value=profile_choice)
-
-#         # Radio button 1 that contains the first profile set.
-#         profile_set1 = ctk.CTkRadioButton(dinamics_frames[0], text=None, value=0, variable=self.profile_choice, command=lambda:RelaxApp_User_Main_Menu_Profiles.get_choice(self),
-#                                           hover=True, border_width_unchecked=2, border_width_checked=5, fg_color=colors["soft_green"],
-#                                           hover_color=colors["dark_green"])
-#         profile_set1.place(rely=0.5, relx=0.87, anchor="w")
-
-#         # Radio button 2 that contains the second profile set.
-#         if len(profile_list) > 2:
-#             profile_set2 = ctk.CTkRadioButton(dinamics_frames[1], text=None, value=1, variable=self.profile_choice, command=lambda:RelaxApp_User_Main_Menu_Profiles.get_choice(self),
-#                                               hover=True, border_width_unchecked=2, border_width_checked=5, fg_color=colors["soft_green"],
-#                                               hover_color=colors["dark_green"])
-#             profile_set2.place(rely=0.5, relx=0.87, anchor="w")
-
-#         # Radio button 3 that contains the third profile set.
-#         if len(profile_list) > 3:
-#             profile_set3 = ctk.CTkRadioButton(dinamics_frames[2], text=None, value=2, variable=self.profile_choice, command=lambda:RelaxApp_User_Main_Menu_Profiles.get_choice(self),
-#                                               hover=True, border_width_unchecked=2, border_width_checked=5, fg_color=colors["soft_green"],
-#                                               hover_color=colors["dark_green"])
-#             profile_set3.place(rely=0.5, relx=0.87, anchor="w")
-
-#     # This method writes all profiles set if there's any.
-#     def run_profiles(self, profile_list, *args):
-
-#         check_profile = RelaxApp_User_Main_Menu_Profiles.check_profile_true(self)
-#         if check_profile == None:
-#             profile_choice = RelaxApp_User_Main_Menu_Profiles.set_profile_true(self, profile_list)
-
-#         # Variable to be used to write the profile selected in the frame 3, 4 or 5.
-#         frame_counter = 3
-#         # Bucle to write each profile on each frame.
-#         for profile in range(1, len(profile_list)):
-#             if frame_counter == 3:
-#                 frame = self.dinamics_frames[0]
-#             elif frame_counter == 4:
-#                 frame = self.dinamics_frames[1]
-#             elif frame_counter == 5:
-#                 frame = self.dinamics_frames[2]
-
-#             profile_set = ctk.CTkLabel(frame, text=profile_list[profile][0], font=(font, 15))
-#             profile_set.place(rely=0.5, relx=0.02, anchor="w")
-#             frame_counter += 1
-
-#         profile_choice = RelaxApp_User_Main_Menu_Profiles.get_profile_chosen_default(self)
-
-#         RelaxApp_User_Main_Menu_Profiles.create_RB_profile(self, profile_list, self.dinamics_frames, profile_choice, self.get_profile_saved)
-
-#     # This method creates the profiles.
-#     def create_profile(self):
-#         RelaxApp_Profile_Name(self.frame_User_SS, self.window_User_SS, self.dinamics_frames, self.get_profile_saved)
-
-#     # This method removes the profile selected.
-#     def remove_profile(self):
-
-#         profile_list = self.get_profile_list()
-#         if len(profile_list) > 1:
-#             # The profile selected is chosen.
-#             profile_choosen = profile_list[self.get_profile_saved[0]+1][0]
-#             # Profile is removed from database.
-#             database.user_configuration(databases["database1"], tables["settings_table"], user["login"], "Remove", ("Login", "Profile_Name"), profile_choosen)
-
-#             # Frames 3,5,6 are cleaned where the profiles are located.
-#             RelaxApp_Structure.clean_MMP_widgets(self, self.dinamics_frames)
-
-#             # Profiles are run again after one was removed.
-#             profile_list = self.get_profile_list()
-#             if len(profile_list) > 1:
-#                 self.get_profile_saved = [0]
-#                 RelaxApp_User_Main_Menu_Profiles.run_profiles(self, profile_list, self.dinamics_frames, self.get_profile_saved)
-
-#     # This method saves the profile/s created and selected as default.
-#     def save_settings(self):
-
-#         profile_list = self.get_profile_list()
-
-#         if len(profile_list) > 1:
-#             profile_selected = self.get_profile_saved
-#             # This bucle set the profile select as "True" and the rest (if there's any) as "False".
-#             for profile in range(1, len(profile_list)):
-#                 if profile == profile_selected[0] + 1:
-#                     database.user_configuration(databases["database1"], tables["settings_table"], user["login"],
-#                                                 "Update", ("Profile_Name", "Default_Profile"), (profile_list[profile][0], "True"))
-#                 else:
-#                     database.user_configuration(databases["database1"], tables["settings_table"], user["login"],
-#                                                 "Update", ("Profile_Name", "Default_Profile"), (profile_list[profile][0], "False"))
-#         self.window_User_SS.destroy()
-
-#     # This method cancel the profile menu and close the window.
-#     def cancel_settings(self):
-#         self.window_User_SS.destroy()
-
+    # This method cancel the profile menu and close the window.
+    def cancel_settings(self):
+        self.window_User_SS.destroy()
+        
+    def check_comms(self, response_dict):
+        
+        if response_dict["connection_status"]:
+            response = response_dict["response"]
+            values = response.json()
+            if response.status_code == 200:
+                print(values["message"])
+                return values
+            else:
+                message = Set_Messages.response_messages(values["error_link"])
+                print(values["error"])
+        else:
+            message = Set_Messages.server_messages(response_dict["error"])
+            print(response_dict["error"])
+            
+        RelaxApp_MessageBox_Options(self.frame_User_SS, self.window_User_SS, "Profile Error", message=message)
+        
 
 ##################################################################
 ###  Class that contains the window to write the profile name  ###
 ##################################################################
 
-# class RelaxApp_Profile_Name(RelaxApp_Profile_Name_Structure):
-#     """This class opens a new window to set the user's personal profiles
-#        of the App. Inherit all structure from parent."""
+class RelaxApp_Profile_Name(RelaxApp_Profile_Name_Structure):
+    """This class opens a new window to set the user's personal profiles
+       of the App. Inherit all structure from parent."""
 
-#     def __init__(self, frame, window, dinamics_frames, variable_saved):
-#         super().__init__(frame)
-#         self.frame = frame
-#         self.window = window
-#         self.dinamics_frames = dinamics_frames
-#         self.get_profile_saved = variable_saved
+    def __init__(self, profile, frame, window, dinamics_frames):
+        super().__init__(frame)
+        self.profile_menu = profile
+        self.frame = frame
+        self.window = window
+        self.dinamics_frames = dinamics_frames
 
-#         # Image of an accept simbol.
-#         self.accept_image = ctk.CTkImage(Image.open(os.path.join(image_path, "Accept.png")))
-#         # Image of a remove simbol.
-#         self.close_image = ctk.CTkImage(Image.open(os.path.join(image_path, "Remove.png")))
+        # Image of an accept simbol.
+        self.accept_image = ctk.CTkImage(Image.open(os.path.join(image_path, "Accept.png")))
+        # Image of a remove simbol.
+        self.close_image = ctk.CTkImage(Image.open(os.path.join(image_path, "Remove.png")))
 
-#         # Validate character limit.
-#         self.lenght_name = self.root.register(Validate_CMD.validate_lenght_name)
+        # Validate character limit.
+        self.lenght_name = self.root.register(Validate_CMD.validate_lenght_name)
 
-#         # Profile name entry.
-#         self.profile_name_entry = ctk.CTkEntry(self.frame_PFS, font=(font,14), width=200, validate="key",
-#                                                validatecommand=(self.lenght_name, "%P"))
-#         self.profile_name_entry.place(rely=0.5, relx=0.01, anchor="w")
-#         self.profile_name_entry.insert(0, "Nombre del Perfil")
-#         self.profile_name_entry.bind("<Button-1>", lambda remove: self.profile_name_entry.delete(0, tk.END))
+        # Profile name entry.
+        self.profile_name_entry = ctk.CTkEntry(self.frame_PFS, font=(font,14), width=200, validate="key",
+                                               validatecommand=(self.lenght_name, "%P"))
+        self.profile_name_entry.place(rely=0.5, relx=0.01, anchor="w")
+        self.profile_name_entry.insert(0, "Nombre del Perfil")
+        self.profile_name_entry.bind("<Button-1>", lambda remove: self.profile_name_entry.delete(0, tk.END))
 
-#         # Accept button to create a profile.
-#         self.accept_button = ctk.CTkButton(self.frame_PFS, text=None, image=self.accept_image, width=0, command=self.accept,
-#                                            hover=True, fg_color=colors["soft_grey"], hover_color=colors["dark_green"])
-#         self.accept_button.place(rely=0.5, relx=0.85, anchor="e")
+        # Accept button to create a profile.
+        self.accept_button = ctk.CTkButton(self.frame_PFS, text=None, image=self.accept_image, width=0, command=self.accept,
+                                           hover=True, fg_color=colors["soft_grey"], hover_color=colors["dark_green"])
+        self.accept_button.place(rely=0.5, relx=0.85, anchor="e")
 
-#         # Cancel button to not create a profile.
-#         self.close_button = ctk.CTkButton(self.frame_PFS, text=None, image=self.close_image, width=0, command=self.close,
-#                                           hover=True, fg_color=colors["soft_grey"], hover_color=colors["dark_green"])
-#         self.close_button.place(rely=0.5, relx=0.99, anchor="e")
+        # Cancel button to not create a profile.
+        self.close_button = ctk.CTkButton(self.frame_PFS, text=None, image=self.close_image, width=0, command=self.close,
+                                          hover=True, fg_color=colors["soft_grey"], hover_color=colors["dark_green"])
+        self.close_button.place(rely=0.5, relx=0.99, anchor="e")
 
-#     # This method check the name given and create or not the new profile.
-#     def accept(self):
-#         profile_name = self.profile_name_entry.get()
+    # This method check the name given and create or not the new profile.
+    def accept(self):
+        profile_name = self.profile_name_entry.get()
+              
+        data = {
+            "profile_name" : profile_name,
+            "visual_configuration" : TemporaryProfile.visual_configuration,
+            "stretch_configuration" : TemporaryProfile.stretch_configuration,
+            "final_sounds_configuration" : TemporaryProfile.final_sounds_configuration,
+            "lapse_sounds_configuration" : TemporaryProfile.lapse_sounds_configuration
+        }
+        
+        response_dict = comms.create_profile(data)
+        
+        # Connection with the server is checked.
+        if response_dict["connection_status"]:
+            
+            response = response_dict["response"]
+            values = response.json()
+            if response.status_code == 201:
+                print(values["message"])
+                self.profile_menu.update_profiles()
+                self.window_PFS.destroy()
+                
+            else:
+                if values["error_type"] == "VIEWS":
+                    message = Set_Messages.response_messages(values["error_link"])
+                    print(values["error"])
+                elif values["error_type"] == "SERIALIZERS":
+                    key = values["error_link"].upper()
+                    message = Set_Messages.serializers_messages(key)
+                    print("* ERROR: ", values["error"])
+                # Pop-up window is displayed error from serializers is displayed in Spanish.    
+                RelaxApp_MessageBox_Options(self.root, self.frame, "Profile Error", message=message)
+        else:
+            message = Set_Messages.server_messages(response_dict["error_link"])
+            # Pop-up window error from the server connection is displayed in Spanish.
+            print(response_dict["error"])
+            RelaxApp_MessageBox_Options(self.root, self.frame, "Server Problem", message=message)
 
-#         profile_list = RelaxApp_User_Main_Menu_Profiles.get_profile_list(self)
-
-#         check_profile_duplicated = Check_Values_Configuration.check_profile_duplicated(self, profile_name)
-
-#         if len(profile_name) == 0:
-#             RelaxApp_MessageBox_Options(self.root, self.window, "No Name")
-#         elif len(profile_list) == 4:
-#             RelaxApp_MessageBox_Options(self.root, self.window, "Full Profile")
-#         elif check_profile_duplicated == True:
-#             RelaxApp_MessageBox_Options(self.root, self.window, "Duplicated")
-#         else:
-#             date_time = datetime.datetime.now().strftime("%d-%m-%Y - %H.%M.%Shs")
-
-#             # Search method is called to get all the profile set for current user.
-#             database.query(f"SELECT Visual_Configuration, Stretch_Configuration, Final_Sounds_Configuration, Lapse_Sounds_Configuration FROM \
-#                            {databases['database1']}.{tables['settings_table']} WHERE login = '{user['login']}' and Profile_Name is NULL")
-#             profile_values = database.value
-#             visual_config = profile_values[0][0]
-#             stretch_config = profile_values[0][1]
-#             final_sound_config = profile_values[0][2]
-#             lapse_sound_config = profile_values[0][3]
-
-#             database.user_configuration(databases["database1"], tables["settings_table"], user["login"],
-#                                         "Add", "Login, Profile_Name, Date_Time, Default_Profile, Visual_Configuration, \
-#                                         Stretch_Configuration, Final_Sounds_Configuration, Lapse_Sounds_Configuration",
-#                                         (profile_name, date_time, False, visual_config, stretch_config, final_sound_config, lapse_sound_config))
-
-#             profile_list = RelaxApp_User_Main_Menu_Profiles.get_profile_list(self)
-
-#             self.window_PFS.destroy()
-
-#             dinamics_frames = RelaxApp_Structure.clean_MMP_widgets(self, self.dinamics_frames)
-#             RelaxApp_User_Main_Menu_Profiles.run_profiles(self, profile_list, dinamics_frames, self.get_profile_saved)
-
-#     # This method cancel the profile name menu and returns to the profile menu.
-#     def close(self):
-#         self.window_PFS.destroy()
+    # This method cancel the profile name menu and returns to the profile menu.
+    def close(self):
+        self.window_PFS.destroy()
 
 
 ##########################################################
@@ -1730,6 +1716,7 @@ class RelaxApp_User_Main_Menu_Settings(RelaxApp_User_Settings_Structure):
         else:
             message = Set_Messages.server_messages(check_values["error_link"])
             print(check_values["error"])
+            RelaxApp_MessageBox_Options(self.root, self.window_User_SS, "Server Problem", message=message)
         
         # All entries are format to create the timer.
         if valid_request:
@@ -1755,26 +1742,13 @@ class RelaxApp_User_Main_Menu_Settings(RelaxApp_User_Settings_Structure):
             self.values += break_time_SS
             self.values += str(self.sound)
         
-            # Varible "self.values" is saved as a temporary configuration in the instance of temporary_profile.
+            # Varible "self.values" is saved as a temporary configuration in TemporaryProfile.
             if self.visual_options_values == True: 
                 TemporaryProfile.visual_configuration = self.values
             elif self.stretch_options_values == True:
                 TemporaryProfile.stretch_configuration = self.values
             
             self.window_User_SS.destroy()
-            #RelaxApp_Structure.close_create2(self, RelaxApp_User_Main_Menu, self.root, self.frame, None, None, True)
-
-            # # Varible "self.values" is saved in the database inside the "Visual_Configuration" column.
-            # if self.visual_options_values == True:
-            #     database.user_configuration(databases["database1"], tables["settings_table"], user["login"],
-            #                                 "UpdateNULL", ("Profile_Name", "Visual_Configuration"), self.values)
-
-            # # Varible "self.values" is saved in the database inside the "Stretch_Configuration" column.
-            # elif self.stretch_options_values == True:
-            #     database.user_configuration(databases["database1"], tables["settings_table"], user["login"],
-            #                                 "UpdateNULL", ("Profile_Name", "Stretch_Configuration"), self.values)
-
-            #self.window_User_SS.destroy()
             #RelaxApp_Structure.close_create2(self, RelaxApp_User_Main_Menu, self.root, self.frame, None, None, True)
 
     # This method cancel the configuration and close the windows in the front.
@@ -1786,269 +1760,264 @@ class RelaxApp_User_Main_Menu_Settings(RelaxApp_User_Settings_Structure):
 ###  Class that contains the user's personal settings  ###
 ##########################################################
 
-# class RelaxApp_User_Main_Menu_Sounds(RelaxApp_User_Settings_Structure):
-#     """This class opens a new window to set the user's personal sounds
-#        of the App. Inherit all structure from parent."""
+class RelaxApp_User_Main_Menu_Sounds(RelaxApp_User_Settings_Structure):
+    """This class opens a new window to set the user's personal sounds
+       of the App. Inherit all structure from parent."""
 
-#     def __init__(self, root):
-#         super().__init__()
-#         self.root = root
+    def __init__(self, root):
+        super().__init__()
+        self.root = root
 
-#         # An empty string which is going to save all values when user save a configuration.
-#         self.final_sound = ""
-#         self.lapse_sound = ""
+        # An empty string which is going to save all values when user save a configuration.
+        self.final_sound = ""
+        self.lapse_sound = ""
 
-#         # Frame at the back.
-#         self.frame_User_SS.configure(fg_color=colors["black"])
-#         self.frame_User_SS.pack(pady=0, padx=0, fill="both")
+        # Frame at the back.
+        self.frame_User_SS.configure(fg_color=colors["black"])
+        self.frame_User_SS.pack(pady=0, padx=0, fill="both")
 
-#         # Frame that contains the tittle of the window.
-#         self.frame1 = ctk.CTkFrame(self.frame_User_SS, height=50, width=250, fg_color=colors["soft_grey"], corner_radius=3)
-#         self.frame1.pack(pady=10, padx=10)
+        # Frame that contains the tittle of the window.
+        self.frame1 = ctk.CTkFrame(self.frame_User_SS, height=50, width=250, fg_color=colors["soft_grey"], corner_radius=3)
+        self.frame1.pack(pady=10, padx=10)
 
-#         # Frame that contains the first sound to set.
-#         self.frame2 = ctk.CTkFrame(self.frame_User_SS, height=40, width=250, fg_color=colors["soft_grey"], corner_radius=3)
-#         self.frame2.pack(pady=1, padx=10)
+        # Frame that contains the first sound to set.
+        self.frame2 = ctk.CTkFrame(self.frame_User_SS, height=40, width=250, fg_color=colors["soft_grey"], corner_radius=3)
+        self.frame2.pack(pady=1, padx=10)
 
-#         # Frame that contains the second sound to set.
-#         self.frame3 = ctk.CTkFrame(self.frame_User_SS, height=40, width=250, fg_color=colors["soft_grey"], corner_radius=3)
-#         self.frame3.pack(pady=1, padx=10)
+        # Frame that contains the second sound to set.
+        self.frame3 = ctk.CTkFrame(self.frame_User_SS, height=40, width=250, fg_color=colors["soft_grey"], corner_radius=3)
+        self.frame3.pack(pady=1, padx=10)
 
-#         # Frame that contains the third sound to set.
-#         self.frame4 = ctk.CTkFrame(self.frame_User_SS, height=40, width=250, fg_color=colors["soft_grey"], corner_radius=3)
-#         self.frame4.pack(pady=1, padx=10)
+        # Frame that contains the third sound to set.
+        self.frame4 = ctk.CTkFrame(self.frame_User_SS, height=40, width=250, fg_color=colors["soft_grey"], corner_radius=3)
+        self.frame4.pack(pady=1, padx=10)
 
-#         # Frame that contains the fourth sound to set.
-#         self.frame5 = ctk.CTkFrame(self.frame_User_SS, height=40, width=250, fg_color=colors["soft_grey"], corner_radius=3)
-#         self.frame5.pack(pady=1, padx=10)
+        # Frame that contains the fourth sound to set.
+        self.frame5 = ctk.CTkFrame(self.frame_User_SS, height=40, width=250, fg_color=colors["soft_grey"], corner_radius=3)
+        self.frame5.pack(pady=1, padx=10)
 
-#         # Frame that contains the save and cancel buttons.
-#         self.frame6 = ctk.CTkFrame(self.frame_User_SS, height=40, width=250, fg_color=colors["soft_grey"], corner_radius=3)
-#         self.frame6.pack(pady=10, padx=10)
+        # Frame that contains the save and cancel buttons.
+        self.frame6 = ctk.CTkFrame(self.frame_User_SS, height=40, width=250, fg_color=colors["soft_grey"], corner_radius=3)
+        self.frame6.pack(pady=10, padx=10)
 
-#         # Tittle label.
-#         self.setting_title = ctk.CTkLabel(self.frame1, text="Configurar Sonidos", font=(font, 15),
-#                                           corner_radius=5, fg_color=colors["soft_green"])
-#         self.setting_title.place(rely=0.5, relx=0.5, anchor="center")
+        # Tittle label.
+        self.setting_title = ctk.CTkLabel(self.frame1, text="Configurar Sonidos", font=(font, 15),
+                                          corner_radius=5, fg_color=colors["soft_green"])
+        self.setting_title.place(rely=0.5, relx=0.5, anchor="center")
 
-#         # Image of a play simbol.
-#         self.play_button_image = ctk.CTkImage(Image.open(os.path.join(image_path, "Play.png")).resize((40,40)))
+        # Image of a play simbol.
+        self.play_button_image = ctk.CTkImage(Image.open(os.path.join(image_path, "Play.png")).resize((40,40)))
 
-#         # Image of a play simbol.
-#         self.pause_button_image = ctk.CTkImage(Image.open(os.path.join(image_path, "Pause.png")).resize((40,40)))
+        # Image of a play simbol.
+        self.pause_button_image = ctk.CTkImage(Image.open(os.path.join(image_path, "Pause.png")).resize((40,40)))
 
-#         # Sound by default 1 label.
-#         self.sound_alert_D1 = ctk.CTkLabel(self.frame2, text="Default 1", font=(font, 14))
-#         self.sound_alert_D1.place(rely=0.5, relx=0.03, anchor="w")
+        # Sound by default 1 label.
+        self.sound_alert_D1 = ctk.CTkLabel(self.frame2, text="Default 1", font=(font, 14))
+        self.sound_alert_D1.place(rely=0.5, relx=0.03, anchor="w")
 
-#         # Button to play sound example.
-#         self.play_button_D1 = ctk.CTkButton(self.frame2, text=None, image=self.play_button_image, width=0, command=lambda: self.sound_default("Play", "Final"),
-#                                             hover=True, fg_color=colors["soft_grey"], hover_color=colors["dark_green"])
-#         self.play_button_D1.place(rely=0.5, relx=0.35, anchor="w")
+        # Button to play sound example.
+        self.play_button_D1 = ctk.CTkButton(self.frame2, text=None, image=self.play_button_image, width=0, command=lambda: self.sound_default("Play", "Final"),
+                                            hover=True, fg_color=colors["soft_grey"], hover_color=colors["dark_green"])
+        self.play_button_D1.place(rely=0.5, relx=0.35, anchor="w")
 
-#         # Button to pause sound example.
-#         self.pause_button_D1 = ctk.CTkButton(self.frame2, text=None, image=self.pause_button_image, width=0, command=lambda: self.sound_default("Pause", "Final"),
-#                                              hover=True, fg_color=colors["soft_grey"], hover_color=colors["dark_green"])
-#         self.pause_button_D1.place(rely=0.5, relx=0.5, anchor="w")
+        # Button to pause sound example.
+        self.pause_button_D1 = ctk.CTkButton(self.frame2, text=None, image=self.pause_button_image, width=0, command=lambda: self.sound_default("Pause", "Final"),
+                                             hover=True, fg_color=colors["soft_grey"], hover_color=colors["dark_green"])
+        self.pause_button_D1.place(rely=0.5, relx=0.5, anchor="w")
 
-#         # Both variables get the selected choice by the user.
-#         self.sound_alert_choice1 = ctk.IntVar()
-#         self.sound_alert_choice2 = ctk.IntVar()
+        # Both variables get the selected choice by the user.
+        self.sound_alert_choice1 = ctk.IntVar()
+        self.sound_alert_choice2 = ctk.IntVar()
 
-#         # Checkbox to activate or deactivate sound by default 1 and set it as "final".
-#         self.sound_alert_D1_CB1 = ctk.CTkRadioButton(self.frame2, text=None, value=0, variable=self.sound_alert_choice1, hover=True,
-#                                                      border_width_unchecked=2, border_width_checked=5, fg_color=colors["soft_green"],
-#                                                      hover_color=colors["dark_green"])
-#         self.sound_alert_D1_CB1.place(rely=0.5, relx=0.72, anchor="w")
+        # Checkbox to activate or deactivate sound by default 1 and set it as "final".
+        self.sound_alert_D1_CB1 = ctk.CTkRadioButton(self.frame2, text=None, value=0, variable=self.sound_alert_choice1, hover=True,
+                                                     border_width_unchecked=2, border_width_checked=5, fg_color=colors["soft_green"],
+                                                     hover_color=colors["dark_green"])
+        self.sound_alert_D1_CB1.place(rely=0.5, relx=0.72, anchor="w")
 
-#         # Checkbox to activate or deactivate sound by default 1 and set it as "lapse".
-#         self.sound_alert_D1_CB2 = ctk.CTkRadioButton(self.frame2, text=None, value=0, variable=self.sound_alert_choice2, hover=True,
-#                                                      border_width_unchecked=2, border_width_checked=5, fg_color=colors["soft_green"],
-#                                                      hover_color=colors["dark_green"])
-#         self.sound_alert_D1_CB2.place(rely=0.5, relx=0.87, anchor="w")
+        # Checkbox to activate or deactivate sound by default 1 and set it as "lapse".
+        self.sound_alert_D1_CB2 = ctk.CTkRadioButton(self.frame2, text=None, value=0, variable=self.sound_alert_choice2, hover=True,
+                                                     border_width_unchecked=2, border_width_checked=5, fg_color=colors["soft_green"],
+                                                     hover_color=colors["dark_green"])
+        self.sound_alert_D1_CB2.place(rely=0.5, relx=0.87, anchor="w")
 
-#         # Sound by default 2 label.
-#         self.sound_alert_D2 = ctk.CTkLabel(self.frame3, text="Default 2", font=(font, 14))
-#         self.sound_alert_D2.place(rely=0.5, relx=0.03, anchor="w")
+        # Sound by default 2 label.
+        self.sound_alert_D2 = ctk.CTkLabel(self.frame3, text="Default 2", font=(font, 14))
+        self.sound_alert_D2.place(rely=0.5, relx=0.03, anchor="w")
 
-#         # Button to play sound example.
-#         self.play_button_D2 = ctk.CTkButton(self.frame3, text=None, image=self.play_button_image, width=0, command=lambda: self.sound_default("Play", "Lapse"),
-#                                             hover=True, fg_color=colors["soft_grey"], hover_color=colors["dark_green"])
-#         self.play_button_D2.place(rely=0.5, relx=0.35, anchor="w")
+        # Button to play sound example.
+        self.play_button_D2 = ctk.CTkButton(self.frame3, text=None, image=self.play_button_image, width=0, command=lambda: self.sound_default("Play", "Lapse"),
+                                            hover=True, fg_color=colors["soft_grey"], hover_color=colors["dark_green"])
+        self.play_button_D2.place(rely=0.5, relx=0.35, anchor="w")
 
-#         # Button to pause sound example.
-#         self.pause_button_D2 = ctk.CTkButton(self.frame3, text=None, image=self.pause_button_image, width=0, command=lambda: self.sound_default("Pause", "Lapse"),
-#                                              hover=True, fg_color=colors["soft_grey"], hover_color=colors["dark_green"])
-#         self.pause_button_D2.place(rely=0.5, relx=0.5, anchor="w")
+        # Button to pause sound example.
+        self.pause_button_D2 = ctk.CTkButton(self.frame3, text=None, image=self.pause_button_image, width=0, command=lambda: self.sound_default("Pause", "Lapse"),
+                                             hover=True, fg_color=colors["soft_grey"], hover_color=colors["dark_green"])
+        self.pause_button_D2.place(rely=0.5, relx=0.5, anchor="w")
 
-#         # Checkbox to activate or deactivate sound by default 2 and set it as "final".
-#         self.sound_alert_D2_CB1 = ctk.CTkRadioButton(self.frame3, text=None, value=1, variable=self.sound_alert_choice1, hover=True,
-#                                                      border_width_unchecked=2, border_width_checked=5, fg_color=colors["soft_green"],
-#                                                      hover_color=colors["dark_green"])
-#         self.sound_alert_D2_CB1.place(rely=0.5, relx=0.72, anchor="w")
+        # Checkbox to activate or deactivate sound by default 2 and set it as "final".
+        self.sound_alert_D2_CB1 = ctk.CTkRadioButton(self.frame3, text=None, value=1, variable=self.sound_alert_choice1, hover=True,
+                                                     border_width_unchecked=2, border_width_checked=5, fg_color=colors["soft_green"],
+                                                     hover_color=colors["dark_green"])
+        self.sound_alert_D2_CB1.place(rely=0.5, relx=0.72, anchor="w")
 
-#         # Checkbox to activate or deactivate sound by default 2 and set it as "lapse".
-#         self.sound_alert_D2_CB2 = ctk.CTkRadioButton(self.frame3, text=None, value=1, variable=self.sound_alert_choice2, hover=True,
-#                                                      border_width_unchecked=2, border_width_checked=5, fg_color=colors["soft_green"],
-#                                                      hover_color=colors["dark_green"])
-#         self.sound_alert_D2_CB2.place(rely=0.5, relx=0.87, anchor="w")
+        # Checkbox to activate or deactivate sound by default 2 and set it as "lapse".
+        self.sound_alert_D2_CB2 = ctk.CTkRadioButton(self.frame3, text=None, value=1, variable=self.sound_alert_choice2, hover=True,
+                                                     border_width_unchecked=2, border_width_checked=5, fg_color=colors["soft_green"],
+                                                     hover_color=colors["dark_green"])
+        self.sound_alert_D2_CB2.place(rely=0.5, relx=0.87, anchor="w")
 
-#         # Sound load 1 label.
-#         self.sound_alert_load1 = ctk.CTkButton(self.frame4, width=10, height=10, text="Cargar 1", font=(font, 14), command=lambda: self.sound_load("1"),
-#                                                corner_radius=10, hover=True, fg_color=colors["soft_grey"], hover_color=colors["dark_green"])
-#         self.sound_alert_load1.place(rely=0.5, anchor="w")
+        # Sound load 1 label.
+        self.sound_alert_load1 = ctk.CTkButton(self.frame4, width=10, height=10, text="Cargar 1", font=(font, 14), command=lambda: self.sound_load("1"),
+                                               corner_radius=10, hover=True, fg_color=colors["soft_grey"], hover_color=colors["dark_green"])
+        self.sound_alert_load1.place(rely=0.5, anchor="w")
 
-#         # Button to play sound example.
-#         self.play_button_load1 = ctk.CTkButton(self.frame4, text=None, image=self.play_button_image, width=0, command=lambda: self.sound_loaded("Play", "1"),
-#                                                hover=True, fg_color=colors["soft_grey"], hover_color=colors["dark_green"])
-#         self.play_button_load1.place(rely=0.5, relx=0.35, anchor="w")
+        # Button to play sound example.
+        self.play_button_load1 = ctk.CTkButton(self.frame4, text=None, image=self.play_button_image, width=0, command=lambda: self.sound_loaded("Play", "1"),
+                                               hover=True, fg_color=colors["soft_grey"], hover_color=colors["dark_green"])
+        self.play_button_load1.place(rely=0.5, relx=0.35, anchor="w")
 
-#         # Button to pause sound example.
-#         self.pause_button_load1 = ctk.CTkButton(self.frame4, text=None, image=self.pause_button_image, width=0, command=lambda: self.sound_loaded("Pause", "1"),
-#                                                 hover=True, fg_color=colors["soft_grey"], hover_color=colors["dark_green"])
-#         self.pause_button_load1.place(rely=0.5, relx=0.5, anchor="w")
+        # Button to pause sound example.
+        self.pause_button_load1 = ctk.CTkButton(self.frame4, text=None, image=self.pause_button_image, width=0, command=lambda: self.sound_loaded("Pause", "1"),
+                                                hover=True, fg_color=colors["soft_grey"], hover_color=colors["dark_green"])
+        self.pause_button_load1.place(rely=0.5, relx=0.5, anchor="w")
 
-#         # Checkbox to activate or deactivate sound loaded 2 and set it as "final".
-#         self.sound_alert_load1_CB1 = ctk.CTkRadioButton(self.frame4, text=None, value=2, variable=self.sound_alert_choice1, hover=True,
-#                                                         border_width_unchecked=2, border_width_checked=5, fg_color=colors["soft_green"],
-#                                                         hover_color=colors["dark_green"])
-#         self.sound_alert_load1_CB1.place(rely=0.5, relx=0.72, anchor="w")
+        # Checkbox to activate or deactivate sound loaded 2 and set it as "final".
+        self.sound_alert_load1_CB1 = ctk.CTkRadioButton(self.frame4, text=None, value=2, variable=self.sound_alert_choice1, hover=True,
+                                                        border_width_unchecked=2, border_width_checked=5, fg_color=colors["soft_green"],
+                                                        hover_color=colors["dark_green"])
+        self.sound_alert_load1_CB1.place(rely=0.5, relx=0.72, anchor="w")
 
-#         # Checkbox to activate or deactivate sound loaded 2 and set it as "lapse".
-#         self.sound_alert_load1_CB2 = ctk.CTkRadioButton(self.frame4, text=None, value=2, variable=self.sound_alert_choice2, hover=True,
-#                                                         border_width_unchecked=2, border_width_checked=5, fg_color=colors["soft_green"],
-#                                                         hover_color=colors["dark_green"])
-#         self.sound_alert_load1_CB2.place(rely=0.5, relx=0.87, anchor="w")
+        # Checkbox to activate or deactivate sound loaded 2 and set it as "lapse".
+        self.sound_alert_load1_CB2 = ctk.CTkRadioButton(self.frame4, text=None, value=2, variable=self.sound_alert_choice2, hover=True,
+                                                        border_width_unchecked=2, border_width_checked=5, fg_color=colors["soft_green"],
+                                                        hover_color=colors["dark_green"])
+        self.sound_alert_load1_CB2.place(rely=0.5, relx=0.87, anchor="w")
 
-#         # Sound load 2 label.
-#         self.sound_alert_load2 = ctk.CTkButton(self.frame5, width=10, height=10, text="Cargar 2", font=(font, 14), command=lambda: self.sound_load("2"),
-#                                                corner_radius=10, hover=True, fg_color=colors["soft_grey"], hover_color=colors["dark_green"])
-#         self.sound_alert_load2.place(rely=0.5, anchor="w")
+        # Sound load 2 label.
+        self.sound_alert_load2 = ctk.CTkButton(self.frame5, width=10, height=10, text="Cargar 2", font=(font, 14), command=lambda: self.sound_load("2"),
+                                               corner_radius=10, hover=True, fg_color=colors["soft_grey"], hover_color=colors["dark_green"])
+        self.sound_alert_load2.place(rely=0.5, anchor="w")
 
-#         # Button to play sound example.
-#         self.play_button_load2 = ctk.CTkButton(self.frame5, text=None, image=self.play_button_image, width=0, command=lambda: self.sound_loaded("Play", "2"),
-#                                                hover=True, fg_color=colors["soft_grey"], hover_color=colors["dark_green"])
-#         self.play_button_load2.place(rely=0.5, relx=0.35, anchor="w")
+        # Button to play sound example.
+        self.play_button_load2 = ctk.CTkButton(self.frame5, text=None, image=self.play_button_image, width=0, command=lambda: self.sound_loaded("Play", "2"),
+                                               hover=True, fg_color=colors["soft_grey"], hover_color=colors["dark_green"])
+        self.play_button_load2.place(rely=0.5, relx=0.35, anchor="w")
 
-#         # Button to pause sound example.
-#         self.pause_button_load2 = ctk.CTkButton(self.frame5, text=None, image=self.pause_button_image, width=0, command=lambda: self.sound_loaded("Pause", "2"),
-#                                                 hover=True, fg_color=colors["soft_grey"], hover_color=colors["dark_green"])
-#         self.pause_button_load2.place(rely=0.5, relx=0.5, anchor="w")
+        # Button to pause sound example.
+        self.pause_button_load2 = ctk.CTkButton(self.frame5, text=None, image=self.pause_button_image, width=0, command=lambda: self.sound_loaded("Pause", "2"),
+                                                hover=True, fg_color=colors["soft_grey"], hover_color=colors["dark_green"])
+        self.pause_button_load2.place(rely=0.5, relx=0.5, anchor="w")
 
-#         # Checkbox to activate or deactivate sound loaded 2 and set it as "final".
-#         self.sound_alert_load2_CB1 = ctk.CTkRadioButton(self.frame5, text=None, value=3, variable=self.sound_alert_choice1, hover=True,
-#                                                         border_width_unchecked=2, border_width_checked=5, fg_color=colors["soft_green"],
-#                                                         hover_color=colors["dark_green"])
-#         self.sound_alert_load2_CB1.place(rely=0.5, relx=0.72, anchor="w")
+        # Checkbox to activate or deactivate sound loaded 2 and set it as "final".
+        self.sound_alert_load2_CB1 = ctk.CTkRadioButton(self.frame5, text=None, value=3, variable=self.sound_alert_choice1, hover=True,
+                                                        border_width_unchecked=2, border_width_checked=5, fg_color=colors["soft_green"],
+                                                        hover_color=colors["dark_green"])
+        self.sound_alert_load2_CB1.place(rely=0.5, relx=0.72, anchor="w")
 
-#         # Checkbox to activate or deactivate sound loaded 2 and set it as "lapse".
-#         self.sound_alert_load2_CB2 = ctk.CTkRadioButton(self.frame5, text=None, value=3, variable=self.sound_alert_choice2, hover=True,
-#                                                         border_width_unchecked=2, border_width_checked=5, fg_color=colors["soft_green"],
-#                                                         hover_color=colors["dark_green"])
-#         self.sound_alert_load2_CB2.place(rely=0.5, relx=0.87, anchor="w")
+        # Checkbox to activate or deactivate sound loaded 2 and set it as "lapse".
+        self.sound_alert_load2_CB2 = ctk.CTkRadioButton(self.frame5, text=None, value=3, variable=self.sound_alert_choice2, hover=True,
+                                                        border_width_unchecked=2, border_width_checked=5, fg_color=colors["soft_green"],
+                                                        hover_color=colors["dark_green"])
+        self.sound_alert_load2_CB2.place(rely=0.5, relx=0.87, anchor="w")
 
-#         # Save button.
-#         self.save_button = ctk.CTkButton(self.frame6, width=10, height=10, text="Guardar", font=(font,14),
-#                                          command=self.save_settings, corner_radius=10, hover=True,
-#                                          fg_color=colors["soft_grey"], hover_color=colors["dark_green"])
-#         self.save_button.place(rely=0.5, relx=0.1, anchor="w")
+        # Save button.
+        self.save_button = ctk.CTkButton(self.frame6, width=10, height=10, text="Guardar", font=(font,14),
+                                         command=self.save_settings, corner_radius=10, hover=True,
+                                         fg_color=colors["soft_grey"], hover_color=colors["dark_green"])
+        self.save_button.place(rely=0.5, relx=0.1, anchor="w")
 
-#         # Cancel button.
-#         self.cancel_button = ctk.CTkButton(self.frame6, width=10, height=10, text="Cancelar", font=(font,14),
-#                                            command=self.cancel_settings, corner_radius=10, hover=True,
-#                                            fg_color=colors["soft_grey"], hover_color=colors["dark_green"])
-#         self.cancel_button.place(rely=0.5, relx=0.9, anchor="e")
+        # Cancel button.
+        self.cancel_button = ctk.CTkButton(self.frame6, width=10, height=10, text="Cancelar", font=(font,14),
+                                           command=self.cancel_settings, corner_radius=10, hover=True,
+                                           fg_color=colors["soft_grey"], hover_color=colors["dark_green"])
+        self.cancel_button.place(rely=0.5, relx=0.9, anchor="e")
 
-#         # An information is showed when mouse is over "Configurar Sonidos".
-#         ToolTip(self.setting_title, msg="Debes elegir un sonido de alarma en la columna 1 que \nsonará al finalizar el contador y otro en la columna 2 \npara que se ejecute \
-# entre cada alerta.", parent_kwargs = { "bg": colors["black"]}, delay=0.5, font=(font,11), fg=colors["white"], bg=colors["soft_grey"], padx=10, pady=10)
+        # An information is showed when mouse is over "Configurar Sonidos".
+        ToolTip(self.setting_title, msg=messages.MESSAGE_RELAXAPP_USER_MM_SOUNDS_TOOLTIP, parent_kwargs = { "bg": colors["black"]}, delay=0.5, font=(font,11), fg=colors["white"], bg=colors["soft_grey"], padx=10, pady=10)
 
-#     # This method runs and stop defaults sounds.
-#     def sound_default(self, action, sound):
-#         pygame.mixer.init()
-#         if action == "Play":
-#             if sound == "Final":
-#                 pygame.mixer.music.load(os.path.join(sounds_path, "Final.mp3"))
-#             elif sound == "Lapse":
-#                 pygame.mixer.music.load(os.path.join(sounds_path, "Lapse.mp3"))
+    # This method runs and stop defaults sounds.
+    def sound_default(self, action, sound):
+        pygame.mixer.init()
+        if action == "Play":
+            if sound == "Final":
+                pygame.mixer.music.load(os.path.join(sounds_path, "Final.mp3"))
+            elif sound == "Lapse":
+                pygame.mixer.music.load(os.path.join(sounds_path, "Lapse.mp3"))
 
-#             pygame.mixer.music.play(loops=0)
-#         elif action == "Pause":
-#             pygame.mixer.quit()
+            pygame.mixer.music.play(loops=0)
+        elif action == "Pause":
+            pygame.mixer.quit()
 
-#     # This method loads sounds.
-#     def sound_load(self, value):
-#         if value == "1":
-#             self.sound_loaded1_path = ctk.filedialog.askopenfilename(title="Cargar Sonido Final", filetypes=audio_accepted_files)
-#         elif value == "2":
-#             self.sound_loaded2_path = ctk.filedialog.askopenfilename(title="Cargar Sonido Alerta", filetypes=audio_accepted_files)
+    # This method loads sounds.
+    def sound_load(self, value):
+        if value == "1":
+            self.sound_loaded1_path = ctk.filedialog.askopenfilename(title="Cargar Sonido Final", filetypes=audio_accepted_files)
+        elif value == "2":
+            self.sound_loaded2_path = ctk.filedialog.askopenfilename(title="Cargar Sonido Alerta", filetypes=audio_accepted_files)
 
-#     # This method runs and stops loaded sounds.
-#     def sound_loaded(self, action, value):
-#         try:
-#             pygame.mixer.init()
-#             if action == "Play" and value == "1":
-#                 pygame.mixer.music.load(self.sound_loaded1_path)
-#                 pygame.mixer.music.play(loops=0)
-#             elif action == "Play" and value == "2":
-#                 pygame.mixer.music.load(self.sound_loaded2_path)
-#                 pygame.mixer.music.play(loops=0)
-#             elif action == "Pause":
-#                 pygame.mixer.quit()
-#         except:
-#             pass
+    # This method runs and stops loaded sounds.
+    def sound_loaded(self, action, value):
+        try:
+            pygame.mixer.init()
+            if action == "Play" and value == "1":
+                pygame.mixer.music.load(self.sound_loaded1_path)
+                pygame.mixer.music.play(loops=0)
+            elif action == "Play" and value == "2":
+                pygame.mixer.music.load(self.sound_loaded2_path)
+                pygame.mixer.music.play(loops=0)
+            elif action == "Pause":
+                pygame.mixer.quit()
+        except:
+            pass
 
-#     # This method saves the configuration.
-#     def save_settings(self):
-#         try:
-#             # Final sound is choosen.
-#             if self.sound_alert_choice1.get() == 0:
-#                 self.final_sound = os.path.join(sounds_path, "Final.mp3")
-#             elif self.sound_alert_choice1.get() == 1:
-#                 self.final_sound = os.path.join(sounds_path, "Lapse.mp3")
-#             elif self.sound_alert_choice1.get() == 2:
-#                 self.final_sound = self.sound_loaded1_path
-#             elif self.sound_alert_choice1.get() == 3:
-#                 self.final_sound = self.sound_loaded2_path
-#         except:
-#             self.final_sound = ""
+    # This method saves the configuration.
+    def save_settings(self):
+        try:
+            # Final sound is choosen.
+            if self.sound_alert_choice1.get() == 0:
+                self.final_sound = os.path.join(sounds_path, "Final.mp3")
+            elif self.sound_alert_choice1.get() == 1:
+                self.final_sound = os.path.join(sounds_path, "Lapse.mp3")
+            elif self.sound_alert_choice1.get() == 2:
+                self.final_sound = self.sound_loaded1_path
+            elif self.sound_alert_choice1.get() == 3:
+                self.final_sound = self.sound_loaded2_path
+        except:
+            self.final_sound = ""
 
-#         try:
-#             # Lapse sound is choosen.
-#             if self.sound_alert_choice2.get() == 0:
-#                 self.lapse_sound = os.path.join(sounds_path, "Final.mp3")
-#             elif self.sound_alert_choice2.get() == 1:
-#                 self.lapse_sound = os.path.join(sounds_path, "Lapse.mp3")
-#             elif self.sound_alert_choice2.get() == 2:
-#                 self.lapse_sound = self.sound_loaded1_path
-#             elif self.sound_alert_choice2.get() == 3:
-#                 self.lapse_sound = self.sound_loaded2_path
-#         except:
-#             self.lapse_sound = ""
+        try:
+            # Lapse sound is choosen.
+            if self.sound_alert_choice2.get() == 0:
+                self.lapse_sound = os.path.join(sounds_path, "Final.mp3")
+            elif self.sound_alert_choice2.get() == 1:
+                self.lapse_sound = os.path.join(sounds_path, "Lapse.mp3")
+            elif self.sound_alert_choice2.get() == 2:
+                self.lapse_sound = self.sound_loaded1_path
+            elif self.sound_alert_choice2.get() == 3:
+                self.lapse_sound = self.sound_loaded2_path
+        except:
+            self.lapse_sound = ""
 
-#         # MessageBox is called when user try to save a configuration with a loaded sound before loading.
-#         if self.final_sound == "" or self.lapse_sound == "":
-#             RelaxApp_MessageBox_Options(self.root, self.window_User_SS, "No Sound")
-#         else:
-#             # Varible "self.final_sound" is saved in the database inside the "Final_Sounds_Configuration" column.
-#             database.user_configuration(databases["database1"], tables["settings_table"], user["login"],
-#                                         "UpdateNULL", ("Profile_Name", "Final_Sounds_Configuration"), self.final_sound)
+        # MessageBox is called when user try to save a configuration with a loaded sound before loading.
+        if self.final_sound == "" or self.lapse_sound == "":
+            RelaxApp_MessageBox_Options(self.root, self.window_User_SS, "No Sound")
+        else:
+            TemporaryProfile.final_sounds_configuration = self.final_sound
+            TemporaryProfile.lapse_sounds_configuration = self.lapse_sound
+            self.window_User_SS.destroy()  
+        pygame.mixer.quit()
+        
+    # This method cancel the configuration to returns to the main menu.
+    def cancel_settings(self):
+        pygame.mixer.quit()
+        self.window_User_SS.destroy()
 
-#             # Varible "self.lapse_sound" is saved in the database inside the "Lapse_Sounds_Configuration" column.
-#             database.user_configuration(databases["database1"], tables["settings_table"], user["login"],
-#                                         "UpdateNULL", ("Profile_Name", "Lapse_Sounds_Configuration"), self.lapse_sound)
-
-#             self.window_User_SS.destroy()
-
-#     # This method cancel the configuration to returns to the main menu.
-#     def cancel_settings(self):
-#         self.window_User_SS.destroy()
-
-#     # Function that show information about how to use the sound settings.
-#     def show_info(self ,text):
-#         self.text = text
-#         ctk.CTkLabel(self.root, text=f' "{self.text}" ', font=("Segoe Print", 22),
-#         fg_color=colors["soft_grey"]).pack()
+    # Function that show information about how to use the sound settings.
+    def show_info(self ,text):
+        self.text = text
+        ctk.CTkLabel(self.root, text=f' "{self.text}" ', font=("Segoe Print", 22),
+        fg_color=colors["soft_grey"]).pack()
 
 
 #######################################################
@@ -2696,6 +2665,13 @@ class RelaxApp_MessageBox_Options(RelaxApp_MessageBox_Structure):
             self.invalid_data_label.place(rely=0.35, relx=0.5, anchor="center")
             self.select_button2 = True
             
+        elif self.message_type == "Profile Error":
+            # Label to inform that there is a proble with profiles.
+            self.profile_error_label = ctk.CTkLabel(self.window_MS, text=self.message,
+                                        font=(font,15), bg_color=colors["soft_grey"])
+            self.profile_error_label.place(rely=0.35, relx=0.5, anchor="center")
+            self.select_button2 = True
+            
         # elif self.message_type == "No Profile":
         #     # Label to alert there's no profile set.
         #     self.no_profile_label = ctk.CTkLabel(self.window_MS, text="No tienes ningún perfil creado actualmente. Configura al menos un \nvalue para poder habilitar la opción de perfiles.",
@@ -2752,12 +2728,12 @@ class RelaxApp_MessageBox_Options(RelaxApp_MessageBox_Structure):
         #     self.no_values_set_label.place(rely=0.35, relx=0.5, anchor="center")
         #     self.select_button2 = True
 
-        # elif self.message_type == "No Sound":
-        #     # Label to alert that a load sounds is trying to save but no file is loaded.
-        #     self.no_sound_label = ctk.CTkLabel(self.window_MS, text="No puedes guardar una configuración con un sonido propio \nsin cargarlo previamente.",
-        #                                        font=(font,14), bg_color=colors["soft_grey"])
-        #     self.no_sound_label.place(rely=0.35, relx=0.5, anchor="center")
-        #     self.select_button2 = True
+        elif self.message_type == "No Sound":
+            # Label to alert that a load sounds is trying to save but no file is loaded.
+            self.no_sound_label = ctk.CTkLabel(self.window_MS, text=messages.MESSAGE_RELAXAPP_USER_MM_SOUNDS_NO_SOUND,
+                                               font=(font,14), bg_color=colors["soft_grey"])
+            self.no_sound_label.place(rely=0.35, relx=0.5, anchor="center")
+            self.select_button2 = True
 
         # elif self.message_type == "No Name":
         #     # Label to alert that a load sounds is trying to save but no file is loaded.

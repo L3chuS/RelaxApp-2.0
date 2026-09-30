@@ -88,14 +88,6 @@ def reset_password_confirmation(data):
         )        
     return response
 
-# def validate_profiles(data):
-#     response = make_request(
-#         "POST",
-#         f"{API_URL}profiles/validate/",
-#         json=data
-#     )
-#     return response
-
 def data_validate(data):
     response = make_request(
         "POST",
@@ -111,4 +103,32 @@ def remove_account(data):
         json=data
     )
     return response
-    
+
+def get_profiles():
+    response = make_request(
+        "GET",
+        f"{API_URL}profiles/"
+    )
+    return response
+
+def create_profile(data):
+    response = make_request(
+        "POST",
+        f"{API_URL}profiles/",
+        json=data
+    )
+    return response
+
+def remove_profile(pk):
+    response = make_request(
+        "DELETE",
+        f"{API_URL}profiles/{pk}/"
+    )
+    return response
+
+def set_profile_dafault(pk):
+    response = make_request(
+        "PUT",
+        f"{API_URL}profiles/{pk}/"
+    )
+    return response
