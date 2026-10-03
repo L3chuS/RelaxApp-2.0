@@ -9,10 +9,10 @@ class UserLoginSerializer(serializers.Serializer):
 
 class UserRegistrationSerializer(serializers.Serializer):
     
-    first_name = serializers.CharField()
-    last_name = serializers.CharField()
-    username = serializers.CharField()
-    email = serializers.EmailField()
+    first_name = serializers.CharField(max_length=100)
+    last_name = serializers.CharField(max_length=100)
+    username = serializers.CharField(max_length=25)
+    email = serializers.EmailField(max_length=100)
     password = serializers.CharField()
 
 
@@ -34,33 +34,7 @@ class UserChangePasswordConfirmationSerializer(serializers.Serializer):
                 "PASSWORD_NO_MATCH": "Passwords do not match."
             }) 
         return data
-    
 
-# class ProfilesSerializer(serializers.Serializer):
-#     profile_name = serializers.CharField()
-#     visual_configuration = serializers.CharField(
-#         required=False,
-#         allow_blank=True
-#     )
-#     stretch_configuration = serializers.CharField(
-#         required=False,
-#         allow_blank=True
-#     )
-#     final_sounds_configuration = serializers.CharField(
-#         required=False,
-#         allow_blank=True
-#     )
-#     lapse_sounds_configuration = serializers.CharField(
-#         required=False,
-#         allow_blank=True
-#     )
-    
-#     def validate(self, data):
-#         if data["visual_configuration"] == "" and data["stretch_configuration"] == "":
-#             raise serializers.ValidationError({
-#                 "PROFILE_VALUES_EMPTY": "Visual Configuration and Stretch Configuration can't both be empty."
-#             }) 
-#         return data
 
 class ProfilesSerializer(serializers.ModelSerializer):
     

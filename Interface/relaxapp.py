@@ -246,6 +246,73 @@ class RelaxApp_Profile_Name_Structure:
         self.title = self.window_PFS.title("RelaxApp")
         self.window_PFS.after(200, lambda: self.window_PFS.iconbitmap(os.path.join(image_path, "logo.ico")))
 
+
+##################################################################################
+### Class that contains general functions to check connection with the backend ###
+##################################################################################
+
+class Requests_Status():
+    """This class defines the general functions to check the
+       connection with backend and the responses returned."""
+    
+    # Connection with the server is checked.   
+    def check_server_connection(response_dict):
+        
+        if response_dict["connection_status"]:
+            response = response_dict["response"]
+            return response, None
+
+        else:
+            message = Set_Messages.server_messages(response_dict["error_link"])
+            print(response_dict["error"])
+            return None, message
+
+    def check_request_status(response, status, type):
+        values = response.json()
+        valid = False
+        
+        if response.status_code == status:
+            message = Set_Messages.response_messages(values["message_link"])
+            print(values["message"])
+            valid = True
+        else:
+            if values["error_type"] == "VIEWS":
+                # Message from backend is translated.
+                message = Set_Messages.response_messages(values["error_link"])
+                print(values["error"])
+                
+            elif values["error_type"] == "SERIALIZERS":
+                # The first key error from serializers is gotten.
+                key = values["error_link"].upper()
+                # Message from backend is translated.
+                message = Set_Messages.serializers_messages(key)
+                print("* ERROR: ", values["error"])
+                
+            elif values["error_type"] == "VALIDATORS":
+                message = Set_Messages.validators_messages(values["error_link"])
+                print("* ERROR: ", values["error"])
+        
+        if type in (
+            "sign_in",
+            "get_profile_list",
+            "accept_button_MB",
+        ):
+            if valid:
+                return True, values, message
+            return False, None, message
+
+        elif type in (
+            "send_code",
+            "remove_profile",
+            "save_settings",
+            "accept_profile_name",
+            "save_settings_MM",
+        ):
+            if valid:
+                return True, None
+            return False, message
+        
+    
 #############################################################
 ### Class that contains general functions to set messages ###
 #############################################################
@@ -274,12 +341,17 @@ class Set_Messages():
             return messages.ERROR_SERIALIZERS_INVALID_FIRST_NAME
         elif key == "LAST_NAME_BLANK":
             return messages.ERROR_SERIALIZERS_INVALID_LAST_NAME
-        elif key == "USERNAME_BLANK":
-            return messages.ERROR_SERIALIZERS_INVALID_USERNAME
+        elif key == "USERNAME_MAX_LENGTH":
+            return messages.ERROR_SERIALIZERS_USERNAME_MAX_LENGTH
+        
+        elif key in (
+            "FIRST_NAME_MAX_LENGTH",
+            "LAST_NAME_MAX_LENGTH",
+            "EMAIL_MAX_LENGTH",
+        ):
+            return messages.ERROR_SERIALIZERS_FIRST_LAST_NAME_EMAIL_MAX_LENGTH
         elif key == "EMAIL_BLANK" or key == "EMAIL_INVALID":
             return messages.ERROR_SERIALIZERS_INVALID_EMAIL
-        elif key == "PASSWORD_BLANK":
-            return messages.ERROR_SERIALIZERS_INVALID_PASSWORD
         elif key == "CODE_BLANK":
             return messages.ERROR_SERIALIZERS_TOKEN_MISSING
         elif key == "PASSWORD1_BLANK":
@@ -544,29 +616,12 @@ class RelaxApp_Initial_Frame():
 
         # Request to login is started.
         response_dict = comms.login(data)
+        response, message = Requests_Status.check_server_connection(response_dict) 
 
-        # Connection with the server is checked.
-        if response_dict["connection_status"]:
+        if response != None:
 
-            response = response_dict["response"]
-            values = response.json()
-            if response.status_code == 200:
-                # Message from backend is translated.
-                message = Set_Messages.response_messages(values["message_link"])
-                print(values["message"])
-                valid_request = True
-            else:
-                if values["error_type"] == "VIEWS":
-                    message = Set_Messages.response_messages(values["error_link"])
-                    print(values["error"])
-                elif values["error_type"] == "SERIALIZERS":
-                    key = values["error_link"].upper()
-                    message = Set_Messages.serializers_messages(key)
-                    print("* ERROR: ", values["error"])
-
-        else:
-            message = Set_Messages.server_messages(response_dict["error_link"])
-            print(response_dict["error"])
+            status_expected = 200
+            valid_request, values, message = Requests_Status.check_request_status(response, status_expected, "sign_in")
 
         # Label "self.login" is checked if exists or not to clean it from the interface.
         if hasattr(self, "login"):
@@ -689,11 +744,13 @@ class RelaxApp_User_Registration():
             "password" : get_password,
         }
         
-        RelaxApp_MessageBox_Options(self.root, self.frame, "Sign up", data=data)
+        MB_message = messages.MESSAGE_RELAXAPP_MB_OPTIONS_CONFIRM_ACCEPT_REGISTRATION
+        RelaxApp_MessageBox_Options(self.root, self.frame, "Sign up", data=data, action="Accept", message=MB_message)
 
     # This method cancel the user registration and turns back to the main menu.
     def cancel_sign_up (self):
-        RelaxApp_MessageBox_Options(self.root, self.frame, "Cancel")
+        MB_message = messages.MESSAGE_RELAXAPP_MB_OPTIONS_CONFIRM_CANCEL_REGISTRATION
+        RelaxApp_MessageBox_Options(self.root, self.frame, "Cancel", action="Accept", message=MB_message)
 
 
 ##############################################################
@@ -757,32 +814,28 @@ class RelaxApp_User_Change_Password():
         
         # Request to reset the password is started.
         response_dict = comms.reset_password(data)
+        response, message = Requests_Status.check_server_connection(response_dict) 
 
-        # Connection with the server is checked.
-        if response_dict["connection_status"]:
-            response = response_dict["response"]
-            values = response.json()
-            if response.status_code == 200:
-                print(values["message"])
+        if response != None:
+
+            status_expected = 200
+            valid_request, message = Requests_Status.check_request_status(response, status_expected, "send_code")
+
+            if valid_request:
                 # Second step to make a reset of the password is called.
                 RelaxApp_Structure.close_create(self, RelaxApp_User_Confirm_Change_Password, self.root, self.frame, get_email_pw_menu)
             else:
-                # The first key error from serializers is gotten.
-                key = values["error_link"].upper()
-                # Message from backend is translated.
-                message = Set_Messages.serializers_messages(key)
-                print("* ERROR: ", values["error"])
                 # Pop-up window is displayed error from serializers is displayed in Spanish.
-                RelaxApp_MessageBox_Options(self.root, self.frame, "Invalid Change PW", message=message)
+                RelaxApp_MessageBox_Options(self.root, self.frame, "Invalid Change PW", action="Return", message=message)
+               
         else:
-            message = Set_Messages.server_messages(response_dict["error_link"])
-            print(response_dict["error"])
             # Pop-up window error from the server connection is displayed in Spanish.
-            RelaxApp_MessageBox_Options(self.root, self.frame, "Server Problem", message=message)
- 
+            RelaxApp_MessageBox_Options(self.root, self.frame, "Server Problem", action="Return", message=message)
+             
     # This method cancel the change of password and turns back to the main menu.
     def cancel_change_pw (self):
-        RelaxApp_MessageBox_Options(self.root, self.frame, "Cancel Change PW")
+        MB_message = messages.MESSAGE_RELAXAPP_MB_OPTIONS_CONFIRM_CANCEL_PW_CHANGE
+        RelaxApp_MessageBox_Options(self.root, self.frame, "Cancel Change PW", action="Accept", message=MB_message)
 
 
 #############################################################################
@@ -867,11 +920,13 @@ class RelaxApp_User_Confirm_Change_Password():
             "password2" : get_password2_pw_menu
         }
         
-        RelaxApp_MessageBox_Options(self.root, self.frame, "Confirm Change PW", data=data)
+        MB_message = messages.MESSAGE_RELAXAPP_MB_OPTIONS_CONFIRM_ACCEPT_PW_CHANGE
+        RelaxApp_MessageBox_Options(self.root, self.frame, "Confirm Change PW", data=data, action="Accept", message=MB_message)
  
     # This method cancel the change of password and turns back to the main menu.
     def cancel_change_pw (self):
-        RelaxApp_MessageBox_Options(self.root, self.frame, "Cancel Confirm Change PW")
+        MB_message = messages.MESSAGE_RELAXAPP_MB_OPTIONS_CONFIRM_CANCEL_PW_CHANGE
+        RelaxApp_MessageBox_Options(self.root, self.frame, "Cancel Confirm Change PW", action="Accept", message=MB_message)
         
 
 #########################################################
@@ -882,15 +937,15 @@ class RelaxApp_User_Main_Menu():
     """This class contains the user's main menu. It allows to start
        the app, set, save and load settings and knows about RelaxApp."""
 
-    def __init__(self, root, frame, visual_set=False, stretch_set=False, value=False):
+    # REVISAR LO DE visual_set=False,ETC DEL INIT el root tambien
+    def __init__(self, root, frame, visual_set=False, stretch_set=False):
 
         self.root = root
         self.frame = frame
         
         self.visual_set = visual_set
         self.stretch_set = stretch_set
-        self.value_test = value
-
+        
         # Frame at the back.
         self.frame.configure(fg_color=colors["black"])
 
@@ -960,23 +1015,11 @@ class RelaxApp_User_Main_Menu():
         self.options = ctk.CTkLabel(self.frame_main, text="Configurar", font=(font, 16), corner_radius=10, height=35)
         self.options.place(rely=0.2, relx=0.5, anchor="center")
 
-        # database.query(f"SELECT Profile_Name FROM {databases['database1']}.{tables['settings_table']} WHERE login = '{user['login']}'")
-        # len_profiles = database.value
-
-        # Profile button is set as active or deactive when a profile exists.
-        # if len(len_profiles) > 1 or self.value_test == True:
-        #     self.profile_state = "normal"
-        # else:
-        #     self.profile_state = ctk.DISABLED
-
-        # BORRAR LA SIGUIENTE LINEA:
-        self.profile_state = "normal"
-        
         # Button to create profiles.
         self.profile_options = ctk.CTkButton(self.frame_main, text="Perfiles", font=(font, 14),
                                              command=self.create_profile, corner_radius=10, height=35,
                                              hover=True, fg_color=colors["soft_green"], hover_color=colors["dark_green"],
-                                             state=self.profile_state)
+                                             state="disabled")
         self.profile_options.place(rely=0.3, relx=0.25, anchor="w")
 
         # Variable to save the information of "profile_options_CB" when is marked or unmarked.
@@ -984,7 +1027,7 @@ class RelaxApp_User_Main_Menu():
 
         # Checkbox to activate or deactivate "profile_options".
         self.profile_options_CB = ctk.CTkCheckBox(self.frame_main, text=None, variable=self.profile_options_choice , width=20, height=20, hover=True,
-                                                  command=self.checkbox_option1, state=self.profile_state,
+                                                  command=self.checkbox_option1, state="disabled",
                                                   fg_color=colors["soft_green"], hover_color=colors["dark_green"])
         self.profile_options_CB.place(rely=0.3, relx=0.8, anchor="e")
 
@@ -1004,7 +1047,6 @@ class RelaxApp_User_Main_Menu():
 
         # Image of a restart simbol.
         self.restart_button = ctk.CTkImage(Image.open(os.path.join(image_path, "Restart.png")))
-
 
         # Button to restart VO values set.
         self.restart_button1 = ctk.CTkButton(self.frame_main, text=None, image=self.restart_button, width=20, height=20, hover=True,
@@ -1042,7 +1084,29 @@ class RelaxApp_User_Main_Menu():
                                                    command=self.start_relaxapp, height=70, corner_radius=50,
                                                    hover=True, fg_color=colors["soft_green"], hover_color=colors["dark_green"])
         self.start_relaxapp_button.place(rely=0.8, relx=0.5, anchor="center")
+ 
+        self.update_profile_button()
 
+    def update_profile_button(self):
+
+        # Profile button is set as active or deactive when there is at least one configuration set.
+        if TemporaryProfile.visual_configuration != "" or TemporaryProfile.stretch_configuration != "":
+
+            self.profile_options.configure(state="normal")
+            self.profile_options_CB.configure(state="normal")
+            return 
+        
+        len_profiles = RelaxApp_User_Main_Menu_Profiles.get_profile_list(self)
+
+        # Profile button is set as active or deactive when a profile exists.
+        if len(len_profiles) >= 1:
+            self.profile_options.configure(state="normal")
+            self.profile_options_CB.configure(state="normal")
+            return
+        
+        self.profile_options.configure(state="disabled")
+        self.profile_options_CB.configure(state="disabled")
+       
     # Next 3 functions unmark values when user choose between use a profile or not.
     def checkbox_option1(self):
         self.visual_options_choice.set(0)
@@ -1056,10 +1120,12 @@ class RelaxApp_User_Main_Menu():
 
     # This method creates profiles.
     def create_profile(self):
-        RelaxApp_User_Main_Menu_Profiles()
+
+        RelaxApp_User_Main_Menu_Profiles(self)
 
     # This method import profiles.
     def import_profile(self):
+        #self.update_profile_button()
         print("import_profile")
         # try:
         #     import_file = ctk.filedialog.askopenfilename(title="Importar Perfil")
@@ -1149,21 +1215,24 @@ class RelaxApp_User_Main_Menu():
 
     # This method removes profiles set.
     def remove_account(self):
-        RelaxApp_MessageBox_Options(self.root, self.frame, "Remove Account")
+        
+        MB_message = messages.MESSAGE_RELAXAPP_MB_OPTIONS_REMOVE_ACCOUNT.format(username=Session.username)
+        RelaxApp_MessageBox_Options(self.root, self.frame, "Remove Account", action="Accept", message=MB_message)
 
     # This method signs out of the App.
     def sign_out(self):
-        RelaxApp_MessageBox_Options(self.root, self.frame, "Sign Out")
+        MB_message = messages.MESSAGE_RELAXAPP_MB_OPTIONS_SIGN_OUT.format(username=Session.username)
+        RelaxApp_MessageBox_Options(self.root, self.frame, "Sign Out", action="Accept", message=MB_message)
 
-    # This method sets visual options of the App.
+    # # This method sets visual options of the App.
     def set_visual_options(self):
         self.visual_options_values = True
-        RelaxApp_User_Main_Menu_Settings(self.root, self.frame, self.visual_options_values)
+        RelaxApp_User_Main_Menu_Settings(self.root, self.frame, self, self.visual_options_values)
 
     # This method sets stretch options of the App.
     def set_stretch_options(self):
         self.stretch_options_values = True
-        RelaxApp_User_Main_Menu_Settings(self.root, self.frame, None, self.stretch_options_values)
+        RelaxApp_User_Main_Menu_Settings(self.root, self.frame, self, None, self.stretch_options_values)
 
     # This method restarts values set.
     def restart_values(self, value):
@@ -1171,6 +1240,8 @@ class RelaxApp_User_Main_Menu():
             TemporaryProfile.visual_configuration = ""
         elif value == "SO":
             TemporaryProfile.stretch_configuration = ""
+        
+        self.update_profile_button()
                 
     # This method sets sound options of the App.
     def set_sounds_options(self):
@@ -1248,10 +1319,11 @@ class RelaxApp_User_Main_Menu_Profiles(RelaxApp_User_Settings_Structure):
     """This class opens a new window to set the user's personal profiles
        of the App. Inherit all structure from parent."""
 
-    def __init__(self):
-
+    def __init__(self, instance):
         super().__init__()
 
+        self.MM_instance = instance
+        
         # Frame at the back.
         self.frame_User_SS.configure(fg_color=colors["black"])
         self.frame_User_SS.pack(pady=0, padx=0, fill="both")
@@ -1331,9 +1403,16 @@ class RelaxApp_User_Main_Menu_Profiles(RelaxApp_User_Settings_Structure):
 
         response_dict = comms.get_profiles()
         
-        response = self.check_comms(response_dict)
-        if response:
-            return response["profiles_list"]
+        response, message = Requests_Status.check_server_connection(response_dict)
+        
+        if response != None:
+            status_expected = 200
+            valid_request, values, message = Requests_Status.check_request_status(response, status_expected, "get_profile_list")
+            
+            if valid_request:
+                return values["profiles_list"]
+        
+        RelaxApp_MessageBox_Options(self.frame_User_SS, self.window_User_SS, "Profile Error", action="Return", message=message)
             
     # This method set the first profile and set it as default. Is used when none profiles is set as default.
     def get_profile_selected(self):
@@ -1420,10 +1499,18 @@ class RelaxApp_User_Main_Menu_Profiles(RelaxApp_User_Settings_Structure):
         
         response_dict = comms.remove_profile(profile_ID)
         
-        response = self.check_comms(response_dict)
-        if response:
-            self.update_profiles()
-
+        response, message = Requests_Status.check_server_connection(response_dict)
+        
+        if response != None:
+            status_expected = 200
+            valid_request, message = Requests_Status.check_request_status(response, status_expected, "remove_profile")
+            if valid_request:
+                self.MM_instance.update_profile_button()
+                self.update_profiles()
+                return 
+    
+        RelaxApp_MessageBox_Options(self.frame_User_SS, self.window_User_SS, "Profile Error", action="Return", message=message)
+                
     def update_profiles(self):
         profile_list = self.get_profile_list()                    
         RelaxApp_Structure.clean_MMP_widgets(self, self.dinamics_frames)
@@ -1435,31 +1522,24 @@ class RelaxApp_User_Main_Menu_Profiles(RelaxApp_User_Settings_Structure):
         profile_list = self.get_profile_list()
         if profile_list:
             profile_ID = self.get_profile_selected()
+            
             response_dict = comms.set_profile_dafault(profile_ID)
-            self.check_comms(response_dict)             
+            
+            response, message = Requests_Status.check_server_connection(response_dict)
+            
+            if response != None:
+                status_expected = 200
+                valid_request, message = Requests_Status.check_request_status(response, status_expected, "save_settings")
+                if valid_request:
+                    self.window_User_SS.destroy()
+                    return
 
+            RelaxApp_MessageBox_Options(self.frame_User_SS, self.window_User_SS, "Profile Error", action="Return", message=message)
+        else:
             self.window_User_SS.destroy()
-
     # This method cancel the profile menu and close the window.
     def cancel_settings(self):
         self.window_User_SS.destroy()
-        
-    def check_comms(self, response_dict):
-        
-        if response_dict["connection_status"]:
-            response = response_dict["response"]
-            values = response.json()
-            if response.status_code == 200:
-                print(values["message"])
-                return values
-            else:
-                message = Set_Messages.response_messages(values["error_link"])
-                print(values["error"])
-        else:
-            message = Set_Messages.server_messages(response_dict["error"])
-            print(response_dict["error"])
-            
-        RelaxApp_MessageBox_Options(self.frame_User_SS, self.window_User_SS, "Profile Error", message=message)
         
 
 ##################################################################
@@ -1516,32 +1596,25 @@ class RelaxApp_Profile_Name(RelaxApp_Profile_Name_Structure):
         
         response_dict = comms.create_profile(data)
         
-        # Connection with the server is checked.
-        if response_dict["connection_status"]:
-            
-            response = response_dict["response"]
-            values = response.json()
-            if response.status_code == 201:
-                print(values["message"])
+        response, message = Requests_Status.check_server_connection(response_dict)
+        
+        if response != None:
+            status_expected = 201
+            valid_request, message = Requests_Status.check_request_status(response, status_expected, "accept_profile_name")
+            if valid_request:
                 self.profile_menu.update_profiles()
                 self.window_PFS.destroy()
-                
+                return
             else:
-                if values["error_type"] == "VIEWS":
-                    message = Set_Messages.response_messages(values["error_link"])
-                    print(values["error"])
-                elif values["error_type"] == "SERIALIZERS":
-                    key = values["error_link"].upper()
-                    message = Set_Messages.serializers_messages(key)
-                    print("* ERROR: ", values["error"])
-                # Pop-up window is displayed error from serializers is displayed in Spanish.    
-                RelaxApp_MessageBox_Options(self.root, self.frame, "Profile Error", message=message)
-        else:
-            message = Set_Messages.server_messages(response_dict["error_link"])
-            # Pop-up window error from the server connection is displayed in Spanish.
-            print(response_dict["error"])
-            RelaxApp_MessageBox_Options(self.root, self.frame, "Server Problem", message=message)
-
+                # Pop-up window is displayed error from serializers is displayed in Spanish.
+                RelaxApp_MessageBox_Options(self.root, self.frame, "Profile Error", action="Return", message=message)
+                return
+            
+        message = Set_Messages.server_messages(response_dict["error_link"])
+        
+        # Pop-up window error from the server connection is displayed in Spanish.
+        RelaxApp_MessageBox_Options(self.root, self.frame, "Server Problem", action="Return", message=message)
+        
     # This method cancel the profile name menu and returns to the profile menu.
     def close(self):
         self.window_PFS.destroy()
@@ -1555,12 +1628,13 @@ class RelaxApp_User_Main_Menu_Settings(RelaxApp_User_Settings_Structure):
     """This class opens a new window to set the user's personal settings
        of the App. Inherit all structure from parent."""
 
-    def __init__(self, root, frame, visual_values=None, stretch_values=None):
+    def __init__(self, root, frame, instance, visual_values=None, stretch_values=None):
         super().__init__()
 
         self.root = root
         self.frame = frame
-        
+        self.MM_instance = instance
+
         self.visual_options_values = visual_values
         self.stretch_options_values = stretch_values
 
@@ -1687,7 +1761,7 @@ class RelaxApp_User_Main_Menu_Settings(RelaxApp_User_Settings_Structure):
 
     # This method saves settings in the user's main menu.
     def save_settings(self):
-        valid_request = False
+        valid_values = False
         
         # Get when the sound checkbox is activated or not.
         if self.sound_alert_choice.get() == 1:
@@ -1702,24 +1776,23 @@ class RelaxApp_User_Main_Menu_Settings(RelaxApp_User_Settings_Structure):
         break_time_SS = self.break_time_entrySS.get()
 
         to_validate = lenght_HH + lenght_MM + lapse + break_time_MM + break_time_SS + str(self.sound)
-        check_values = comms.data_validate({"data": to_validate})
-
-        if check_values["connection_status"]:
-            response = check_values["response"]
-            values = response.json()
-            if response.status_code == 200:
-                valid_request = True
-            else:
-                message = Set_Messages.validators_messages(values["error_link"])
-                print("* ERROR: ", values["error"])
-                RelaxApp_MessageBox_Options(self.root, self.window_User_SS, "Invalid Data", message=message)
-        else:
-            message = Set_Messages.server_messages(check_values["error_link"])
-            print(check_values["error"])
-            RelaxApp_MessageBox_Options(self.root, self.window_User_SS, "Server Problem", message=message)
         
+        response_dict = comms.data_validate({"data": to_validate})
+
+        response, message = Requests_Status.check_server_connection(response_dict)
+        
+        if response != None:
+            status_expected = 200
+            valid_request, message = Requests_Status.check_request_status(response, status_expected, "save_settings_MM")
+            if valid_request:
+                valid_values = True
+            else:
+                RelaxApp_MessageBox_Options(self.root, self.window_User_SS, "Invalid Data", action="Return", message=message)
+        else:
+            RelaxApp_MessageBox_Options(self.root, self.window_User_SS, "Server Problem", action="Return", message=message)
+
         # All entries are format to create the timer.
-        if valid_request:
+        if valid_values:
 
         # Convert 60 minutes in 1 hour.
             if lenght_MM == "60":
@@ -1748,6 +1821,8 @@ class RelaxApp_User_Main_Menu_Settings(RelaxApp_User_Settings_Structure):
             elif self.stretch_options_values == True:
                 TemporaryProfile.stretch_configuration = self.values
             
+            #RelaxApp_User_Main_Menu.update_profile_button(self.frame_main)
+            self.MM_instance.update_profile_button() 
             self.window_User_SS.destroy()
             #RelaxApp_Structure.close_create2(self, RelaxApp_User_Main_Menu, self.root, self.frame, None, None, True)
 
@@ -2001,7 +2076,8 @@ class RelaxApp_User_Main_Menu_Sounds(RelaxApp_User_Settings_Structure):
 
         # MessageBox is called when user try to save a configuration with a loaded sound before loading.
         if self.final_sound == "" or self.lapse_sound == "":
-            RelaxApp_MessageBox_Options(self.root, self.window_User_SS, "No Sound")
+            MB_message = messages.MESSAGE_RELAXAPP_USER_MM_SOUNDS_NO_SOUND
+            RelaxApp_MessageBox_Options(self.root, self.window_User_SS, "No Sound", action="Return", message=MB_message)
         else:
             TemporaryProfile.final_sounds_configuration = self.final_sound
             TemporaryProfile.lapse_sounds_configuration = self.lapse_sound
@@ -2603,75 +2679,26 @@ class RelaxApp_MessageBox_Options(RelaxApp_MessageBox_Structure):
         self.message_type = message_type
         self.message = kwargs.get("message")
         self.data = kwargs.get("data")
+        self.action = kwargs.get("action")
 
         # Variable to set when the button "Accept", "Cancel" is activated
         self.select_button1 = False
         # Variable to set when the button "Return" is activated
         self.select_button2 = False
-        
-        if self.message_type == "Server Problem":
-            # Label to inform a problem with the server connections.
-            self.server_failure = ctk.CTkLabel(self.window_MS, text=self.message,
-                                               font=(font,15), bg_color=colors["soft_grey"])
-            self.server_failure.place(rely=0.35, relx=0.5, anchor="center")
-            self.select_button2 = True
 
-        elif self.message_type == "Sign up":
-            # Label ask/cancel to confirm user registration.
-            self.confirm_user_registration_label = ctk.CTkLabel(self.window_MS, text=messages.MESSAGE_RELAXAPP_MB_OPTIONS_CONFIRM_ACCEPT_REGISTRATION,
-                                                   font=(font,15), bg_color=colors["soft_grey"])
-            self.confirm_user_registration_label.place(rely=0.3, relx=0.5, anchor="center")
+        if self.action == "Accept":
+            self.accept_label = ctk.CTkLabel(self.window_MS, text=self.message,
+                                             font=(font,15), wraplength=500, bg_color=colors["soft_grey"])
+            self.accept_label.place(rely=0.3, relx=0.5, anchor="center")
             self.select_button1 = True
-
-        elif self.message_type == "Cancel":
-            # Label ask/cancel to cancel user registration.
-            self.cancel_user_registration_label = ctk.CTkLabel(self.window_MS, text=messages.MESSAGE_RELAXAPP_MB_OPTIONS_CONFIRM_CANCEL_REGISTRATION,
-                                                  font=(font,15), bg_color=colors["soft_grey"])
-            self.cancel_user_registration_label.place(rely=0.3, relx=0.5, anchor="center")
-            self.select_button1 = True
-                       
-        elif self.message_type == "Invalid Change PW":
-            # Label to inform that the values to change the password are invalid.
-            self.invalid_change_pw_label = ctk.CTkLabel(self.window_MS, text=self.message,
-                                           font=(font,15), bg_color=colors["soft_grey"])
-            self.invalid_change_pw_label.place(rely=0.35, relx=0.5, anchor="center")
-            self.select_button2 = True
-
-        elif self.message_type == "Cancel Change PW":
-            # Label ask/cancel to cancel to change password.
-            self.cancel_change_pw_label = ctk.CTkLabel(self.window_MS, text=messages.MESSAGE_RELAXAPP_MB_OPTIONS_CONFIRM_CANCEL_PW_CHANGE,
-                                          font=(font,15), bg_color=colors["soft_grey"])
-            self.cancel_change_pw_label.place(rely=0.3, relx=0.5, anchor="center")
-            self.select_button1 = True
-
-        elif self.message_type == "Confirm Change PW":
-            # Label ask/cancel to confirm the confirmation to change password.
-            self.accept_confirm_change_pw_label = ctk.CTkLabel(self.window_MS, text=messages.MESSAGE_RELAXAPP_MB_OPTIONS_CONFIRM_ACCEPT_PW_CHANGE,
-                                                  font=(font,15), bg_color=colors["soft_grey"])
-            self.accept_confirm_change_pw_label.place(rely=0.3, relx=0.5, anchor="center")
-            self.select_button1 = True
-        
-        elif self.message_type == "Cancel Confirm Change PW":
-            # Label ask/cancel to cancel the confirmation to change password.
-            self.cancel_confirm_change_pw_label = ctk.CTkLabel(self.window_MS, text=messages.MESSAGE_RELAXAPP_MB_OPTIONS_CONFIRM_CANCEL_PW_CHANGE,
-                                                  font=(font,15), bg_color=colors["soft_grey"])
-            self.cancel_confirm_change_pw_label.place(rely=0.3, relx=0.5, anchor="center")
-            self.select_button1 = True
-
-        elif self.message_type == "Invalid Data":
-            # Label to inform that the values to set the timers are invalid.
-            self.invalid_data_label = ctk.CTkLabel(self.window_MS, text=self.message,
-                                      font=(font,15), bg_color=colors["soft_grey"])
-            self.invalid_data_label.place(rely=0.35, relx=0.5, anchor="center")
-            self.select_button2 = True
             
-        elif self.message_type == "Profile Error":
-            # Label to inform that there is a proble with profiles.
-            self.profile_error_label = ctk.CTkLabel(self.window_MS, text=self.message,
-                                        font=(font,15), bg_color=colors["soft_grey"])
-            self.profile_error_label.place(rely=0.35, relx=0.5, anchor="center")
+        if self.action == "Return":
+
+            self.return_label = ctk.CTkLabel(self.window_MS, text=self.message,
+                                             font=(font,15), wraplength=500, bg_color=colors["soft_grey"])
+            self.return_label.place(rely=0.3, relx=0.5, anchor="center")
             self.select_button2 = True
-            
+                            
         # elif self.message_type == "No Profile":
         #     # Label to alert there's no profile set.
         #     self.no_profile_label = ctk.CTkLabel(self.window_MS, text="No tienes ningún perfil creado actualmente. Configura al menos un \nvalue para poder habilitar la opción de perfiles.",
@@ -2693,20 +2720,6 @@ class RelaxApp_MessageBox_Options(RelaxApp_MessageBox_Structure):
         #     self.file_corrupt_label.place(rely=0.35, relx=0.5, anchor="center")
         #     self.select_button2 = True
 
-        elif self.message_type == "Remove Account":
-            # Label ask/cancel to sign out.
-            self.pw_ask_cancel_label = ctk.CTkLabel(self.window_MS, text=messages.MESSAGE_RELAXAPP_MB_OPTIONS_REMOVE_ACCOUNT.format(username=Session.username),
-                                                    font=(font,14), bg_color=colors["soft_grey"])
-            self.pw_ask_cancel_label.place(rely=0.3, relx=0.5, anchor="center")
-            self.select_button1 = True
-
-        elif self.message_type == "Sign Out":
-            # Label ask/cancel to sign out.
-            self.sign_out_label = ctk.CTkLabel(self.window_MS, text=messages.MESSAGE_RELAXAPP_MB_OPTIONS_SIGN_OUT.format(username=Session.username),
-                                               font=(font,14), bg_color=colors["soft_grey"])
-            self.sign_out_label.place(rely=0.3, relx=0.5, anchor="center")
-            self.select_button1 = True
-
         # elif self.message_type == "Valid Profile":
         #     # Label to alert to set at least 1 minute between alerts.
         #     self.valid_profile = ctk.CTkLabel(self.window_MS, text="Está seguro que desea importar el perfil seleccionado? Esto \neliminará el último de la lista  de perfiles si estuviera llena.",
@@ -2727,13 +2740,6 @@ class RelaxApp_MessageBox_Options(RelaxApp_MessageBox_Structure):
         #                                             font=(font,14), bg_color=colors["soft_grey"])
         #     self.no_values_set_label.place(rely=0.35, relx=0.5, anchor="center")
         #     self.select_button2 = True
-
-        elif self.message_type == "No Sound":
-            # Label to alert that a load sounds is trying to save but no file is loaded.
-            self.no_sound_label = ctk.CTkLabel(self.window_MS, text=messages.MESSAGE_RELAXAPP_USER_MM_SOUNDS_NO_SOUND,
-                                               font=(font,14), bg_color=colors["soft_grey"])
-            self.no_sound_label.place(rely=0.35, relx=0.5, anchor="center")
-            self.select_button2 = True
 
         # elif self.message_type == "No Name":
         #     # Label to alert that a load sounds is trying to save but no file is loaded.
@@ -2781,7 +2787,7 @@ class RelaxApp_MessageBox_Options(RelaxApp_MessageBox_Structure):
 
     # This method confirm a change.
     def accept_button(self, message_type):
-        valid_request = False
+        valid_values = False
         server_ok = True
         
         # This conditional accept the registration. 
@@ -2810,55 +2816,39 @@ class RelaxApp_MessageBox_Options(RelaxApp_MessageBox_Structure):
             self.window_MS.destroy()
             RelaxApp_Structure.close_create2(self, RelaxApp_Initial_Frame, self.root, self.frame)
             return
- 
-        # Connection with the server is checked.
-        # This is only for request with comms: Sign up, Confirm Change PW and Remove Account.  
-        if response_dict["connection_status"]:
-            response = response_dict["response"]
-            values = response.json()
-            if response.status_code == 200 or response.status_code == 201:
-                request_type = values["request_type"]
-                if request_type == "user_registration" or request_type == "user_pw_reset_confirmation":
-                    # Message from backend is translated.
-                    message = Set_Messages.response_messages(values["message_link"])
-                    print(values["message"])
-                    valid_request = True
+
+        response, message = Requests_Status.check_server_connection(response_dict)
+        
+        if response != None:
+            if message_type == "Sign up":
+                status_expected = 201
+            else:
+                status_expected = 200
                 
+            valid_request, values, message = Requests_Status.check_request_status(response, status_expected, "accept_button_MB")
+
+            if valid_request:
+                request_type = values["request_type"]
+                
+                if request_type == "user_registration" or request_type == "user_pw_reset_confirmation":
+                    valid_values = True
+                    
                 elif request_type == "remove_account":
                     Session.clear()
                     TemporaryProfile.clear()
-                    print(values["message"])
                     self.window_MS.destroy()
                     RelaxApp_Structure.close_create2(self, RelaxApp_Initial_Frame, self.root, self.frame)
                     return
-
-            else:
-                # These conditionals check if the error cames from views or serializers to set the correct translation.
-                if values["error_type"] == "VIEWS":
-                    message = Set_Messages.response_messages(values["error_link"])
-                    print(values["error"])
-    
-                elif values["error_type"] == "SERIALIZERS":
-                    key = values["error_link"].upper()
-                    message = Set_Messages.serializers_messages(key)
-                    print("* ERROR: ", values["error"])
-
-        else:
-            server_ok = False
-
-        # Message displayed when the connection with the server fails.
-        if server_ok == False:
-            message = Set_Messages.server_messages(response_dict["error_link"])
-            print(response_dict["error"])
            
         # The request is checked. 
-        if valid_request:
+        if valid_values:
             # A pop-up window is displayed to confirm that the request has been succesful.
             # First the pop-up window is cleaned.
             RelaxApp_MessageBox_Structure.clean_MB_widgets(self, self.window_MS)
             # Second a new label is created with a new message.
             self.new_message_box("Continue", message)
         else:
+            
             RelaxApp_MessageBox_Structure.clean_MB_widgets(self, self.window_MS)
             self.new_message_box("Error", message)
                      
@@ -2881,11 +2871,7 @@ class RelaxApp_MessageBox_Options(RelaxApp_MessageBox_Structure):
         #     RelaxApp_Structure.close_create(self, RelaxApp_User_Main_Menu, self.root, self.frame, None, None, True)
 
         #     return
-
-        
-
-        
-
+ 
         # User is registered.
         # if database.validate_editing == True:
 
@@ -2920,8 +2906,8 @@ class RelaxApp_MessageBox_Options(RelaxApp_MessageBox_Structure):
         if message_type == "Error":
             # Label confirm user registration.
             self.continue_registration = ctk.CTkLabel(self.window_MS, text=message, font=(font,15),
-                                                      bg_color=colors["soft_grey"])
-            self.continue_registration.place(rely=0.35, relx=0.5, anchor="center")
+                                                      wraplength=500, bg_color=colors["soft_grey"])
+            self.continue_registration.place(rely=0.3, relx=0.5, anchor="center")
 
             # Button to continue to the main menu.
             self.continue_registration_button = ctk.CTkButton(self.window_MS, width=80, height=17, text="Volver", font=(font,14),
@@ -2936,8 +2922,8 @@ class RelaxApp_MessageBox_Options(RelaxApp_MessageBox_Structure):
             
             # Label confirm user registration.
             self.continue_registration = ctk.CTkLabel(self.window_MS, text=message, font=(font,15),
-                                                      bg_color=colors["soft_grey"])
-            self.continue_registration.place(rely=0.35, relx=0.5, anchor="center")
+                                                      wraplength=500, bg_color=colors["soft_grey"])
+            self.continue_registration.place(rely=0.30, relx=0.5, anchor="center")
 
         # elif message_type == "Continue2":
         #     # Label confirm user registration.
@@ -2951,3 +2937,4 @@ class RelaxApp_MessageBox_Options(RelaxApp_MessageBox_Structure):
                                                             fg_color=colors["soft_green"], hover_color=colors["dark_green"],
                                                             bg_color=colors["soft_grey"])
         self.continue_registration_button.place(rely=0.65, relx=0.5, anchor="center")
+

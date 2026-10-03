@@ -342,7 +342,7 @@ def profiles(request):
                 profiles_list,
                 many=True
             )
-            # raise Exception
+            #raise Exception
         
             return Response(
                 {"message" : f"* MESSAGE: List of profiles for user '{request.user}' are displayed.",
@@ -436,6 +436,8 @@ def profile_details(request, pk):
                 profile.default_profile = True
                 profile.save()
 
+                #raise Exception
+            
                 return Response(
                     {"message" : f"* MESSAGE: The indicated profile has been set as default.",
                     "message_link" : None,

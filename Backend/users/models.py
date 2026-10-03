@@ -6,15 +6,14 @@ from .validators import *
 class PasswordReset(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     code = models.CharField(max_length=100)
+    used = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
     expires_at = models.DateTimeField()
-    used = models.BooleanField(default=False)
-    
+
 class Profiles(models.Model):
         
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     profile_name = models.CharField(max_length=20, blank=False)
-    created_at = models.DateTimeField(auto_now_add=True)
     default_profile = models.BooleanField(default=True)
     visual_configuration = models.CharField(
         max_length=15,
@@ -26,6 +25,7 @@ class Profiles(models.Model):
         blank=True)
     final_sounds_configuration = models.CharField(max_length=300, blank=True)
     lapse_sounds_configuration = models.CharField(max_length=300, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
     
     class Meta:
         constraints = [
