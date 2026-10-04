@@ -60,10 +60,13 @@ MESSAGE_RELAXAPP_MB_OPTIONS_CONFIRM_CANCEL_PW_CHANGE = "¿Está seguro que desea
 MESSAGE_RELAXAPP_MB_OPTIONS_SIGN_OUT = "¿Está seguro que desea cerrar la sesión de '{username}'?"
 MESSAGE_RELAXAPP_MB_OPTIONS_REMOVE_ACCOUNT = "Esta opción permite eliminar completamente la cuenta de '{username}'. ¿Está seguro que desea continuar?"
 MESSAGE_RELAXAPP_MB_OPTIONS_PROFILES_IMPORTED = "El perfil ha sido importado exitósamente y se ha establecido como predeterminado."
-MESSAGE_RELAXAPP_MB_OPTIONS_PROFILES_EMPTY = "La exportación no es posible ya que no tienes ningún perfil configurado actualmente."
+MESSAGE_RELAXAPP_MB_OPTIONS_PROFILES_EXPORT_EMPTY = "La exportación no es posible ya que no tienes ningún perfil configurado actualmente."
+MESSAGE_RELAXAPP_MB_OPTIONS_PROFILES_STARTAPP_EMPTY = "No es posible iniciar RelaxApp si eliges la opción de perfiles y no tienes ninguno configurado. Configura uno o crea valores temporales."
 MESSAGE_RELAXAPP_MB_OPTIONS_PROFILES_INVALID = "El perfil que intenta importar es inválido. Revíselo antes de continuar."
 MESSAGE_RELAXAPP_MB_OPTIONS_PROFILES_UNICODE_ERROR = "El archivo que intenta abrir utiliza una codificación no compatible. Revíselo antes de continuar."
 MESSAGE_RELAXAPP_MB_OPTIONS_PROFILES_FILE_ERROR = "El archivo que intenta abrir no existe o se encuentra dañado."
+MESSAGE_RELAXAPP_MB_OPTIONS_STARTAPP_NO_VALUES = "Cada opción elegida debe tener valores configurados antes de iniciar la aplicación."
+MESSAGE_RELAXAPP_MB_OPTIONS_STARTAPP_NO_SETTINGS = "Debes seleccionar al menos una opción antes de iniciar la aplicación."
 
 
 # MESSAGES FROM RelaxApp_User_Main_Menu_Sounds
