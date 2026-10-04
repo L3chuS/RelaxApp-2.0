@@ -96,6 +96,14 @@ def data_validate(data):
     )
     return response
 
+def sound_validate(data):
+    response = make_request(
+        "POST",
+        f"{API_URL}sound/validate/",
+        json=data,
+    )
+    return response
+
 def remove_account(data):
     response = make_request(
         "DELETE",

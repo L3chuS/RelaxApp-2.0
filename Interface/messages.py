@@ -19,6 +19,7 @@ ERROR_SERIALIZERS_PASSWORD_BLANK = "El campo de la contraseña no puede estar va
 ERROR_SERIALIZERS_GENERAL = "Los campos no se han cumplimentado correctamente."
 ERROR_SERIALIZERS_PROFILE_NAME_MISSING = "El campo del nombre del perfil no puede estar vacío."
 ERROR_SERIALIZERS_VC_SC_BOTH_EMPTY = "Para crear un perfil es necesario configurar al menos un valor del descanso visual o los estiramientos."
+ERROR_SERIALIZERS_PROFILE_IMPORT_ERROR = "El archivo que intenta abrir está dañado o ha sido modificado y no puede abrirse. Compruebe con otro archivo."
 
 ERROR_LOGIN_USERNAME_NOT_EXISTS = "El nombre de usuario no existe en nuestro sistema."
 ERROR_LOGIN_INVALID_PASSWORD = "La contraseña no es correcta. Vuelva a intentarlo."
@@ -58,6 +59,12 @@ MESSAGE_RELAXAPP_MB_OPTIONS_CONFIRM_ACCEPT_PW_CHANGE = "¿Está seguro que desea
 MESSAGE_RELAXAPP_MB_OPTIONS_CONFIRM_CANCEL_PW_CHANGE = "¿Está seguro que desea cancelar el cambio de contraseña?"
 MESSAGE_RELAXAPP_MB_OPTIONS_SIGN_OUT = "¿Está seguro que desea cerrar la sesión de '{username}'?"
 MESSAGE_RELAXAPP_MB_OPTIONS_REMOVE_ACCOUNT = "Esta opción permite eliminar completamente la cuenta de '{username}'. ¿Está seguro que desea continuar?"
+MESSAGE_RELAXAPP_MB_OPTIONS_PROFILES_IMPORTED = "El perfil ha sido importado exitósamente y se ha establecido como predeterminado."
+MESSAGE_RELAXAPP_MB_OPTIONS_PROFILES_EMPTY = "La exportación no es posible ya que no tienes ningún perfil configurado actualmente."
+MESSAGE_RELAXAPP_MB_OPTIONS_PROFILES_INVALID = "El perfil que intenta importar es inválido. Revíselo antes de continuar."
+MESSAGE_RELAXAPP_MB_OPTIONS_PROFILES_UNICODE_ERROR = "El archivo que intenta abrir utiliza una codificación no compatible. Revíselo antes de continuar."
+MESSAGE_RELAXAPP_MB_OPTIONS_PROFILES_FILE_ERROR = "El archivo que intenta abrir no existe o se encuentra dañado."
+
 
 # MESSAGES FROM RelaxApp_User_Main_Menu_Sounds
 MESSAGE_RELAXAPP_USER_MM_SOUNDS_TOOLTIP = "Debes elegir un sonido de alarma en la columna 1 que sonará al finalizar el contador y otro en la columna 2 para que se ejecute \

@@ -9,5 +9,6 @@ urlpatterns = [
     path("profiles/", views.profiles, name="profiles"),
     path("profiles/<int:pk>/", views.profile_details, name="profile_details"),
     path("data/validate/", views.data_validate, name="data_validate"),
+    path("sound/validate/", views.sound_validate, name="sound_validate"),
     path("account/remove/", views.remove_account, name="remove_account")
 ]

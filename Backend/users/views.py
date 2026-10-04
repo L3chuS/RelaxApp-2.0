@@ -295,9 +295,30 @@ def data_validate(request):
         }, status=400)
     
     return Response(
-        {"message" : "* MESSAGE: Data is valid",
+        {"message" : "* MESSAGE: Data is valid.",
         "message_link" : None,
         "request_type" : "data_validate"},
+        status=200
+    )
+    
+@api_view(["POST"])
+@authentication_classes([TokenAuthentication])
+@permission_classes([IsAuthenticated])
+def sound_validate(request):
+    try: 
+        check_sound_settings(request.data["sound"])
+    
+    except ValidationError as error:
+        return Response({
+            "error" : error.message,
+            "error_type" : "VALIDATORS",
+            "error_link" : error.code
+        }, status=400)
+    
+    return Response(
+        {"message" : "* MESSAGE: Sound is valid.",
+        "message_link" : None,
+        "request_type" : "sound_validate"},
         status=200
     )
 
@@ -326,7 +347,6 @@ def remove_account(request):
     )
     
     
-
 @api_view(["GET", "POST"])
 @authentication_classes([TokenAuthentication])
 @permission_classes([IsAuthenticated])
@@ -343,7 +363,7 @@ def profiles(request):
                 many=True
             )
             #raise Exception
-        
+
             return Response(
                 {"message" : f"* MESSAGE: List of profiles for user '{request.user}' are displayed.",
                 "message_link" : None,
@@ -364,7 +384,7 @@ def profiles(request):
                 )
                 
                 profile_list = Profiles.objects.filter(user=request.user)
- 
+            
             if profile_exists:
                 return Response(
                     {"error" : "* ERROR: Profile already exists.",

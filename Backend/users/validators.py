@@ -1,16 +1,10 @@
 from django.core.exceptions import ValidationError
+import os
 
-    # # This method checks if the lenght of the profile name is shorter than 1 or larger than 20 characters.
-    # def check_profile_lenght(self, value):
-    #     if len(value) > 20 or len(value) == 0:
-    #         return False
+# Set all valid audio extension.
+audio_accepted_files = (("Audio Files", "*.mp3"),("Audio Files", "*.ogg"), ("Audio Files", "*.wav"),
+                        ("Audio Files", "*.m4a"), ("Audio Files", "*.wma"), ("Audio Files", "*.flac"))
 
-    # # This method checks if the profile name is duplicated.
-    # def check_profile_duplicated(self, profile):
-    #     database.query(f"SELECT Profile_Name FROM {databases['database1']}.{tables['settings_table']} WHERE login = '{user['login']}' and Profile_Name = '{profile}'")
-    #     profile_name = database.value
-    #     if profile_name != []:
-    #         return True
 
 # This method checks if all values set by the user are correct.
 def check_timer_settings(value):
@@ -82,23 +76,34 @@ def check_timer_settings(value):
             )
     return
 
-# # This method checks if all sound values set by the user are correct.
-# def check_sounds_settings(self, value):
-#     if value == "":
-#         return None
-#     sound_path = os.path.isfile(value)
-#     extension_sound_path = os.path.splitext(value)
+# This method checks if all sound values set by the user are correct.
+def check_sound_settings(value):
+    
+    if value == "":
+        raise ValidationError(
+            "The path given is empty.", 
+            code="SOUND_EMPTY_PATH"
+            )
 
-#     if sound_path == False:
-#         return False
+    sound_path = os.path.isfile(value)
+    extension_sound_path = os.path.splitext(value)   
+    
+    if sound_path == False:
+        raise ValidationError(
+            "The path given is invalid.", 
+            code="SOUND_INVALID_PATH"
+            )
 
-#     extension = False
-#     for values in audio_accepted_files:
-#         if extension_sound_path[1] in values[1]:
-#             extension = True
-#             break
+    extension = False
+    for values in audio_accepted_files:
+        if extension_sound_path[1] in values[1]:
+            extension = True
+            break
 
-#     if extension == False:
-#         return False
+    if extension == False:
+        raise ValidationError(
+            "The extension of the file given is invalid.", 
+            code="SOUND_INVALID_EXTENSION"
+            )
 
-#     return True
+    return

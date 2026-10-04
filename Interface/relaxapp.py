@@ -10,6 +10,7 @@ import datetime
 import os
 from utils import get_resource_path
 import webbrowser
+import json
 import comms
 import messages
 from user_temporary_settings import *
@@ -36,10 +37,6 @@ colors = {"black":"#242424",
 
 # Set App font.
 font = "Segoe Print"
-
-# Set all valid audio extension.
-audio_accepted_files = (("Audio Files", "*.mp3"),("Audio Files", "*.ogg"), ("Audio Files", "*.wav"),
-                        ("Audio Files", "*.m4a"), ("Audio Files", "*.wma"), ("Audio Files", "*.flac"))
 
 
 #######################################################
@@ -312,7 +309,13 @@ class Requests_Status():
                 return True, None
             return False, message
         
-    
+        elif type in (
+            "import_profile"
+        ):
+            if valid:
+                return True, None,  message
+            return False, values, message
+
 #############################################################
 ### Class that contains general functions to set messages ###
 #############################################################
@@ -419,96 +422,6 @@ class Set_Messages():
         elif key == "INVALID_SOUND":
             return messages.ERROR_VALIDATORS_INVALID_SOUND
         
-
-#############################################################
-### Class that contains general functions to set RelaxApp ###
-#############################################################
-
-# class Check_Values_Configuration():
-#     """This class contains only functions which are used to
-#        verify profiles imported and settings made by the user."""
-
-#     # This method checks if the lenght of the profile name is shorter than 1 or larger than 20 characters.
-#     def check_profile_lenght(self, value):
-#         if len(value) > 20 or len(value) == 0:
-#             return False
-
-#     # This method checks if the profile name is duplicated.
-#     def check_profile_duplicated(self, profile):
-#         database.query(f"SELECT Profile_Name FROM {databases['database1']}.{tables['settings_table']} WHERE login = '{user['login']}' and Profile_Name = '{profile}'")
-#         profile_name = database.value
-#         if profile_name != []:
-#             return True
-
-#     # This method checks if all values set by the user are correct.
-#     def check_settings(self, value):
-
-#         if value == "":
-#             return None, None
-
-#         if value != "":
-#             try:
-#                 lenght_HH = value[:2]
-#                 lenght_MM = value[2:4]
-#                 lapse = value[4:6]
-#                 break_time_MM = value[6:8]
-#                 break_time_SS = value[8:10]
-#                 sound = value[10:]
-#             except:
-#                 return False, False
-
-#             valid_numbers = [str(x).zfill(2) for x in range(61)]
-
-#             if lenght_HH not in valid_numbers or lenght_MM not in valid_numbers or \
-#             lapse not in valid_numbers or break_time_MM not in valid_numbers or \
-#             break_time_SS not in valid_numbers:
-#                 return False, "Invalid Time"
-
-#             elif int(lenght_HH) * 60 + int(lenght_MM) > 960:
-#                 return False, "Extra Hours"
-
-#             elif int(lenght_HH) * 60 + int(lenght_MM) < 1:
-#                 return False, "Minimum Time"
-
-#             elif int(lapse) > int(lenght_HH) * 60 + int(lenght_MM):
-#                 return False, "Over Duration"
-
-#             elif int(break_time_MM) * 60 + int(break_time_SS) > \
-#             int(lapse) * 60:
-#                 return False, "Over Lapse"
-
-#             elif int(lapse) == 0:
-#                 return False, "No Lapse"
-
-#             elif int(break_time_MM) == 0 and int(break_time_SS) < 30:
-#                 return False, "No Break"
-
-#             elif sound != "True" and sound != "False":
-#                 return False, False
-#             else:
-#                 return True, "Valid Profile"
-
-#     # This method checks if all sound values set by the user are correct.
-#     def check_sounds_settings(self, value):
-#         if value == "":
-#             return None
-#         sound_path = os.path.isfile(value)
-#         extension_sound_path = os.path.splitext(value)
-
-#         if sound_path == False:
-#             return False
-
-#         extension = False
-#         for values in audio_accepted_files:
-#             if extension_sound_path[1] in values[1]:
-#                 extension = True
-#                 break
-
-#         if extension == False:
-#             return False
-
-#         return True
-
 
 ###############################################################################
 ### Class that is used to validate entries in the user's main menu settings ###
@@ -937,7 +850,7 @@ class RelaxApp_User_Main_Menu():
     """This class contains the user's main menu. It allows to start
        the app, set, save and load settings and knows about RelaxApp."""
 
-    # REVISAR LO DE visual_set=False,ETC DEL INIT el root tambien
+    # REVISAR LO DE visual_set=False,ETC DEL INIT
     def __init__(self, root, frame, visual_set=False, stretch_set=False):
 
         self.root = root
@@ -1125,90 +1038,90 @@ class RelaxApp_User_Main_Menu():
 
     # This method import profiles.
     def import_profile(self):
-        #self.update_profile_button()
-        print("import_profile")
-        # try:
-        #     import_file = ctk.filedialog.askopenfilename(title="Importar Perfil")
+      
+        try:
+            import_file = ctk.filedialog.askopenfilename(title="Importar Perfil")
 
-        #     with open(import_file, mode="r", encoding="utf-8") as file:
-        #         read_file = file.readlines()
-        #         self.corrupt_file = False
-        #         file_values = []
-
-        #         # Bucle that add values in a list to check them easily.
-        #         for value in read_file:
-        #             file_values.append(value[:-1])
-
-        #         while self.corrupt_file == False:
-        #             # Lenght of the profile name is checked.
-        #             check_profile = Check_Values_Configuration.check_profile_lenght(self, file_values[0])
-        #             if check_profile == False:
-        #                 self.corrupt_file = True
-
-        #             # Name of the profile is checked to avoid duplicated name.
-        #             check_profile_duplicated = Check_Values_Configuration.check_profile_duplicated(self, file_values[0])
-        #             if check_profile_duplicated == True:
-        #                 self.corrupt_file = True
-
-        #             # Settings of the profile values are checked.
-        #             check_settings_1 = Check_Values_Configuration.check_settings(self, file_values[1])
-        #             check_settings_2 = Check_Values_Configuration.check_settings(self, file_values[2])
-
-        #             if check_settings_1[0] == False or check_settings_2[0] == False:
-        #                 self.corrupt_file = True
-
-        #             if file_values[1] == "" and file_values[2] == "":
-        #                 self.corrupt_file = True
-
-        #             check_sounds_settings_1 = Check_Values_Configuration.check_sounds_settings(self, file_values[3])
-        #             check_sounds_settings_2 = Check_Values_Configuration.check_sounds_settings(self, file_values[4])
-
-        #             if check_sounds_settings_1 == False or check_sounds_settings_2 == False:
-        #                 self.corrupt_file = True
-
-        #             if check_sounds_settings_1 != check_sounds_settings_2:
-        #                 self.corrupt_file = True
-        #             break
-
-        #         if self.corrupt_file == True:
-        #             return RelaxApp_MessageBox_Options(self.root, self.frame, "File_Corrupt")
-        #         else:
-        #             RelaxApp_MessageBox_Options(self.root, self.frame, "Valid Profile", None, file_values)
-
-        # except FileNotFoundError:
-        #     pass
-        # except UnicodeDecodeError:
-        #     RelaxApp_MessageBox_Options(self.root, self.frame, "Invalid_Format")
-        # except:
-        #     RelaxApp_MessageBox_Options(self.root, self.frame, "File_Corrupt")
+            with open(import_file, mode="r", encoding="utf-8") as file:
+                
+                profile = json.load(file)
+                
+                response_dict = comms.create_profile(profile)
+                
+                response, message = Requests_Status.check_server_connection(response_dict)
+                
+                if response != None:                   
+                    
+                    status_expected = 201
+                    valid_request, values, message = Requests_Status.check_request_status(response, status_expected, "import_profile")
+                    if valid_request:
+                        MB_message = messages.MESSAGE_RELAXAPP_MB_OPTIONS_PROFILES_IMPORTED
+                        RelaxApp_MessageBox_Options(self.root, self.frame, None, action="Return", message=MB_message)
+                        return
+                    else:
+                        if values["error_type"] == "SERIALIZERS":
+                            message = messages.ERROR_SERIALIZERS_PROFILE_IMPORT_ERROR
+                        # Pop-up window is displayed error from serializers is displayed in Spanish.
+                        RelaxApp_MessageBox_Options(self.root, self.frame, "Profile Error", action="Return", message=message)
+                        return
+                
+                message = Set_Messages.server_messages(response_dict["error_link"])
+        
+                # Pop-up window error from the server connection is displayed in Spanish.
+                RelaxApp_MessageBox_Options(self.root, self.frame, "Server Problem", action="Return", message=message)
+     
+        except json.JSONDecodeError:
+            MB_message = messages.MESSAGE_RELAXAPP_MB_OPTIONS_PROFILES_INVALID
+            RelaxApp_MessageBox_Options(self.root, self.frame, "Profile Error", action="Return", message=MB_message)
+        
+        except UnicodeDecodeError:
+            MB_message = messages.MESSAGE_RELAXAPP_MB_OPTIONS_PROFILES_UNICODE_ERROR
+            RelaxApp_MessageBox_Options(self.root, self.frame, "Profile Error", action="Return", message=MB_message)
+            
+        except OSError:
+            MB_message = messages.MESSAGE_RELAXAPP_MB_OPTIONS_PROFILES_FILE_ERROR
+            RelaxApp_MessageBox_Options(self.root, self.frame, "Profile Error", action="Return", message=MB_message)
 
     # This method saves profiles set.
     def export_profile(self):
-        print("export_profile")
+        
+        response_dict = comms.get_profiles()
+        
+        response, message = Requests_Status.check_server_connection(response_dict)
 
-        # # Query method is called to check or get profiles information.
-        # database.query(f"SELECT Profile_Name, Default_Profile, Visual_Configuration, Stretch_Configuration, Final_Sounds_Configuration, \
-        #                Lapse_Sounds_Configuration FROM {databases['database1']}.{tables['settings_table']} WHERE \
-        #                login = '{user['login']}' and Default_Profile = 'True'")
+        if response != None:
+            status_expected = 200
+            valid_request, values, message = Requests_Status.check_request_status(response, status_expected, "get_profile_list")
+                        
+            if valid_request:
+                if values["profiles_list"] == []:
+                    MB_message = messages.MESSAGE_RELAXAPP_MB_OPTIONS_PROFILES_EMPTY
+                    RelaxApp_MessageBox_Options(self.root, self.frame, "Profile Error", action="Return", message=MB_message)
+                else:
+                                        
+                    for profile in values["profiles_list"]:
+                        if profile["default_profile"] == True:
+                            
+                            profile = {
+                                "profile_name": profile["profile_name"],
+                                "visual_configuration": profile["visual_configuration"],
+                                "stretch_configuration": profile["stretch_configuration"],
+                                "final_sounds_configuration": profile["final_sounds_configuration"],
+                                "lapse_sounds_configuration": profile["lapse_sounds_configuration"]
+                            }
 
-        # # Message box is called if there no profile to export.
-        # if database.value == []:
-        #     RelaxApp_MessageBox_Options(self.root, self.frame, "No Profile")
-        # else:
-        #     try:
-        #         save_file = ctk.filedialog.asksaveasfilename(title="Exportar Perfil")
+                            try:
+                                
+                                save_file = ctk.filedialog.asksaveasfilename(title="Exportar Perfil")
+                                # Bucle to go through each value saved in the profile.
+                                with open(save_file, mode="w", encoding="utf-8") as file:
+                                    json.dump(profile, file, indent=4, ensure_ascii=False)
+                              
+                            except OSError:
+                                pass
 
-        #         # Bucle to go through each value saved in the profile.
-        #         with open(save_file, mode="w", encoding="utf-8") as file:
-        #             for line in database.value[0]:
-        #                 if line == "True" or line == "False":
-        #                     pass
-        #                 elif line == "":
-        #                     file.write("\n")
-        #                 else:
-        #                     file.write(line + "\n")
-        #     except:
-        #         pass
+        else:
+            RelaxApp_MessageBox_Options(self.root, self.frame, "Profile Error", action="Return", message=message)
 
     def about_us(self):
         webbrowser.open("https://github.com/L3chuS/Relaxapp.git")
@@ -1240,7 +1153,7 @@ class RelaxApp_User_Main_Menu():
             TemporaryProfile.visual_configuration = ""
         elif value == "SO":
             TemporaryProfile.stretch_configuration = ""
-        
+
         self.update_profile_button()
                 
     # This method sets sound options of the App.
@@ -2788,7 +2701,6 @@ class RelaxApp_MessageBox_Options(RelaxApp_MessageBox_Structure):
     # This method confirm a change.
     def accept_button(self, message_type):
         valid_values = False
-        server_ok = True
         
         # This conditional accept the registration. 
         if message_type == "Sign up":

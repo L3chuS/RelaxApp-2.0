@@ -23,8 +23,14 @@ class Profiles(models.Model):
         max_length=15,
         validators=[check_timer_settings],
         blank=True)
-    final_sounds_configuration = models.CharField(max_length=300, blank=True)
-    lapse_sounds_configuration = models.CharField(max_length=300, blank=True)
+    final_sounds_configuration = models.CharField(
+        max_length=300,
+        validators=[check_sound_settings]
+        )
+    lapse_sounds_configuration = models.CharField(
+        max_length=300,
+        validators=[check_sound_settings]
+        )
     created_at = models.DateTimeField(auto_now_add=True)
     
     class Meta:
