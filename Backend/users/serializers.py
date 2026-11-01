@@ -1,13 +1,18 @@
+# External imports.
 from rest_framework import serializers
+
+# Internal imports.
 from .models import Profiles
 
 class UserLoginSerializer(serializers.Serializer):
+    """Validate the data required for user authentication."""
     
     username = serializers.CharField()
     password = serializers.CharField()
     
 
 class UserRegistrationSerializer(serializers.Serializer):
+    """Validate the data required for user registration."""
     
     first_name = serializers.CharField(max_length=100)
     last_name = serializers.CharField(max_length=100)
@@ -17,11 +22,13 @@ class UserRegistrationSerializer(serializers.Serializer):
 
 
 class UserChangePasswordSerializer(serializers.Serializer):
+    """Validate the data required to request a password reset."""
     
     email = serializers.EmailField()
 
   
 class UserChangePasswordConfirmationSerializer(serializers.Serializer):
+    """Validate the data required to request a password reset."""
     
     email = serializers.EmailField()
     code = serializers.CharField()
@@ -29,6 +36,8 @@ class UserChangePasswordConfirmationSerializer(serializers.Serializer):
     password2 = serializers.CharField()
     
     def validate(self, data):
+        """This function validates that both passwords match."""
+        
         if data["password1"] != data["password2"]:
             raise serializers.ValidationError({
                 "PASSWORD_NO_MATCH": "Passwords do not match."
@@ -37,6 +46,7 @@ class UserChangePasswordConfirmationSerializer(serializers.Serializer):
 
 
 class ProfilesSerializer(serializers.ModelSerializer):
+    """Validate the data required to set a profile."""
     
     class Meta:
         model = Profiles
@@ -51,6 +61,8 @@ class ProfilesSerializer(serializers.ModelSerializer):
         ]
     
     def validate(self, data):
+        """This function validates the the value configuration to prevent both from being empty."""
+        
         if (
             data.get("visual_configuration", "") == ""
             and data.get("stretch_configuration", "") == ""

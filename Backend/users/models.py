@@ -1,17 +1,24 @@
+# External imports.
 from django.db import models
 from django.contrib.auth.models import User
+
+# Internal imports.
 from .validators import *
 
 
 class PasswordReset(models.Model):
+    """Store password reset codes and their expiration data."""
+    
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     code = models.CharField(max_length=100)
     used = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
     expires_at = models.DateTimeField()
 
+
 class Profiles(models.Model):
-        
+    """Store the configuration profiles associated with each user."""
+    
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     profile_name = models.CharField(max_length=20, blank=False)
     default_profile = models.BooleanField(default=True)

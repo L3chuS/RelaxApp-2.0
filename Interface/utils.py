@@ -1,8 +1,9 @@
+# External imports.
 import os
 import sys
 
-# Function to get absolute path.
 def get_resource_path(relative_path):
+    """Function to get absolute path."""
     try:
         # When .exe is executed.
         base_path = sys._MEIPASS

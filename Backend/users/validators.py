@@ -1,13 +1,19 @@
+# External imports.
 from django.core.exceptions import ValidationError
 import os
+
+"""Use to have all specific validations of the backend. Use by serializers to validate values."""
 
 # Set all valid audio extension.
 audio_accepted_files = (("Audio Files", "*.mp3"),("Audio Files", "*.ogg"), ("Audio Files", "*.wav"),
                         ("Audio Files", "*.m4a"), ("Audio Files", "*.wma"), ("Audio Files", "*.flac"))
 
 
-# This method checks if all values set by the user are correct.
 def check_timer_settings(value):
+    """Validate values provided by the user.
+
+    Raises a ValidationError if the configuration is invalid.
+    """
 
     try:
         lenght_HH = value[:2]
@@ -76,8 +82,11 @@ def check_timer_settings(value):
             )
     return
 
-# This method checks if all sound values set by the user are correct.
-def check_sound_settings(value):
+def check_sound_settings(value):  
+    """Validate the sound file paths and their supported formats.
+
+    Raises a ValidationError if the configuration is invalid.
+    """
     
     if value == "":
         raise ValidationError(
@@ -85,6 +94,8 @@ def check_sound_settings(value):
             code="SOUND_EMPTY_PATH"
             )
 
+    print("Esto es el path de value: ", value)
+    
     sound_path = os.path.isfile(value)
     extension_sound_path = os.path.splitext(value)   
     
@@ -95,6 +106,7 @@ def check_sound_settings(value):
             )
 
     extension = False
+    
     for values in audio_accepted_files:
         if extension_sound_path[1] in values[1]:
             extension = True

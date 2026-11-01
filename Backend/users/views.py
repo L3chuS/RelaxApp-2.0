@@ -1,3 +1,4 @@
+# External imports.
 from rest_framework.decorators import api_view, authentication_classes, permission_classes
 from rest_framework.response import Response
 from rest_framework.authtoken.models import Token
@@ -13,16 +14,21 @@ import secrets
 import resend
 import base64
 from django.conf import settings
+
+# Internal imports.
 from .models import *
 from .serializers import *
 from .validators import *
 from .handle_errors import *
 
+"""Handle API requests and return the corresponding HTTP responses."""
 
 @api_view(["POST"])
 def user_login(request):
+    """Authenticate a user and return an authentication token."""
     
     try:
+
         login_serializer = UserLoginSerializer(data=request.data)
         
         login_serializer.is_valid(raise_exception=True)
@@ -73,6 +79,7 @@ def user_login(request):
 
 @api_view(["POST"])
 def user_registration(request):
+    """Creates a user."""
     
     try: 
         register_serializer = UserRegistrationSerializer(data=request.data)
@@ -135,6 +142,11 @@ def user_registration(request):
 
 @api_view(["POST"])     
 def user_pw_reset(request):
+    """Initiate the password reset process.
+
+    Send a reset code to the provided email address, regardless of whether
+    the email address is associated with an existing account.
+    """
     
     try:
         change_pw_serializer = UserChangePasswordSerializer(data=request.data)
@@ -146,6 +158,7 @@ def user_pw_reset(request):
 
         # import time
         # time.sleep(15)
+        
     except serializers.ValidationError as error:
         
         code = format_serializers_code_errors(error.get_codes())
@@ -217,6 +230,8 @@ def user_pw_reset(request):
 @api_view(["PUT"])     
 def user_pw_reset_confirmation(request):
     
+    """Finalize the password reset process."""
+    
     try:
         change_pw_confirm_serializer =  UserChangePasswordConfirmationSerializer(data=request.data)
     
@@ -230,6 +245,7 @@ def user_pw_reset_confirmation(request):
         
         # import time
         # time.sleep(15)
+        
     except serializers.ValidationError as error:
         
         code = format_serializers_code_errors(error.get_codes())
@@ -278,58 +294,17 @@ def user_pw_reset_confirmation(request):
         status=200
     )
     
-    
-@api_view(["POST"])
-@authentication_classes([TokenAuthentication])
-@permission_classes([IsAuthenticated])
-def data_validate(request):
-    
-    try: 
-        check_timer_settings(request.data["data"])
-
-    except ValidationError as error:
-        return Response({
-            "error" : error.message,
-            "error_type" : "VALIDATORS",
-            "error_link" : error.code
-        }, status=400)
-    
-    return Response(
-        {"message" : "* MESSAGE: Data is valid.",
-        "message_link" : None,
-        "request_type" : "data_validate"},
-        status=200
-    )
-    
-@api_view(["POST"])
-@authentication_classes([TokenAuthentication])
-@permission_classes([IsAuthenticated])
-def sound_validate(request):
-    try: 
-        check_sound_settings(request.data["sound"])
-    
-    except ValidationError as error:
-        return Response({
-            "error" : error.message,
-            "error_type" : "VALIDATORS",
-            "error_link" : error.code
-        }, status=400)
-    
-    return Response(
-        {"message" : "* MESSAGE: Sound is valid.",
-        "message_link" : None,
-        "request_type" : "sound_validate"},
-        status=200
-    )
-
 
 @api_view(["DELETE"])
 @authentication_classes([TokenAuthentication])
 @permission_classes([IsAuthenticated])
 def remove_account(request):
+    """Delete the authenticated user's account."""
     
     try:
         request.user.delete()
+        # import time
+        # time.sleep(15)
         
     except Exception as error:
         return Response({
@@ -351,6 +326,8 @@ def remove_account(request):
 @authentication_classes([TokenAuthentication])
 @permission_classes([IsAuthenticated])
 def profiles(request):
+    """Retrieve the profiles associated with the authenticated user or 
+    creates a new profile depending on the chosen method."""
     
     try:
 
@@ -362,6 +339,9 @@ def profiles(request):
                 profiles_list,
                 many=True
             )
+            
+            # import time
+            # time.sleep(15)
 
             return Response(
                 {"message" : f"* MESSAGE: List of profiles for user '{request.user}' are displayed.",
@@ -374,6 +354,9 @@ def profiles(request):
         elif request.method == "POST":
             
             profile_serializer = ProfilesSerializer(data=request.data)
+            
+            # import time
+            # time.sleep(15)
             
             if profile_serializer.is_valid(raise_exception=True):
 
@@ -440,6 +423,7 @@ def profiles(request):
 @authentication_classes([TokenAuthentication])
 @permission_classes([IsAuthenticated])
 def profile_details(request, pk):
+    """Update or delete a profile depending on the HTTP request method."""
     
     try:
         if request.method == "PUT":
@@ -451,6 +435,9 @@ def profile_details(request, pk):
                     user=request.user,
                     pk=pk
                 )
+                
+                # import time
+                # time.sleep(15)
                 
                 profile.default_profile = True
                 profile.save()
@@ -471,6 +458,9 @@ def profile_details(request, pk):
                     pk=pk
                 ).delete()
                 
+                # import time
+                # time.sleep(15)
+                
                 update_default_profiles("DELETE", request.user)
       
             return Response(
@@ -487,14 +477,22 @@ def profile_details(request, pk):
             "error_link" : "ERROR_PROFILES_GENERAL"},
             status=500
         )   
-    
+
+
+
 def update_default_profiles(request_type, user):
+    """Ensure that only one profile is marked as the default profile."""
     
+    # import time
+    # time.sleep(15)
+    
+    # Set all existing profiles as False before creating or updating them. 
     if request_type == "CREATE" or request_type == "UPDATE":
         
         profile_list = Profiles.objects.filter(user=user)
         profile_list.update(default_profile=False)       
-         
+    
+    # Ensure that only one profile is marked as the default profile before deleting it.  
     elif request_type == "DELETE":
         
         default_profile_exists = Profiles.objects.filter(
@@ -509,3 +507,57 @@ def update_default_profiles(request_type, user):
         if not default_profile_exists and profile_to_default:
             profile_to_default.default_profile = True
             profile_to_default.save()
+            
+
+@api_view(["POST"])
+@authentication_classes([TokenAuthentication])
+@permission_classes([IsAuthenticated])
+def data_validate(request):  
+    """Validate values provided by the user."""
+    
+    try: 
+        check_timer_settings(request.data["data"])
+        
+        # import time
+        # time.sleep(15)
+
+    except ValidationError as error:
+        return Response({
+            "error" : error.message,
+            "error_type" : "VALIDATORS",
+            "error_link" : error.code
+        }, status=400)
+    
+    return Response(
+        {"message" : "* MESSAGE: Data is valid.",
+        "message_link" : None,
+        "request_type" : "data_validate"},
+        status=200
+    )
+    
+    
+@api_view(["POST"])
+@authentication_classes([TokenAuthentication])
+@permission_classes([IsAuthenticated])
+def sound_validate(request):
+    """Validate the sound file paths and their supported formats."""
+    
+    try: 
+        check_sound_settings(request.data["sound"])
+        
+        # import time
+        # time.sleep(15)
+    
+    except ValidationError as error:
+        return Response({
+            "error" : error.message,
+            "error_type" : "VALIDATORS",
+            "error_link" : error.code
+        }, status=400)
+    
+    return Response(
+        {"message" : "* MESSAGE: Sound is valid.",
+        "message_link" : None,
+        "request_type" : "sound_validate"},
+        status=200
+    )

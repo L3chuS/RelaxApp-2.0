@@ -1,5 +1,11 @@
+# External imports.
 from django.urls import path
+
+# Internal imports.
 from . import views
+
+"""URL configuration for set RelaxApp. 
+The urlpatterns list all endpoints of the app."""
 
 urlpatterns = [
     path("login/", views.user_login, name="user_login"),

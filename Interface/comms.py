@@ -1,11 +1,18 @@
+# External imports.
 import requests
+
+# Internal imports.
 from settings import API_URL
 from user_temporary_settings import Session
 
+"""Handle HTTP communication between the interface and the backend API."""
+
 def make_request(method, url, **kwargs):
+    """Send an HTTP request and handle connection errors and timeouts."""
     
     try:
         
+        # It checks if the request is authenticated or not to create the headers.
         headers = kwargs.pop("headers", {})
 
         if Session.token:
