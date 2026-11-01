@@ -94,7 +94,7 @@ def check_sound_settings(value):
             code="SOUND_EMPTY_PATH"
             )
 
-    print("Esto es el path de value: ", value)
+    print("Esto es el path de value: ", value, "text")
     
     sound_path = os.path.isfile(value)
     extension_sound_path = os.path.splitext(value)   
