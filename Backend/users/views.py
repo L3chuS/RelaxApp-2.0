@@ -479,7 +479,6 @@ def profile_details(request, pk):
         )   
 
 
-
 def update_default_profiles(request_type, user):
     """Ensure that only one profile is marked as the default profile."""
     

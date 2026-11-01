@@ -57,6 +57,9 @@ ERROR_VALIDATORS_NO_BREAK = "El tiempo de descanso debe tener al menos 30 segund
 ERROR_VALIDATORS_NO_LAPSE = "El tiempo de intervalo entre alertas debe tener al menos 1 minuto."
 ERROR_VALIDATORS_INVALID_SOUND = "La configuración de los sonidos no es válida."
 
+# ERRORS FROM Validate_CMD
+ERROR_VALIDATE_CMD_INVALID_SOUND_PATH = "No ha sido posible encontrar el/los sonidos en la ruta proporcionada."
+
 # MESSAGES FROM RelaxApp_MessageBox_Options
 MESSAGE_RELAXAPP_MB_OPTIONS_CONFIRM_ACCEPT_REGISTRATION = "¿Estás seguro de que deseas dar de alta al usuario indicado?"
 MESSAGE_RELAXAPP_MB_OPTIONS_CONFIRM_CANCEL_REGISTRATION = "¿Estás seguro de que deseas cancelar el alta del usuario indicado?"

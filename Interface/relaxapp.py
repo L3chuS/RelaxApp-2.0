@@ -410,7 +410,7 @@ class Set_Messages():
             return messages.ERROR_VALIDATORS_NO_BREAK
         elif key == "INVALID_SOUND":
             return messages.ERROR_VALIDATORS_INVALID_SOUND
-        
+       
 
 class Validate_CMD:
     """Used to validate the user's personal settings entries in the main menu."""
@@ -449,6 +449,12 @@ class Validate_CMD:
         else:
             return False
 
+    def validate_sound_path(value):
+        sound_path = os.path.isfile(value)
+        
+        if sound_path == False:
+            return False
+        return True
 
 class RelaxApp_Initial_Frame():
     """This class defines all buttons and options availables into the first frame."""
@@ -1486,7 +1492,7 @@ class RelaxApp_Profile_Name(RelaxApp_Profile_Name_Structure):
         """This method check the name given and create or not the new profile."""
         
         profile_name = self.profile_name_entry.get()
-              
+            
         data = {
             "profile_name" : profile_name,
             "visual_configuration" : TemporaryProfile.visual_configuration,
@@ -1494,6 +1500,22 @@ class RelaxApp_Profile_Name(RelaxApp_Profile_Name_Structure):
             "final_sounds_configuration" : TemporaryProfile.final_sounds_configuration,
             "lapse_sounds_configuration" : TemporaryProfile.lapse_sounds_configuration
         }
+        
+        # Sounds files are check if their exist in the system.
+        valid_final_sounds_conf = Validate_CMD.validate_sound_path(data["final_sounds_configuration"])
+        valid_lapse_sounds_conf = Validate_CMD.validate_sound_path(data["lapse_sounds_configuration"])
+        
+        print("Esto es valid_final_sounds:", data["final_sounds_configuration"])
+        print("Esto es valid_lapse_sounds:", data["lapse_sounds_configuration"])
+        
+        print("Esto es valid_final_sounds_conf:", valid_final_sounds_conf)
+        print("Esto es valid_lapse_sounds_conf:", valid_lapse_sounds_conf)
+        
+        if not valid_final_sounds_conf or not valid_lapse_sounds_conf:
+            print("The sound path given is invalid.")
+            message = messages.ERROR_VALIDATE_CMD_INVALID_SOUND_PATH
+            RelaxApp_MessageBox_Options(self.root, self.frame, "Profile Error", action="Return", message=message)
+            return
         
         response_dict = comms.create_profile(data)
         
