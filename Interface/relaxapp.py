@@ -175,14 +175,6 @@ class RelaxApp_User_Settings_Structure:
         self.title = self.window_User_SS.title("RelaxApp")
         self.window_User_SS.after(200, lambda: self.window_User_SS.iconbitmap(os.path.join(image_path, "logo.ico")))
 
-    # def close_create_profiles(self, new_window, root, clean_frame, *args):
-    #     """Create a new root window after the main root is destroyed."""
-        
-    #     self.root = root
-    #     for wid in clean_frame.winfo_children():
-    #         wid.destroy()
-    #     app = new_window(self.root, clean_frame)
-
 
 class RelaxApp_Running_Structure:
     """Define the general structure of the running window, including its appearance, dimensions, and title."""
@@ -455,6 +447,7 @@ class Validate_CMD:
         if sound_path == False:
             return False
         return True
+
 
 class RelaxApp_Initial_Frame():
     """This class defines all buttons and options availables into the first frame."""
@@ -825,15 +818,10 @@ class RelaxApp_User_Confirm_Change_Password():
 class RelaxApp_User_Main_Menu():
     """This class contains the user's main menu. It allows to start the app, set, save and load settings and knows about RelaxApp."""
 
-    # REVISAR LO DE visual_set=False,ETC DEL INIT
-    # def __init__(self, root, frame, visual_set=False, stretch_set=False):
     def __init__(self, root, frame):
 
         self.root = root
         self.frame = frame
-        
-        # self.visual_set = visual_set
-        # self.stretch_set = stretch_set
         
         # Frame at the back.
         self.frame.configure(fg_color=colors["black"])
@@ -1746,10 +1734,8 @@ class RelaxApp_User_Main_Menu_Settings(RelaxApp_User_Settings_Structure):
             elif self.stretch_options_values == True:
                 TemporaryProfile.stretch_configuration = self.values
             
-            #RelaxApp_User_Main_Menu.update_profile_button(self.frame_main)
             self.MM_instance.update_profile_button() 
             self.window_User_SS.destroy()
-            #RelaxApp_Structure.close_create2(self, RelaxApp_User_Main_Menu, self.root, self.frame, None, None, True)
 
     def cancel_settings(self):
         """This method cancel the configuration and close the windows in the front."""

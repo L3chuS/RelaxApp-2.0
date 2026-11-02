@@ -36,8 +36,6 @@ def user_login(request):
         password = login_serializer.validated_data["password"]
         
         user = User.objects.filter(username=username).first()
-        # import time
-        # time.sleep(15)
     
     except serializers.ValidationError as error:
         
@@ -93,9 +91,6 @@ def user_registration(request):
 
         username_exist = User.objects.filter(username=username).exists()
         email_exist = User.objects.filter(email=email).exists()
-        
-        # import time
-        # time.sleep(15)
         
     except serializers.ValidationError as error:
         
@@ -156,9 +151,6 @@ def user_pw_reset(request):
 
         user = User.objects.filter(email=email).first()
 
-        # import time
-        # time.sleep(15)
-        
     except serializers.ValidationError as error:
         
         code = format_serializers_code_errors(error.get_codes())
@@ -243,9 +235,6 @@ def user_pw_reset_confirmation(request):
         user = User.objects.filter(email=email).first()
         user_token = PasswordReset.objects.filter(user=user, code=code).first()
         
-        # import time
-        # time.sleep(15)
-        
     except serializers.ValidationError as error:
         
         code = format_serializers_code_errors(error.get_codes())
@@ -303,8 +292,6 @@ def remove_account(request):
     
     try:
         request.user.delete()
-        # import time
-        # time.sleep(15)
         
     except Exception as error:
         return Response({
@@ -339,9 +326,6 @@ def profiles(request):
                 profiles_list,
                 many=True
             )
-            
-            # import time
-            # time.sleep(15)
 
             return Response(
                 {"message" : f"* MESSAGE: List of profiles for user '{request.user}' are displayed.",
@@ -354,9 +338,6 @@ def profiles(request):
         elif request.method == "POST":
             
             profile_serializer = ProfilesSerializer(data=request.data)
-            
-            # import time
-            # time.sleep(15)
             
             if profile_serializer.is_valid(raise_exception=True):
 
@@ -436,9 +417,6 @@ def profile_details(request, pk):
                     pk=pk
                 )
                 
-                # import time
-                # time.sleep(15)
-                
                 profile.default_profile = True
                 profile.save()
             
@@ -457,9 +435,6 @@ def profile_details(request, pk):
                     user=request.user,
                     pk=pk
                 ).delete()
-                
-                # import time
-                # time.sleep(15)
                 
                 update_default_profiles("DELETE", request.user)
       
@@ -481,9 +456,6 @@ def profile_details(request, pk):
 
 def update_default_profiles(request_type, user):
     """Ensure that only one profile is marked as the default profile."""
-    
-    # import time
-    # time.sleep(15)
     
     # Set all existing profiles as False before creating or updating them. 
     if request_type == "CREATE" or request_type == "UPDATE":
@@ -516,9 +488,6 @@ def data_validate(request):
     
     try: 
         check_timer_settings(request.data["data"])
-        
-        # import time
-        # time.sleep(15)
 
     except ValidationError as error:
         return Response({
@@ -543,9 +512,6 @@ def sound_validate(request):
     
     try: 
         check_sound_settings(request.data["sound"])
-        
-        # import time
-        # time.sleep(15)
     
     except ValidationError as error:
         return Response({

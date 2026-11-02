@@ -93,15 +93,8 @@ def check_sound_settings(value):
             "The path given is empty.", 
             code="SOUND_EMPTY_PATH"
             )
-   
-    # sound_path = os.path.isfile(value)
+
     extension_sound_path = os.path.splitext(value)   
-    
-    # if sound_path == False:
-    #     raise ValidationError(
-    #         "The path given is invalid.", 
-    #         code="SOUND_INVALID_PATH"
-    #         )
 
     extension = False
     
