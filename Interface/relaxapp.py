@@ -1080,6 +1080,7 @@ class RelaxApp_User_Main_Menu():
                     status_expected = 201
                     valid_request, values, message = Requests_Status.check_request_status(response, status_expected, "import_profile")
                     if valid_request:
+                        self.update_profile_button()
                         MB_message = messages.MESSAGE_RELAXAPP_MB_OPTIONS_PROFILES_IMPORTED
                         RelaxApp_MessageBox_Options(self.root, self.frame, None, action="Return", message=MB_message)
                         return
@@ -1514,13 +1515,7 @@ class RelaxApp_Profile_Name(RelaxApp_Profile_Name_Structure):
         # Sounds files are check if their exist in the system.
         valid_final_sounds_conf = Validate_CMD.validate_sound_path(data["final_sounds_configuration"])
         valid_lapse_sounds_conf = Validate_CMD.validate_sound_path(data["lapse_sounds_configuration"])
-        
-        # print("Esto es valid_final_sounds:", data["final_sounds_configuration"])
-        # print("Esto es valid_lapse_sounds:", data["lapse_sounds_configuration"])
-        
-        # print("Esto es valid_final_sounds_conf:", valid_final_sounds_conf)
-        # print("Esto es valid_lapse_sounds_conf:", valid_lapse_sounds_conf)
-        
+                
         if not valid_final_sounds_conf or not valid_lapse_sounds_conf:
             print("* ERROR: The sound path given is invalid.")
             message = messages.ERROR_VALIDATE_CMD_INVALID_SOUND_PATH
