@@ -25,8 +25,8 @@ user32 = ctypes.windll.user32
 user32.SetProcessDPIAware()
 
 # Get the image and sounds folders path.
-image_path = os.path.join(get_resource_path("images"))
-sounds_path = os.path.join(get_resource_path("sounds"))
+image_path = get_resource_path("images")
+sounds_path = get_resource_path("sounds")
 
 # Set appearance.
 appearance = ctk.set_appearance_mode("dark")
