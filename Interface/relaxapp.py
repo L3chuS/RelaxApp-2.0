@@ -1114,7 +1114,7 @@ class RelaxApp_User_Main_Menu():
 
     def about_us(self):
         """This method open the webpage of RelaxApp."""
-        webbrowser.open("https://github.com/L3chuS/Relaxapp.git")
+        webbrowser.open("https://github.com/L3chuS/RelaxApp-2.0")
 
     def remove_account(self):
         """This method removes profiles set."""

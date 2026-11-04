@@ -2,7 +2,7 @@
 venv/
 .venv/
 backend_venv/
-interface_venv
+interface_venv/
 
 # Python
 __pycache__/
@@ -19,39 +19,12 @@ __pycache__/
 .DS_Store
 Thumbs.db
 
+# Packaging
+Packaging
+
+# Scripts
+Scripts
+
 # General Files
-information.txt
-test.py
-clases_originales.py
-Test/
-
-----------------------------------------------------------------------------------------------
-Old Version
-
-# Ignore Python caches.
-**/__pycache__
-**/*cache
-*.pyc
-*.pyd
-*.c
-*/build/
-
-# Ignores file named "dependecias.docx" and avoid to upload the temporal "~$dependencies.docx"
-# when file is opened.
-**/*dencies.docx
-
-# Ignore personal, testing or tutorial files.
-**/Profile_Test
-**/test
-**/Videos
+General_Files
 **/*.psd
-**/queries.py
-**/Scripts/*
-!/Scripts/script_compiler.bat
-**/build
-**/dist
-**/*.spec
-
-# Ignore sensible files.
-**/*.env
-**/AppSupport
