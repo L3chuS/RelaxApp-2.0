@@ -34,7 +34,7 @@
 
 ### Instalación:
 
-#### 1 - Dirígete al apartado de "releases", busca en las "Assets" y descarga "RelaxApp_1.0.exe".
+#### 1 - Dirígete al apartado de "releases", busca en las "Assets" y descarga "RelaxApp_Setup_2.0.0".
 #### 2 - Ejecuta el archivo descargado.
 #### 3 - Sigue los pasos indicados por el instalador hasta finalizar.
 #### 4 - Inicia la aplicación.
